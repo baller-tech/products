@@ -3,7 +3,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
-<meta name="generator" content="Doxygen 1.8.15"/>
+<meta name="generator" content="Doxygen 1.8.16"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
 <title>baller sdk: com.baller.vw.BallerVWProcess接口 参考</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
@@ -37,7 +37,7 @@
 </table>
 </div>
 <!-- end header part -->
-<!-- 制作者 Doxygen 1.8.15 -->
+<!-- 制作者 Doxygen 1.8.16 -->
 <script type="text/javascript">
 /* @license magnet:?xt=urn:btih:cf05388f2679ee054f2beb29a391d25f4e673ac3&amp;dn=gpl-2.0.txt GPL-v2 */
 var searchBox = new SearchBox("searchBox", "search",false,'搜索');
@@ -96,7 +96,7 @@ $(document).ready(function(){initNavTree('interfacecom_1_1baller_1_1vw_1_1_balle
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public 成员函数</h2></td></tr>
 <tr class="memitem:abd1b6d583c581f860dbbf422a813be0f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="interfacecom_1_1baller_1_1vw_1_1_baller_v_w_process.html#abd1b6d583c581f860dbbf422a813be0f">onWake</a> (int wordIndex)</td></tr>
-<tr class="memdesc:abd1b6d583c581f860dbbf422a813be0f"><td class="mdescLeft">&#160;</td><td class="mdescRight">语音唤醒通知回调接口  <a href="#abd1b6d583c581f860dbbf422a813be0f">更多...</a><br /></td></tr>
+<tr class="memdesc:abd1b6d583c581f860dbbf422a813be0f"><td class="mdescLeft">&#160;</td><td class="mdescRight">语音唤醒通知回调接口  <a href="interfacecom_1_1baller_1_1vw_1_1_baller_v_w_process.html#abd1b6d583c581f860dbbf422a813be0f">更多...</a><br /></td></tr>
 <tr class="separator:abd1b6d583c581f860dbbf422a813be0f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">详细描述</h2>
@@ -127,7 +127,23 @@ Public 成员函数</h2></td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section note"><dt>注解</dt><dd><div class="fragment"><div class="line"><span class="comment">// 调用sessionBegin接口，创建session</span></div><div class="line">BallerVW wakeInstance = <span class="keyword">new</span> BallerVW();</div><div class="line">String sessionParam = <span class="stringliteral">&quot;res_dir=data,wakeup_word=DA NIU KE JI,engine_type=local,hardware=cpu_slow,vad=on,sample_rate=16,sample_size=16&quot;</span>;</div><div class="line">iRet = wakeInstance.sessionBegin(sessionParam, <span class="keyword">new</span> BallerVWProcess() {</div><div class="line">        <span class="keyword">public</span> <span class="keywordtype">void</span> <a class="code" href="interfacecom_1_1baller_1_1vw_1_1_baller_v_w_process.html#abd1b6d583c581f860dbbf422a813be0f">onWake</a>(<span class="keywordtype">int</span> wordIndex) {</div><div class="line">            System.out.printf(<span class="stringliteral">&quot;wake up by %d\n&quot;</span>, wordIndex);</div><div class="line">        }</div><div class="line">    });</div><div class="line"></div><div class="line"><span class="keywordflow">if</span> (BallerErrorCode.BALLER_SUCCESS != iRet)</div><div class="line">{</div><div class="line">        System.out.printf(<span class="stringliteral">&quot;call sessionBegin falied %d\n&quot;</span>, iRet);</div><div class="line">}</div><div class="line"></div><div class="line"><span class="comment">// 调用sessionEnd接口，结束一个session</span></div><div class="line">....</div></div><!-- fragment --> </dd></dl>
+<dl class="section note"><dt>注解</dt><dd><div class="fragment"><div class="line"><span class="comment">// 调用sessionBegin接口，创建session</span></div>
+<div class="line">BallerVW wakeInstance = <span class="keyword">new</span> BallerVW();</div>
+<div class="line">String sessionParam = <span class="stringliteral">&quot;res_dir=data,wakeup_word=DA NIU KE JI,engine_type=local,hardware=cpu_slow,vad=on,sample_rate=16,sample_size=16&quot;</span>;</div>
+<div class="line">iRet = wakeInstance.sessionBegin(sessionParam, <span class="keyword">new</span> BallerVWProcess() {</div>
+<div class="line">        <span class="keyword">public</span> <span class="keywordtype">void</span> <a class="code" href="interfacecom_1_1baller_1_1vw_1_1_baller_v_w_process.html#abd1b6d583c581f860dbbf422a813be0f">onWake</a>(<span class="keywordtype">int</span> wordIndex) {</div>
+<div class="line">            System.out.printf(<span class="stringliteral">&quot;wake up by %d\n&quot;</span>, wordIndex);</div>
+<div class="line">        }</div>
+<div class="line">    });</div>
+<div class="line"> </div>
+<div class="line"><span class="keywordflow">if</span> (BallerErrorCode.BALLER_SUCCESS != iRet)</div>
+<div class="line">{</div>
+<div class="line">        System.out.printf(<span class="stringliteral">&quot;call sessionBegin falied %d\n&quot;</span>, iRet);</div>
+<div class="line">}</div>
+<div class="line"> </div>
+<div class="line"><span class="comment">// 调用sessionEnd接口，结束一个session</span></div>
+<div class="line">....</div>
+</div><!-- fragment --> </dd></dl>
 
 </div>
 </div>
@@ -136,13 +152,14 @@ Public 成员函数</h2></td></tr>
 </ul>
 </div><!-- contents -->
 </div><!-- doc-content -->
+<div class="ttc" id="ainterfacecom_1_1baller_1_1vw_1_1_baller_v_w_process_html_abd1b6d583c581f860dbbf422a813be0f"><div class="ttname"><a href="interfacecom_1_1baller_1_1vw_1_1_baller_v_w_process.html#abd1b6d583c581f860dbbf422a813be0f">com.baller.vw.BallerVWProcess.onWake</a></div><div class="ttdeci">void onWake(int wordIndex)</div><div class="ttdoc">语音唤醒通知回调接口</div></div>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="namespacecom.html">com</a></li><li class="navelem"><a class="el" href="namespacecom_1_1baller.html">baller</a></li><li class="navelem"><a class="el" href="namespacecom_1_1baller_1_1vw.html">vw</a></li><li class="navelem"><a class="el" href="interfacecom_1_1baller_1_1vw_1_1_baller_v_w_process.html">BallerVWProcess</a></li>
     <li class="footer">制作者
     <a href="http://www.doxygen.org/index.html">
-    <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.15 </li>
+    <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.16 </li>
   </ul>
 </div>
 </body>

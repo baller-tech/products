@@ -123,8 +123,7 @@ $(document).ready(function(){initNavTree('baller__ocr_8h.html','');});
 <dl class="section copyright"><dt>版权所有</dt><dd>2019 by baller technology, Co,LTD. All rights reserved.</dd></dl>
 <p>调用 baller ocr sdk 的接口前需先调用 <a class="el" href="baller__common_8h.html#a17ee54dc764fd16d8bc607f3e3879842">BallerLogin</a> 进行登录和调用者身份的验证。<br  />
 <a class="el" href="baller__common_8h.html#a17ee54dc764fd16d8bc607f3e3879842">BallerLogin</a> 接口调用成功后需调用 <a class="el" href="baller__ocr_8h.html#ad282c2a9ef5e2a566e36f89e8a326611">BallerOCRSessionBegin</a> 接口创建一个图像识别功能的session，图像识别操作都是基于session的，当不再需要图像识别功能后，需调用 <a class="el" href="baller__ocr_8h.html#aad11d05dbf42fdc3c071e2ea28743d40">BallerOCRSessionEnd</a> 接口回收该 session。<br  />
-<a class="el" href="baller__ocr_8h.html#ad282c2a9ef5e2a566e36f89e8a326611">BallerOCRSessionBegin</a> 和 <a class="el" href="baller__ocr_8h.html#aad11d05dbf42fdc3c071e2ea28743d40">BallerOCRSessionEnd</a> 需成对出现，如果缺少 <a class="el" href="baller__ocr_8h.html#aad11d05dbf42fdc3c071e2ea28743d40">BallerOCRSessionEnd</a> 的调用，会导致SDK的端并发数不会减少。<br  />
-如果授权信息中有SDK端并发数限制，建议应用程序添加异常处理逻辑，当应用程序的进程出现异常需要结束时，对已创建的session调用<a class="el" href="baller__ocr_8h.html#aad11d05dbf42fdc3c071e2ea28743d40">BallerOCRSessionEnd</a>接口后再结束。否则已使用的并发数永远不会减少，直到机器重启。 </p>
+</p>
 
 <p class="definition">在文件 <a class="el" href="baller__ocr_8h_source.html">baller_ocr.h</a> 中定义.</p>
 </div><h2 class="groupheader">函数说明</h2>
@@ -433,7 +432,7 @@ $(document).ready(function(){initNavTree('baller__ocr_8h.html','');});
 </div>
 </div><!-- contents -->
 </div><!-- doc-content -->
-<div class="ttc" id="aballer__errors_8h_html_a62d5d2703fc6d8aa0585ee473d2ba69da0f883667bfcce8e129c64053a14598a7"><div class="ttname"><a href="baller__errors_8h.html#a62d5d2703fc6d8aa0585ee473d2ba69da0f883667bfcce8e129c64053a14598a7">BALLER_MORE_RESULT</a></div><div class="ttdef"><b>Definition:</b> <a href="baller__errors_8h_source.html#l00081">baller_errors.h:81</a></div></div>
+<div class="ttc" id="aballer__errors_8h_html_a62d5d2703fc6d8aa0585ee473d2ba69da0f883667bfcce8e129c64053a14598a7"><div class="ttname"><a href="baller__errors_8h.html#a62d5d2703fc6d8aa0585ee473d2ba69da0f883667bfcce8e129c64053a14598a7">BALLER_MORE_RESULT</a></div><div class="ttdef"><b>Definition:</b> <a href="baller__errors_8h_source.html#l00082">baller_errors.h:82</a></div></div>
 <div class="ttc" id="aballer__ocr_8h_html_a930b6cce70d9086ae8564d24217479ea"><div class="ttname"><a href="baller__ocr_8h.html#a930b6cce70d9086ae8564d24217479ea">BallerOCRPut</a></div><div class="ttdeci">BALLER_API int BallerOCRPut(const baller_session_id session_id, const char *params, const void *in_data, const int in_len)</div><div class="ttdoc">向 session 中传入图像数据</div></div>
 <div class="ttc" id="aballer__ocr_8h_html_aad11d05dbf42fdc3c071e2ea28743d40"><div class="ttname"><a href="baller__ocr_8h.html#aad11d05dbf42fdc3c071e2ea28743d40">BallerOCRSessionEnd</a></div><div class="ttdeci">BALLER_API int BallerOCRSessionEnd(const baller_session_id session_id)</div><div class="ttdoc">结束一个图像识别 session</div></div>
 <div class="ttc" id="aballer__ocr_8h_html_a33079e6291af84fd56bdc8fc6453f679"><div class="ttname"><a href="baller__ocr_8h.html#a33079e6291af84fd56bdc8fc6453f679">BallerOCRVersion</a></div><div class="ttdeci">BALLER_API void BallerOCRVersion(char *version, int len)</div><div class="ttdoc">版本获取接口</div></div>

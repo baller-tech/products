@@ -167,9 +167,20 @@ $(document).ready(function(){initNavTree('baller__common_8h.html','');});
 </dl>
 <dl class="section return"><dt>返回</dt><dd>0表示成功；其他表示失败，详情见<a class="el" href="baller__errors_8h.html#a62d5d2703fc6d8aa0585ee473d2ba69d">错误码</a> 。</dd></dl>
 <dl class="section warning"><dt>警告</dt><dd><b>授权中SDK端并发数限制的说明:</b><br  />
-SDK端并发数限制是指可以调用BallerXXXSessionBegin创建session的数量，是对一台机器中所有进程可创建session数量总和的限制。<br  />
-SDK端并发数是一台机器中的全局限制，与<a class="el" href="baller__common_8h.html#a17ee54dc764fd16d8bc607f3e3879842">BallerLogin</a>和与<a class="el" href="baller__common_8h.html#af7b36edf18d104921978f9377786796e">BallerLogout</a>的调用无关；必须显式的调用BallerXXXSessionEnd接口，才会将已使用的并发数减一；当应用程序的进程退出（正常或异常退出）时，必须对已创建的session调用BallerXXXSessionEnd接口，否则已使用的并发数不会减少。<br  />
-如果授权信息中有SDK端并发数限制，建议应用程序添加异常处理逻辑，当应用程序的进程出现异常需要结束时，对已创建的session调用BallerXXXSessionEnd接口后再结束。否则已使用的并发数永远不会减少，直到机器重启。</dd></dl>
+SDK端并发数限制是指可以调用BallerXXXSessionBegin创建session的数量，以能力类型为最小粒度，以一台主机为范围进行限制。授权信息中如果有对某能力进行SDK端并发数限制，该能力在同一主机内仅能在一个进程中使用。<br  />
+例如当授权信息中包含了TTS和ASR两种能力，ASR能力的SDK端并发数限制为1，TTS能力的SDK端并发数无限制时，ASR能力只能在主机内的一个进程中使用，且同时只能有一个session存在，TTS能力可以在主机内多个进程中使用且不会限制session的数量。<br  />
+在Windwos平台，当授权信息中包含SDK端并发数限制时，可执行程序运行时需选择以管理员身份运行。<br  />
+<br  />
+<b>授权中SDK端调用间隔限制的说明:</b><br  />
+SDK端调用间隔限制是指两次完整的BallerXXXPut接口调用的间隔限制，以能力类型为最小粒度，以一台主机为范围进行限制。授权信息中如果有对某能力进行SDK端调用间隔限制，该能力在同一主机内仅能在一个进程中使用。<br  />
+例如当授权信息中包含了TTS和ASR两种能力，ASR能力的SDK端调用间隔限制为1秒，TTS能力不限制SDK端调用间隔时，ASR能力只能在主机内的一个进程中使用，且两次完整的BallerXXXPut接口调用需要间隔1秒，TTS能力可以在主机内多个进程中使用且两次完整的BallerXXXPut之间不需要间隔。<br  />
+在Windwos平台，当授权信息中包含SDK端调用间隔限制时，可执行程序运行时需选择以管理员身份运行。<br  />
+当出现以下两种情况之一时才算一次完整的BallerXXXPut调用：<ul>
+<li>调用BallerXXXPut接口，当input_mode为once时算一次完整的调用。</li>
+<li>调用BallerXXXPut接口，当input_mode为continue或end时，仅当input_mode变为end时，才算一次完整的调用。同一个session中，当连续多次的input_mode都为continue时，不算一次完整的调用，也不会受SDK端并发数的限制。 <br  />
+ </li>
+</ul>
+</dd></dl>
 <dl class="section note"><dt>注解</dt><dd><div class="fragment"><div class="line"><span class="keyword">const</span> <span class="keywordtype">char</span>* login_params = <span class="stringliteral">&quot;org_id=1157870520697357744,app_id=1157889509295128642,app_key=f497dae1bb3a5c2490b2f97dcbcc579c,license=./baller_sdk.license,log_level=debug,log_path=./baller_log/&quot;</span>;</div>
 <div class="line"><span class="keywordtype">int</span> ret = <a class="code" href="baller__common_8h.html#a17ee54dc764fd16d8bc607f3e3879842">BallerLogin</a>(login_params);</div>
 <div class="line"><span class="keywordflow">if</span> (<a class="code" href="baller__errors_8h.html#a62d5d2703fc6d8aa0585ee473d2ba69da5ef8ab1c6b896d786b054380668849f0">BALLER_SUCCESS</a> ！= ret)</div>

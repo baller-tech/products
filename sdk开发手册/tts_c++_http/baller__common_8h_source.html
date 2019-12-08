@@ -3,7 +3,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
-<meta name="generator" content="Doxygen 1.8.15"/>
+<meta name="generator" content="Doxygen 1.8.16"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
 <title>baller sdk: baller_common.h 源文件</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
@@ -37,7 +37,7 @@
 </table>
 </div>
 <!-- end header part -->
-<!-- 制作者 Doxygen 1.8.15 -->
+<!-- 制作者 Doxygen 1.8.16 -->
 <script type="text/javascript">
 /* @license magnet:?xt=urn:btih:cf05388f2679ee054f2beb29a391d25f4e673ac3&amp;dn=gpl-2.0.txt GPL-v2 */
 var searchBox = new SearchBox("searchBox", "search",false,'搜索');
@@ -89,19 +89,37 @@ $(document).ready(function(){initNavTree('baller__common_8h_source.html','');});
 <div class="title">baller_common.h</div>  </div>
 </div><!--header-->
 <div class="contents">
-<a href="baller__common_8h.html">浏览该文件的文档.</a><div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;<span class="preprocessor">#ifndef _baller_common_h_</span></div><div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;<span class="preprocessor">#define _baller_common_h_</span></div><div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;</div><div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="baller__types_8h.html">baller_types.h</a>&quot;</span></div><div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;</div><div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;<span class="preprocessor">#ifdef __cplusplus</span></div><div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;<span class="keyword">extern</span> <span class="stringliteral">&quot;C&quot;</span> {</div><div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;<span class="preprocessor">#endif</span></div><div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;</div><div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;<a class="code" href="baller__types_8h.html#a1b84e4bb66ea2d906fbc8827257f01f6">BALLER_API</a> <span class="keywordtype">int</span> <a class="code" href="baller__common_8h.html#a17ee54dc764fd16d8bc607f3e3879842">BallerLogin</a>(<span class="keyword">const</span> <span class="keywordtype">char</span>* login_params);</div><div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;</div><div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;<a class="code" href="baller__types_8h.html#a1b84e4bb66ea2d906fbc8827257f01f6">BALLER_API</a> <span class="keywordtype">int</span> <a class="code" href="baller__common_8h.html#af7b36edf18d104921978f9377786796e">BallerLogout</a>();</div><div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;</div><div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;<span class="preprocessor">#ifdef __cplusplus</span></div><div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;}</div><div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;<span class="preprocessor">#endif</span></div><div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;</div><div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;<span class="preprocessor">#endif </span><span class="comment">/*_baller_common_h_*/</span><span class="preprocessor"></span></div><div class="ttc" id="baller__types_8h_html_a1b84e4bb66ea2d906fbc8827257f01f6"><div class="ttname"><a href="baller__types_8h.html#a1b84e4bb66ea2d906fbc8827257f01f6">BALLER_API</a></div><div class="ttdeci">#define BALLER_API</div><div class="ttdoc">接口导出声明</div><div class="ttdef"><b>Definition:</b> <a href="baller__types_8h_source.html#l00035">baller_types.h:35</a></div></div>
-<div class="ttc" id="baller__common_8h_html_af7b36edf18d104921978f9377786796e"><div class="ttname"><a href="baller__common_8h.html#af7b36edf18d104921978f9377786796e">BallerLogout</a></div><div class="ttdeci">BALLER_API int BallerLogout()</div><div class="ttdoc">baller sdk 登出接口</div></div>
-<div class="ttc" id="baller__types_8h_html"><div class="ttname"><a href="baller__types_8h.html">baller_types.h</a></div><div class="ttdoc">描述 baller sdk 中通用的结构信息</div></div>
-<div class="ttc" id="baller__common_8h_html_a17ee54dc764fd16d8bc607f3e3879842"><div class="ttname"><a href="baller__common_8h.html#a17ee54dc764fd16d8bc607f3e3879842">BallerLogin</a></div><div class="ttdeci">BALLER_API int BallerLogin(const char *login_params)</div><div class="ttdoc">baller sdk 登录接口</div></div>
+<a href="baller__common_8h.html">浏览该文件的文档.</a><div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;<span class="preprocessor">#ifndef _baller_common_h_</span></div>
+<div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;<span class="preprocessor">#define _baller_common_h_</span></div>
+<div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160; </div>
+<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="baller__types_8h.html">baller_types.h</a>&quot;</span></div>
+<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160; </div>
+<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;<span class="preprocessor">#ifdef __cplusplus</span></div>
+<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;<span class="keyword">extern</span> <span class="stringliteral">&quot;C&quot;</span> {</div>
+<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160; </div>
+<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;<a class="code" href="baller__types_8h.html#a1b84e4bb66ea2d906fbc8827257f01f6">BALLER_API</a> <span class="keywordtype">int</span> <a class="code" href="baller__common_8h.html#a17ee54dc764fd16d8bc607f3e3879842">BallerLogin</a>(<span class="keyword">const</span> <span class="keywordtype">char</span>* login_params);</div>
+<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160; </div>
+<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;<a class="code" href="baller__types_8h.html#a1b84e4bb66ea2d906fbc8827257f01f6">BALLER_API</a> <span class="keywordtype">int</span> <a class="code" href="baller__common_8h.html#af7b36edf18d104921978f9377786796e">BallerLogout</a>();</div>
+<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160; </div>
+<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;<span class="preprocessor">#ifdef __cplusplus</span></div>
+<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;}</div>
+<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160; </div>
+<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;<span class="preprocessor">#endif </span><span class="comment">/*_baller_common_h_*/</span><span class="preprocessor"></span></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
+<div class="ttc" id="aballer__types_8h_html_a1b84e4bb66ea2d906fbc8827257f01f6"><div class="ttname"><a href="baller__types_8h.html#a1b84e4bb66ea2d906fbc8827257f01f6">BALLER_API</a></div><div class="ttdeci">#define BALLER_API</div><div class="ttdoc">接口导出声明</div><div class="ttdef"><b>Definition:</b> <a href="baller__types_8h_source.html#l00035">baller_types.h:35</a></div></div>
+<div class="ttc" id="aballer__common_8h_html_a17ee54dc764fd16d8bc607f3e3879842"><div class="ttname"><a href="baller__common_8h.html#a17ee54dc764fd16d8bc607f3e3879842">BallerLogin</a></div><div class="ttdeci">BALLER_API int BallerLogin(const char *login_params)</div><div class="ttdoc">baller sdk 登录接口</div></div>
+<div class="ttc" id="aballer__types_8h_html"><div class="ttname"><a href="baller__types_8h.html">baller_types.h</a></div><div class="ttdoc">描述 baller sdk 中通用的结构信息</div></div>
+<div class="ttc" id="aballer__common_8h_html_af7b36edf18d104921978f9377786796e"><div class="ttname"><a href="baller__common_8h.html#af7b36edf18d104921978f9377786796e">BallerLogout</a></div><div class="ttdeci">BALLER_API int BallerLogout()</div><div class="ttdoc">baller sdk 登出接口</div></div>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="dir_1148ebc2b25b55095aebf6f4cbb6efca.html">Doxygen</a></li><li class="navelem"><a class="el" href="baller__common_8h.html">baller_common.h</a></li>
     <li class="footer">制作者
     <a href="http://www.doxygen.org/index.html">
-    <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.15 </li>
+    <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.16 </li>
   </ul>
 </div>
 </body>

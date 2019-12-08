@@ -3,7 +3,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
-<meta name="generator" content="Doxygen 1.8.15"/>
+<meta name="generator" content="Doxygen 1.8.16"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
 <title>baller sdk: baller_common.h 文件参考</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
@@ -37,7 +37,7 @@
 </table>
 </div>
 <!-- end header part -->
-<!-- 制作者 Doxygen 1.8.15 -->
+<!-- 制作者 Doxygen 1.8.16 -->
 <script type="text/javascript">
 /* @license magnet:?xt=urn:btih:cf05388f2679ee054f2beb29a391d25f4e673ac3&amp;dn=gpl-2.0.txt GPL-v2 */
 var searchBox = new SearchBox("searchBox", "search",false,'搜索');
@@ -101,10 +101,10 @@ $(document).ready(function(){initNavTree('baller__common_8h.html','');});
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 函数</h2></td></tr>
 <tr class="memitem:a17ee54dc764fd16d8bc607f3e3879842"><td class="memItemLeft" align="right" valign="top"><a class="el" href="baller__types_8h.html#a1b84e4bb66ea2d906fbc8827257f01f6">BALLER_API</a> int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="baller__common_8h.html#a17ee54dc764fd16d8bc607f3e3879842">BallerLogin</a> (const char *login_params)</td></tr>
-<tr class="memdesc:a17ee54dc764fd16d8bc607f3e3879842"><td class="mdescLeft">&#160;</td><td class="mdescRight">baller sdk 登录接口  <a href="#a17ee54dc764fd16d8bc607f3e3879842">更多...</a><br /></td></tr>
+<tr class="memdesc:a17ee54dc764fd16d8bc607f3e3879842"><td class="mdescLeft">&#160;</td><td class="mdescRight">baller sdk 登录接口  <a href="baller__common_8h.html#a17ee54dc764fd16d8bc607f3e3879842">更多...</a><br /></td></tr>
 <tr class="separator:a17ee54dc764fd16d8bc607f3e3879842"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af7b36edf18d104921978f9377786796e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="baller__types_8h.html#a1b84e4bb66ea2d906fbc8827257f01f6">BALLER_API</a> int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="baller__common_8h.html#af7b36edf18d104921978f9377786796e">BallerLogout</a> ()</td></tr>
-<tr class="memdesc:af7b36edf18d104921978f9377786796e"><td class="mdescLeft">&#160;</td><td class="mdescRight">baller sdk 登出接口  <a href="#af7b36edf18d104921978f9377786796e">更多...</a><br /></td></tr>
+<tr class="memdesc:af7b36edf18d104921978f9377786796e"><td class="mdescLeft">&#160;</td><td class="mdescRight">baller sdk 登出接口  <a href="baller__common_8h.html#af7b36edf18d104921978f9377786796e">更多...</a><br /></td></tr>
 <tr class="separator:af7b36edf18d104921978f9377786796e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">详细描述</h2>
@@ -112,8 +112,8 @@ $(document).ready(function(){initNavTree('baller__common_8h.html','');});
 <dl class="section version"><dt>版本</dt><dd>2.0 </dd></dl>
 <dl class="section date"><dt>日期</dt><dd>2019-07-31</dd></dl>
 <dl class="section copyright"><dt>版权所有</dt><dd>2019 by baller technology, Co,LTD. All rights reserved.</dd></dl>
-<p><a class="el" href="baller__common_8h.html#a17ee54dc764fd16d8bc607f3e3879842">BallerLogin</a> 和 <a class="el" href="baller__common_8h.html#af7b36edf18d104921978f9377786796e">BallerLogout</a> 是 baller sdk 的公共接口，与使用 baller sdk 的进程相关。不同能力的 baller sdk 使用相同的 <a class="el" href="baller__common_8h.html#a17ee54dc764fd16d8bc607f3e3879842">BallerLogin</a> 和 <a class="el" href="baller__common_8h.html#af7b36edf18d104921978f9377786796e">BallerLogout</a>。 同一个进程使用多种能力的 baller sdk 时，只需调用一次 <a class="el" href="baller__common_8h.html#a17ee54dc764fd16d8bc607f3e3879842">BallerLogin</a> 和 <a class="el" href="baller__common_8h.html#af7b36edf18d104921978f9377786796e">BallerLogout</a> 即可。 <br />
-比如某一个进程既使用了 baller asr sdk 又使用了 baller tts sdk，只需在调用 baller asr sdk 和 baller tts sdk 的接口之前调用一次 <a class="el" href="baller__common_8h.html#a17ee54dc764fd16d8bc607f3e3879842">BallerLogin</a>，在 baller asr sdk 和 baller tts sdk 所有session 都回收完成之后调用一次 <a class="el" href="baller__common_8h.html#af7b36edf18d104921978f9377786796e">BallerLogout</a>即可。 <br />
+<p><a class="el" href="baller__common_8h.html#a17ee54dc764fd16d8bc607f3e3879842">BallerLogin</a> 和 <a class="el" href="baller__common_8h.html#af7b36edf18d104921978f9377786796e">BallerLogout</a> 是 baller sdk 的公共接口，与使用 baller sdk 的进程相关。不同能力的 baller sdk 使用相同的 <a class="el" href="baller__common_8h.html#a17ee54dc764fd16d8bc607f3e3879842">BallerLogin</a> 和 <a class="el" href="baller__common_8h.html#af7b36edf18d104921978f9377786796e">BallerLogout</a>。 同一个进程使用多种能力的 baller sdk 时，只需调用一次 <a class="el" href="baller__common_8h.html#a17ee54dc764fd16d8bc607f3e3879842">BallerLogin</a> 和 <a class="el" href="baller__common_8h.html#af7b36edf18d104921978f9377786796e">BallerLogout</a> 即可。 <br  />
+比如某一个进程既使用了 baller asr sdk 又使用了 baller tts sdk，只需在调用 baller asr sdk 和 baller tts sdk 的接口之前调用一次 <a class="el" href="baller__common_8h.html#a17ee54dc764fd16d8bc607f3e3879842">BallerLogin</a>，在 baller asr sdk 和 baller tts sdk 所有session 都回收完成之后调用一次 <a class="el" href="baller__common_8h.html#af7b36edf18d104921978f9377786796e">BallerLogout</a>即可。 <br  />
 </p>
 
 <p class="definition">在文件 <a class="el" href="baller__common_8h_source.html">baller_common.h</a> 中定义.</p>
@@ -150,7 +150,7 @@ $(document).ready(function(){initNavTree('baller__common_8h.html','');});
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyRight">license  </td><td class="markdownTableBodyCenter">授权文件所在的路径和名称  </td><td class="markdownTableBodyLeft">是  </td><td class="markdownTableBodyLeft">授权文件所在的路径和名称  </td><td class="markdownTableBodyLeft">授权文件所在的路径和名称   </td></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyRight" rowspan="4">log_level  </td><td class="markdownTableBodyCenter" rowspan="4">日志级别<br />
+<td class="markdownTableBodyRight" rowspan="4">log_level  </td><td class="markdownTableBodyCenter" rowspan="4">日志级别<br  />
 不设置则不会输出日志  </td><td class="markdownTableBodyLeft" rowspan="4">否  </td><td class="markdownTableBodyLeft">debug  </td><td class="markdownTableBodyLeft">显示debug级别的日志   </td></tr>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyLeft">info  </td><td class="markdownTableBodyLeft">显示info级别的日志   </td></tr>
@@ -166,11 +166,28 @@ $(document).ready(function(){initNavTree('baller__common_8h.html','');});
   </dd>
 </dl>
 <dl class="section return"><dt>返回</dt><dd>0表示成功；其他表示失败，详情见<a class="el" href="baller__errors_8h.html#a62d5d2703fc6d8aa0585ee473d2ba69d">错误码</a> 。</dd></dl>
-<dl class="section warning"><dt>警告</dt><dd><b>授权中SDK端并发数限制的说明:</b><br />
-SDK端并发数限制是指可以调用BallerXXXSessionBegin创建session的数量，是对一台机器中所有进程可创建session数量总和的限制。<br />
-SDK端并发数是一台机器中的全局限制，与<a class="el" href="baller__common_8h.html#a17ee54dc764fd16d8bc607f3e3879842">BallerLogin</a>和与<a class="el" href="baller__common_8h.html#af7b36edf18d104921978f9377786796e">BallerLogout</a>的调用无关；必须显式的调用BallerXXXSessionEnd接口，才会将已使用的并发数减一；当应用程序的进程退出（正常或异常退出）时，必须对已创建的session调用BallerXXXSessionEnd接口，否则已使用的并发数不会减少。<br />
-如果授权信息中有SDK端并发数限制，建议应用程序添加异常处理逻辑，当应用程序的进程出现异常需要结束时，对已创建的session调用BallerXXXSessionEnd接口后再结束。否则已使用的并发数永远不会减少，直到机器重启。</dd></dl>
-<dl class="section note"><dt>注解</dt><dd><div class="fragment"><div class="line"><span class="keyword">const</span> <span class="keywordtype">char</span>* login_params = <span class="stringliteral">&quot;org_id=1157870520697357744,app_id=1157889509295128642,app_key=f497dae1bb3a5c2490b2f97dcbcc579c,license=./baller_sdk.license,log_level=debug,log_path=./baller_log/&quot;</span>;</div><div class="line"><span class="keywordtype">int</span> ret = <a class="code" href="baller__common_8h.html#a17ee54dc764fd16d8bc607f3e3879842">BallerLogin</a>(login_params);</div><div class="line"><span class="keywordflow">if</span> (<a class="code" href="baller__errors_8h.html#a62d5d2703fc6d8aa0585ee473d2ba69da5ef8ab1c6b896d786b054380668849f0">BALLER_SUCCESS</a> ！= ret)</div><div class="line">{</div><div class="line">    printf(<span class="stringliteral">&quot;BallerLogin failed. error code: %d\n&quot;</span>, ret);</div><div class="line">}</div></div><!-- fragment --> </dd></dl>
+<dl class="section warning"><dt>警告</dt><dd><b>授权中SDK端并发数限制的说明:</b><br  />
+SDK端并发数限制是指可以调用BallerXXXSessionBegin创建session的数量，以能力类型为最小粒度，以一台主机为范围进行限制。授权信息中如果有对某能力进行SDK端并发数限制，该能力在同一主机内仅能在一个进程中使用。<br  />
+例如当授权信息中包含了TTS和ASR两种能力，ASR能力的SDK端并发数限制为1，TTS能力的SDK端并发数无限制时，ASR能力只能在主机内的一个进程中使用，且同时只能有一个session存在，TTS能力可以在主机内多个进程中使用且不会限制session的数量。<br  />
+在Windwos平台，当授权信息中包含SDK端并发数限制时，可执行程序运行时需选择以管理员身份运行。<br  />
+<br  />
+<b>授权中SDK端调用间隔限制的说明:</b><br  />
+SDK端调用间隔限制是指两次完整的BallerXXXPut接口调用的间隔限制，以能力类型为最小粒度，以一台主机为范围进行限制。授权信息中如果有对某能力进行SDK端调用间隔限制，该能力在同一主机内仅能在一个进程中使用。<br  />
+例如当授权信息中包含了TTS和ASR两种能力，ASR能力的SDK端调用间隔限制为1秒，TTS能力不限制SDK端调用间隔时，ASR能力只能在主机内的一个进程中使用，且两次完整的BallerXXXPut接口调用需要间隔1秒，TTS能力可以在主机内多个进程中使用且两次完整的BallerXXXPut之间不需要间隔。<br  />
+在Windwos平台，当授权信息中包含SDK端调用间隔限制时，可执行程序运行时需选择以管理员身份运行。<br  />
+当出现以下两种情况之一时才算一次完整的BallerXXXPut调用：<ul>
+<li>调用BallerXXXPut接口，当input_mode为once时算一次完整的调用。</li>
+<li>调用BallerXXXPut接口，当input_mode为continue或end时，仅当input_mode变为end时，才算一次完整的调用。同一个session中，当连续多次的input_mode都为continue时，不算一次完整的调用，也不会受SDK端并发数的限制。 <br  />
+ </li>
+</ul>
+</dd></dl>
+<dl class="section note"><dt>注解</dt><dd><div class="fragment"><div class="line"><span class="keyword">const</span> <span class="keywordtype">char</span>* login_params = <span class="stringliteral">&quot;org_id=1157870520697357744,app_id=1157889509295128642,app_key=f497dae1bb3a5c2490b2f97dcbcc579c,license=./baller_sdk.license,log_level=debug,log_path=./baller_log/&quot;</span>;</div>
+<div class="line"><span class="keywordtype">int</span> ret = <a class="code" href="baller__common_8h.html#a17ee54dc764fd16d8bc607f3e3879842">BallerLogin</a>(login_params);</div>
+<div class="line"><span class="keywordflow">if</span> (<a class="code" href="baller__errors_8h.html#a62d5d2703fc6d8aa0585ee473d2ba69da5ef8ab1c6b896d786b054380668849f0">BALLER_SUCCESS</a> ！= ret)</div>
+<div class="line">{</div>
+<div class="line">    printf(<span class="stringliteral">&quot;BallerLogin failed. error code: %d\n&quot;</span>, ret);</div>
+<div class="line">}</div>
+</div><!-- fragment --> </dd></dl>
 
 </div>
 </div>
@@ -192,19 +209,27 @@ SDK端并发数是一台机器中的全局限制，与<a class="el" href="baller
 <p>baller sdk 登出接口 </p>
 <p>处理 baller sdk 用户登出操作。当不在使用 baller sdk 时需要调用该接口。</p>
 <dl class="section return"><dt>返回</dt><dd>0表示成功；其他表示失败，详情见<a class="el" href="baller__errors_8h.html#a62d5d2703fc6d8aa0585ee473d2ba69d">错误码</a> 。</dd></dl>
-<dl class="section note"><dt>注解</dt><dd><div class="fragment"><div class="line"><span class="keywordtype">int</span> ret = <a class="code" href="baller__common_8h.html#af7b36edf18d104921978f9377786796e">BallerLogout</a>();</div><div class="line"><span class="keywordflow">if</span> (<a class="code" href="baller__errors_8h.html#a62d5d2703fc6d8aa0585ee473d2ba69da5ef8ab1c6b896d786b054380668849f0">BALLER_SUCCESS</a> ！= ret)</div><div class="line">{</div><div class="line">    printf(<span class="stringliteral">&quot;BallerLogout failed. error code: %d\n&quot;</span>, ret);</div><div class="line">}</div></div><!-- fragment --> </dd></dl>
+<dl class="section note"><dt>注解</dt><dd><div class="fragment"><div class="line"><span class="keywordtype">int</span> ret = <a class="code" href="baller__common_8h.html#af7b36edf18d104921978f9377786796e">BallerLogout</a>();</div>
+<div class="line"><span class="keywordflow">if</span> (<a class="code" href="baller__errors_8h.html#a62d5d2703fc6d8aa0585ee473d2ba69da5ef8ab1c6b896d786b054380668849f0">BALLER_SUCCESS</a> ！= ret)</div>
+<div class="line">{</div>
+<div class="line">    printf(<span class="stringliteral">&quot;BallerLogout failed. error code: %d\n&quot;</span>, ret);</div>
+<div class="line">}</div>
+</div><!-- fragment --> </dd></dl>
 
 </div>
 </div>
 </div><!-- contents -->
 </div><!-- doc-content -->
+<div class="ttc" id="aballer__common_8h_html_a17ee54dc764fd16d8bc607f3e3879842"><div class="ttname"><a href="baller__common_8h.html#a17ee54dc764fd16d8bc607f3e3879842">BallerLogin</a></div><div class="ttdeci">BALLER_API int BallerLogin(const char *login_params)</div><div class="ttdoc">baller sdk 登录接口</div></div>
+<div class="ttc" id="aballer__common_8h_html_af7b36edf18d104921978f9377786796e"><div class="ttname"><a href="baller__common_8h.html#af7b36edf18d104921978f9377786796e">BallerLogout</a></div><div class="ttdeci">BALLER_API int BallerLogout()</div><div class="ttdoc">baller sdk 登出接口</div></div>
+<div class="ttc" id="aballer__errors_8h_html_a62d5d2703fc6d8aa0585ee473d2ba69da5ef8ab1c6b896d786b054380668849f0"><div class="ttname"><a href="baller__errors_8h.html#a62d5d2703fc6d8aa0585ee473d2ba69da5ef8ab1c6b896d786b054380668849f0">BALLER_SUCCESS</a></div><div class="ttdef"><b>Definition:</b> <a href="baller__errors_8h_source.html#l00017">baller_errors.h:17</a></div></div>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="dir_1148ebc2b25b55095aebf6f4cbb6efca.html">Doxygen</a></li><li class="navelem"><a class="el" href="baller__common_8h.html">baller_common.h</a></li>
     <li class="footer">制作者
     <a href="http://www.doxygen.org/index.html">
-    <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.15 </li>
+    <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.16 </li>
   </ul>
 </div>
 </body>

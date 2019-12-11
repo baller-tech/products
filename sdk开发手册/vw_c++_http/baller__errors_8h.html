@@ -1,0 +1,528 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "https://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=9"/>
+<meta name="generator" content="Doxygen 1.8.16"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>baller sdk: baller_errors.h 文件参考</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="resize.js"></script>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:cf05388f2679ee054f2beb29a391d25f4e673ac3&amp;dn=gpl-2.0.txt GPL-v2 */
+  $(document).ready(initResizable);
+/* @license-end */</script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr style="height: 56px;">
+  <td id="projectalign" style="padding-left: 0.5em;">
+   <div id="projectname">baller sdk
+   </div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- 制作者 Doxygen 1.8.16 -->
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:cf05388f2679ee054f2beb29a391d25f4e673ac3&amp;dn=gpl-2.0.txt GPL-v2 */
+var searchBox = new SearchBox("searchBox", "search",false,'搜索');
+/* @license-end */
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:cf05388f2679ee054f2beb29a391d25f4e673ac3&amp;dn=gpl-2.0.txt GPL-v2 */
+$(function() {
+  initMenu('',true,false,'search.php','搜索');
+  $(document).ready(function() { init_search(); });
+});
+/* @license-end */</script>
+<div id="main-nav"></div>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:cf05388f2679ee054f2beb29a391d25f4e673ac3&amp;dn=gpl-2.0.txt GPL-v2 */
+$(document).ready(function(){initNavTree('baller__errors_8h.html','');});
+/* @license-end */
+</script>
+<div id="doc-content">
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<iframe src="javascript:void(0)" frameborder="0" 
+        name="MSearchResults" id="MSearchResults">
+</iframe>
+</div>
+
+<div class="header">
+  <div class="summary">
+<a href="#enum-members">枚举</a>  </div>
+  <div class="headertitle">
+<div class="title">baller_errors.h 文件参考</div>  </div>
+</div><!--header-->
+<div class="contents">
+
+<p>描述了 baller sdk 接口返回的所有错误码信息  
+<a href="#details">更多...</a></p>
+
+<p><a href="baller__errors_8h_source.html">浏览源代码.</a></p>
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="enum-members"></a>
+枚举</h2></td></tr>
+<tr class="memitem:a62d5d2703fc6d8aa0585ee473d2ba69d"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="baller__errors_8h.html#a62d5d2703fc6d8aa0585ee473d2ba69d">EBallerErrorCode</a> { <br />
+&#160;&#160;<a class="el" href="baller__errors_8h.html#a62d5d2703fc6d8aa0585ee473d2ba69da5ef8ab1c6b896d786b054380668849f0">BALLER_SUCCESS</a> = 0, 
+<a class="el" href="baller__errors_8h.html#a62d5d2703fc6d8aa0585ee473d2ba69dae536fc1a4f7809cd48aa067665453f1b">BALLER_ERR_NO_LICENSE</a> = 10001, 
+<a class="el" href="baller__errors_8h.html#a62d5d2703fc6d8aa0585ee473d2ba69da46622234104d049adc007c892b9bec64">BALLER_ERR_INV_LICENSE</a> = 10002, 
+<a class="el" href="baller__errors_8h.html#a62d5d2703fc6d8aa0585ee473d2ba69da33c3c5a76e0e2aa00a70a3b91c34907a">BALLER_ERR_AUTH_EXPIRED</a> = 10003, 
+<br />
+&#160;&#160;<a class="el" href="baller__errors_8h.html#a62d5d2703fc6d8aa0585ee473d2ba69dadd49eb89944c25106c0e28fdebf02d3d">BALLER_ERR_AUTH_NO_START</a> = 10004, 
+<a class="el" href="baller__errors_8h.html#a62d5d2703fc6d8aa0585ee473d2ba69da6cb6b0d21131cda74e499b8237c0c986">BALLER_ERR_ABILITY_NO_AUTH</a> = 10005, 
+<a class="el" href="baller__errors_8h.html#a62d5d2703fc6d8aa0585ee473d2ba69dac592f9aa03d8950f0979f9b82a99a01f">BALLER_ERR_MACHINE_NO_AUTH</a> = 10006, 
+<a class="el" href="baller__errors_8h.html#a62d5d2703fc6d8aa0585ee473d2ba69da4825d2cdd4ab60c6a02201c7bb5ff0f9">BALLER_ERR_RESULT_LIMIT</a> = 10007, 
+<br />
+&#160;&#160;<a class="el" href="baller__errors_8h.html#a62d5d2703fc6d8aa0585ee473d2ba69daca1582e8f28006bf22e6715cf3ca1d4a">BALLER_ERR_CONCURRENCY_LIMIT</a> = 10008, 
+<a class="el" href="baller__errors_8h.html#a62d5d2703fc6d8aa0585ee473d2ba69dae2a9e37d80dc22dc94ac5885dc44e0bf">BALLER_ERR_CALL_INTERVAL_LIMIT</a> = 10009, 
+<a class="el" href="baller__errors_8h.html#a62d5d2703fc6d8aa0585ee473d2ba69da763c79ad6af6eec46071e8842d46310b">BALLER_ERR_WAKE_WORD_NUMBER_LIMIT</a> = 10010, 
+<a class="el" href="baller__errors_8h.html#a62d5d2703fc6d8aa0585ee473d2ba69dad403c33d2fb6943db92226413dc7c60d">BALLER_ERR_HARDWARE_LIMIT</a> = 10011, 
+<br />
+&#160;&#160;<a class="el" href="baller__errors_8h.html#a62d5d2703fc6d8aa0585ee473d2ba69da94b9fb33a2fa0074f3a2ec90685b7fb7">BALLER_ERR_INPUT_MODE_LIMIT</a> = 10012, 
+<a class="el" href="baller__errors_8h.html#a62d5d2703fc6d8aa0585ee473d2ba69da96c633a24ecfce38f5f54a683fa71565">BALLER_ERR_SESSION_MODE_LIMIT</a> = 10013, 
+<a class="el" href="baller__errors_8h.html#a62d5d2703fc6d8aa0585ee473d2ba69da0556a08e4f3ce5cbdc2f34679e99298c">BALLER_ERR_AUTH_TERMINATION</a> = 10014, 
+<a class="el" href="baller__errors_8h.html#a62d5d2703fc6d8aa0585ee473d2ba69da512d93a6db1252a41b09af1f47fb590a">BALLER_ERR_VAD_NO_AUTH</a> = 10015, 
+<br />
+&#160;&#160;<a class="el" href="baller__errors_8h.html#a62d5d2703fc6d8aa0585ee473d2ba69da32f78a9e239ff694397114678656c6bf">BALLER_ERR_PUT_ONCE_CYCLE_SIZE_LIMIT</a> = 10016, 
+<a class="el" href="baller__errors_8h.html#a62d5d2703fc6d8aa0585ee473d2ba69dad5e4cc3020cd8984aef1f0ebf4a7b97b">BALLER_ERR_GET_DEVICE_INFO_FAILED</a> = 10017, 
+<a class="el" href="baller__errors_8h.html#a62d5d2703fc6d8aa0585ee473d2ba69da46c79c96ba711bdf61ab2e44b4199e01">BALLER_ERR_PUT_TOTAL_SIZE_LIMIT</a> = 10018, 
+<a class="el" href="baller__errors_8h.html#a62d5d2703fc6d8aa0585ee473d2ba69da25d413086b480deddeebab0993213084">BALLER_ERR_PUT_TIMES_LIMIT</a> = 10019, 
+<br />
+&#160;&#160;<a class="el" href="baller__errors_8h.html#a62d5d2703fc6d8aa0585ee473d2ba69dac2202be4f5d50b657d88b7ba7eb44120">BALLER_ERR_LICENSE_ENCRYPT_FAILED</a> = 10020, 
+<a class="el" href="baller__errors_8h.html#a62d5d2703fc6d8aa0585ee473d2ba69da3aaedaead75a81ae3594e425faf66445">BALLER_ERR_LICENSE_SAVE_FAILED</a> = 10021, 
+<a class="el" href="baller__errors_8h.html#a62d5d2703fc6d8aa0585ee473d2ba69da4366ced17ba1d826a2e5e6d2bf691757">BALLER_ERR_TIMING</a> = 10022, 
+<a class="el" href="baller__errors_8h.html#a62d5d2703fc6d8aa0585ee473d2ba69da625ad8e23e217c3866739277337af06a">BALLER_ERR_TIMING_FAILED_TOO_MANY_TIMES</a> = 10023, 
+<br />
+&#160;&#160;<a class="el" href="baller__errors_8h.html#a62d5d2703fc6d8aa0585ee473d2ba69dac4de34b8829c6281367b154747ab1ee4">BALLER_ERR_CLOUD_METERING_FAILED_TOO_MANY_TIMES</a> = 10024, 
+<a class="el" href="baller__errors_8h.html#a62d5d2703fc6d8aa0585ee473d2ba69da8c4a927c71a4c604f5a6081782d9d821">BALLER_ERR_GET_PROCESS_INFO_FAILED</a> = 10025, 
+<a class="el" href="baller__errors_8h.html#a62d5d2703fc6d8aa0585ee473d2ba69da773f93e73ee922499de9775e3be43e1a">BALLER_ERR_PARAM_INVALID</a> = 12001, 
+<a class="el" href="baller__errors_8h.html#a62d5d2703fc6d8aa0585ee473d2ba69da591d780bbea22eadc63bcd970c5d2281">BALLER_ERR_SESSION_ID_INVALID</a> = 12002, 
+<br />
+&#160;&#160;<a class="el" href="baller__errors_8h.html#a62d5d2703fc6d8aa0585ee473d2ba69daa5a3309dfdcbb0bc10a2e73821e8043c">BALLER_ERR_NO_RESOURCE_DIR</a> = 12003, 
+<a class="el" href="baller__errors_8h.html#a62d5d2703fc6d8aa0585ee473d2ba69da94ebc057f63bf9b77d2679fa016cb53b">BALLER_ERR_WAKEUP_WORD_INVALID</a> = 12004, 
+<a class="el" href="baller__errors_8h.html#a62d5d2703fc6d8aa0585ee473d2ba69da881b291fc69ace216eb306b736e07c00">BALLER_ERR_ABILITY_UN_KNOW</a> = 12005, 
+<a class="el" href="baller__errors_8h.html#a62d5d2703fc6d8aa0585ee473d2ba69da9339d71ead7bab233622d800350467c4">BALLER_ERR_PARAM_UN_SUPPORT</a> = 12006, 
+<br />
+&#160;&#160;<a class="el" href="baller__errors_8h.html#a62d5d2703fc6d8aa0585ee473d2ba69dacc965d2874de94f4c45020a6c28ebe00">BALLER_ERR_RESOURCE_FILE_MISS</a> = 12007, 
+<a class="el" href="baller__errors_8h.html#a62d5d2703fc6d8aa0585ee473d2ba69da3916eb585b36b87480b3545198c14305">BALLER_ERR_RESOURCE_FILE_MISMATCH</a> = 12008, 
+<a class="el" href="baller__errors_8h.html#a62d5d2703fc6d8aa0585ee473d2ba69da15cf9451c49853b850948afc185925cc">BALLER_ERR_RESOURCE_FILE_BROKEN</a> = 12009, 
+<a class="el" href="baller__errors_8h.html#a62d5d2703fc6d8aa0585ee473d2ba69daedef4f657be5f19a5e99c81612dc2209">BALLER_ERR_CPU_MEM</a> = 12010, 
+<br />
+&#160;&#160;<a class="el" href="baller__errors_8h.html#a62d5d2703fc6d8aa0585ee473d2ba69dabbcb8bb66b85aa0eab7416c67a72ba50">BALLER_ERR_GPU_MEM</a> = 12011, 
+<a class="el" href="baller__errors_8h.html#a62d5d2703fc6d8aa0585ee473d2ba69dad300b042ab1f3946e2a8b3401faf6dd6">BALLER_ERR_NO_GPU</a> = 12012, 
+<a class="el" href="baller__errors_8h.html#a62d5d2703fc6d8aa0585ee473d2ba69da4a9a5acea2a3af703d2ab7fa49ba003b">BALLER_ERR_HARDWARE_INVALID</a> = 12013, 
+<a class="el" href="baller__errors_8h.html#a62d5d2703fc6d8aa0585ee473d2ba69da3540ca958369a64c0a3a82b80a5e5fb0">BALLER_ERR_SAMPLE_RATE_INVALID</a> = 12014, 
+<br />
+&#160;&#160;<a class="el" href="baller__errors_8h.html#a62d5d2703fc6d8aa0585ee473d2ba69da52a3d90c470e72e50abea4c7286b81e6">BALLER_ERR_SAMPLE_SIZE_INVALID</a> = 12015, 
+<a class="el" href="baller__errors_8h.html#a62d5d2703fc6d8aa0585ee473d2ba69da60cd7c999897d955fe9babe2f864cccd">BALLER_ERR_ENGINE_TYPE_INVALID</a> = 12016, 
+<a class="el" href="baller__errors_8h.html#a62d5d2703fc6d8aa0585ee473d2ba69da2c97232812301ccd56a2f9ddb6985227">BALLER_ERR_ENGINE_TYPE_NO_SUPPORT</a> = 12017, 
+<a class="el" href="baller__errors_8h.html#a62d5d2703fc6d8aa0585ee473d2ba69da8e95c372955aac1ea80d8543ec215394">BALLER_ERR_ENGINE_TYPE_NO_AUTH</a> = 12018, 
+<br />
+&#160;&#160;<a class="el" href="baller__errors_8h.html#a62d5d2703fc6d8aa0585ee473d2ba69da01ab88689f79f8430a25031c5dc72c99">BALLER_ERR_INPUT_MODE_INVALID</a> = 12019, 
+<a class="el" href="baller__errors_8h.html#a62d5d2703fc6d8aa0585ee473d2ba69da795549bb8912cacb58abbcb5ffe86fdc">BALLER_ERR_LOG_LEVEL</a> = 12020, 
+<a class="el" href="baller__errors_8h.html#a62d5d2703fc6d8aa0585ee473d2ba69dac21dbdacb4b579bb2123465df5a4c1fb">BALLER_ERR_DATA_LEN_INVALID</a> = 12021, 
+<a class="el" href="baller__errors_8h.html#a62d5d2703fc6d8aa0585ee473d2ba69da3a814dbda20ae254c903a81be267f861">BALLER_ERR_VAD</a> = 12022, 
+<br />
+&#160;&#160;<a class="el" href="baller__errors_8h.html#a62d5d2703fc6d8aa0585ee473d2ba69daefdb22e06ebccdd4ae84f8525b8ceec6">BALLER_ERR_ORG_ID_INVALID</a> = 12023, 
+<a class="el" href="baller__errors_8h.html#a62d5d2703fc6d8aa0585ee473d2ba69da20360c781c9ef755c9a1d51fab7d8fcf">BALLER_ERR_APP_ID_INVALID</a> = 12024, 
+<a class="el" href="baller__errors_8h.html#a62d5d2703fc6d8aa0585ee473d2ba69da6c061fc1089661259de6750b6a1337d3">BALLER_ERR_APP_KEY_INVALID</a> = 12025, 
+<a class="el" href="baller__errors_8h.html#a62d5d2703fc6d8aa0585ee473d2ba69da16ea220891316a35812a12d3c446bd7c">BALLER_ERR_ABILITY_ID_INVALID</a> = 12027, 
+<br />
+&#160;&#160;<a class="el" href="baller__errors_8h.html#a62d5d2703fc6d8aa0585ee473d2ba69da0207a000dc2befbf112e2ded42ce95ad">BALLER_ERR_LANGUAGE_INVALID</a> = 12028, 
+<a class="el" href="baller__errors_8h.html#a62d5d2703fc6d8aa0585ee473d2ba69dad217052157fb435fef4c3179841f4038">BALLER_ERR_AUDIO_FORMAT_INVALID</a> = 12029, 
+<a class="el" href="baller__errors_8h.html#a62d5d2703fc6d8aa0585ee473d2ba69daedabe7a58fa77c71e8991548f97da820">BALLER_ERR_DOMAIN_INVALID</a> = 12030, 
+<a class="el" href="baller__errors_8h.html#a62d5d2703fc6d8aa0585ee473d2ba69da547a46ec4ffbcadf4233f91d2f64bc84">BALLER_ERR_PUNCTUATION</a> = 12031, 
+<br />
+&#160;&#160;<a class="el" href="baller__errors_8h.html#a62d5d2703fc6d8aa0585ee473d2ba69da6564bfac13fe1b347238f9b4d63b0267">BALLER_ERR_REPEAT_LOGIN</a> = 14001, 
+<a class="el" href="baller__errors_8h.html#a62d5d2703fc6d8aa0585ee473d2ba69da1dd2761715aeadb8161ae9781f6615b9">BALLER_ERR_MISS_LOGIN</a> = 14002, 
+<a class="el" href="baller__errors_8h.html#a62d5d2703fc6d8aa0585ee473d2ba69dae84fa8bf84c0ec11a807c5a6d2e4f238">BALLER_ERR_MISS_SESSION_END</a> = 14003, 
+<a class="el" href="baller__errors_8h.html#a62d5d2703fc6d8aa0585ee473d2ba69da0f883667bfcce8e129c64053a14598a7">BALLER_MORE_RESULT</a> = 14004, 
+<br />
+&#160;&#160;<a class="el" href="baller__errors_8h.html#a62d5d2703fc6d8aa0585ee473d2ba69da8576efbab3bb5abbd64f971b89ee3508">BALLER_ERR_NO_RESULT</a> = 14005, 
+<a class="el" href="baller__errors_8h.html#a62d5d2703fc6d8aa0585ee473d2ba69dad6c310ccae8d4c6c6090523b54b4e5cb">BALLER_ERR_SHARE_MEMORY_EMPTY</a> = 14006, 
+<a class="el" href="baller__errors_8h.html#a62d5d2703fc6d8aa0585ee473d2ba69daace6169dc00c65b6da8a0b7bca7c94ff">BALLER_ERR_READ_SHARE_MEMORY_FAILED</a> = 14007, 
+<a class="el" href="baller__errors_8h.html#a62d5d2703fc6d8aa0585ee473d2ba69daaa4b06846d1f9cce6e17ce99814f07ab">BALLER_ERR_WRITE_SHARE_MEMORY_FAILED</a> = 14008, 
+<br />
+&#160;&#160;<a class="el" href="baller__errors_8h.html#a62d5d2703fc6d8aa0585ee473d2ba69dac724dbfeba5272ca76f8f23ab4577bfa">BALLER_ERR_SHARE_MEMORY_CONTENT_INVALID</a> = 14009, 
+<a class="el" href="baller__errors_8h.html#a62d5d2703fc6d8aa0585ee473d2ba69daaef7962d382a682bac8678f95596f9a7">BALLER_ERR_SHARE_MEMORY_CONFLICTING</a> = 14010, 
+<a class="el" href="baller__errors_8h.html#a62d5d2703fc6d8aa0585ee473d2ba69da63d741596ac8a24bb0d27e463c2cf02d">BALLER_ERR_TOO_MANY_PROCESS</a> = 14011, 
+<a class="el" href="baller__errors_8h.html#a62d5d2703fc6d8aa0585ee473d2ba69daf6ff40f0cbf752f81c55db2884600873">BALLER_ERR_LOCK_FILE_FAILED</a> = 14012, 
+<br />
+&#160;&#160;<a class="el" href="baller__errors_8h.html#a62d5d2703fc6d8aa0585ee473d2ba69da94dcd95bc82536e5ce982842512a9b96">BALLER_ERR_HTTP_REQUEST</a> = 15001, 
+<a class="el" href="baller__errors_8h.html#a62d5d2703fc6d8aa0585ee473d2ba69da9612918ae810515e4bb86514701de88d">BALLER_ERR_HTTP_TIME_OUT</a> = 15002, 
+<a class="el" href="baller__errors_8h.html#a62d5d2703fc6d8aa0585ee473d2ba69da9f79d5583bb25affc9428fdca4ceb362">BALLER_ERR_HTTP_BUSY</a> = 15003, 
+<a class="el" href="baller__errors_8h.html#a62d5d2703fc6d8aa0585ee473d2ba69dac21ec7ecdea26d42daafe82fa20dd87f">BALLER_ERR_HTTP_RESPONSE_EMPTY</a> = 15004, 
+<br />
+&#160;&#160;<a class="el" href="baller__errors_8h.html#a62d5d2703fc6d8aa0585ee473d2ba69da48999699d0b7c77d04f3e0f67e759a2d">BALLER_ERR_HTTP_RESPONSE_FORMAT_INVALID</a> = 15005, 
+<a class="el" href="baller__errors_8h.html#a62d5d2703fc6d8aa0585ee473d2ba69da94744472d2ae046d5e8b0d7a8dc6da85">BALLER_ERR_REQUEST_TIME_MISS</a> = 50001, 
+<a class="el" href="baller__errors_8h.html#a62d5d2703fc6d8aa0585ee473d2ba69da630db7e5522528849ffb363f1a9f8228">BALLER_ERR_REQUEST_EXPIRES</a> = 50002, 
+<a class="el" href="baller__errors_8h.html#a62d5d2703fc6d8aa0585ee473d2ba69da65bfc3ae84c6e5141930e782a7e9a8bc">BALLER_ERR_REQUEST_HEADER_PARAM_MISS</a> = 50003, 
+<br />
+&#160;&#160;<a class="el" href="baller__errors_8h.html#a62d5d2703fc6d8aa0585ee473d2ba69dab95da29c1560accd500448d159ea7e97">BALLER_ERR_REQUEST_HEADER_PARAM_INVALID</a> = 50004, 
+<a class="el" href="baller__errors_8h.html#a62d5d2703fc6d8aa0585ee473d2ba69da2a830590df60f5dae01366ef3a1e94ee">BALLER_ERR_REQUEST_CHECK_SUM_MISS</a> = 50005, 
+<a class="el" href="baller__errors_8h.html#a62d5d2703fc6d8aa0585ee473d2ba69da340ec871b4ad77d273de23f7e1eb895d">BALLER_ERR_REQUEST_CHECK_SUM_NOT_MATCH</a> = 50006, 
+<a class="el" href="baller__errors_8h.html#a62d5d2703fc6d8aa0585ee473d2ba69da62904eb46498937ff2b2485bd26dbd04">BALLER_ERR_REQUEST_DEVICE_INFO_INVALID</a> = 50007, 
+<br />
+&#160;&#160;<a class="el" href="baller__errors_8h.html#a62d5d2703fc6d8aa0585ee473d2ba69da2e9611f65c1b88ce26c1bf88411715e8">BALLER_ERR_REQUEST_BODY_FORMAT_INVALID</a> = 50008, 
+<a class="el" href="baller__errors_8h.html#a62d5d2703fc6d8aa0585ee473d2ba69da42689ee49d8f48d76db5232c62a71af4">BALLER_ERR_REQUEST_ORG_ID_NOT_MATCH</a> = 50009, 
+<a class="el" href="baller__errors_8h.html#a62d5d2703fc6d8aa0585ee473d2ba69da8915c0f9c86ded91754924f314c073c0">BALLER_ERR_REQUEST_APP_ID_NOT_MATCH</a> = 50010, 
+<a class="el" href="baller__errors_8h.html#a62d5d2703fc6d8aa0585ee473d2ba69da8565e65cc40575d351854375fa6b6ac8">BALLER_ERR_REQUEST_APP_KEY_NOT_MATCH</a> = 50011, 
+<br />
+&#160;&#160;<a class="el" href="baller__errors_8h.html#a62d5d2703fc6d8aa0585ee473d2ba69dacadc61f583ee14928fc15b28ceb2c812">BALLER_ERR_REQUEST_PUT_TIMES_INVALID</a> = 50012, 
+<a class="el" href="baller__errors_8h.html#a62d5d2703fc6d8aa0585ee473d2ba69dafbf32dd84d0a75e7c793c425b43ba3b3">BALLER_ERR_REQUEST_PUT_TOTAL_SIZE_INVALID</a> = 50013, 
+<a class="el" href="baller__errors_8h.html#a62d5d2703fc6d8aa0585ee473d2ba69dacc333248ff33f2cd3abe897355751a62">BALLER_ERR_ORG_NOT_EXIST</a> = 51014, 
+<a class="el" href="baller__errors_8h.html#a62d5d2703fc6d8aa0585ee473d2ba69dab0fc082a366cb7789279278cd48d27ea">BALLER_ERR_APP_NOT_EXIST</a> = 51015, 
+<br />
+&#160;&#160;<a class="el" href="baller__errors_8h.html#a62d5d2703fc6d8aa0585ee473d2ba69da9efaf42eb2f035f1cfd1709069828091">BALLER_ERR_LICENSE_INFO_NOT_FOUND</a> = 51016, 
+<a class="el" href="baller__errors_8h.html#a62d5d2703fc6d8aa0585ee473d2ba69dae567bd90d973f8291fae02494556bcf2">BALLER_ERR_REQUEST_ID_INVALID</a> = 51017, 
+<a class="el" href="baller__errors_8h.html#a62d5d2703fc6d8aa0585ee473d2ba69daa59225674ff0a62d349d9dfbb947bae2">BALLER_ERR_QUERY_REQUEST_STATUS_FAILED</a> = 51018, 
+<a class="el" href="baller__errors_8h.html#a62d5d2703fc6d8aa0585ee473d2ba69daea1725b6a60a2f18707f62a16b883025">BALLER_ERR_QUERY_COMPUTING_SERVICE_FAILED</a> = 51019, 
+<br />
+&#160;&#160;<a class="el" href="baller__errors_8h.html#a62d5d2703fc6d8aa0585ee473d2ba69da6c41bfdceef80c6ebeefff798749ce17">BALLER_ERR_QUERY_COMPUTING_RESULT_FAILED</a> = 51020, 
+<a class="el" href="baller__errors_8h.html#a62d5d2703fc6d8aa0585ee473d2ba69da0ea99c43eb333b2a42a26ac1517e73b3">BALLER_ERR_COMPUTING_SERVICE_IS_BUSY</a> = 51021, 
+<a class="el" href="baller__errors_8h.html#a62d5d2703fc6d8aa0585ee473d2ba69da7b5882b3c24dc43ae43bfccfdb573d00">BALLER_ERR_COMPUTING_TASK_DISTRIBUTE_TIMEOUT</a> = 51022, 
+<a class="el" href="baller__errors_8h.html#a62d5d2703fc6d8aa0585ee473d2ba69daf864212373399e52e5f0be2a9dd7df61">BALLER_ERR_COMPUTING_TASK_DISTRIBUTE_FAILED</a> = 51023, 
+<br />
+&#160;&#160;<a class="el" href="baller__errors_8h.html#a62d5d2703fc6d8aa0585ee473d2ba69dad2678ff79ac550cc935be0a4e36cf403">BALLER_ERR_SESSION_CACHE_OVERLOAD</a> = 51024, 
+<a class="el" href="baller__errors_8h.html#a62d5d2703fc6d8aa0585ee473d2ba69da903263c5c483eaf7889674ccd1306ef7">BALLER_ERR_SESSION_STATUS_FAULT</a> = 51025, 
+<a class="el" href="baller__errors_8h.html#a62d5d2703fc6d8aa0585ee473d2ba69daee97e60df69f1a0af782827204095df4">BALLER_ERR_SESSION_TIME_OUT</a> = 51026, 
+<a class="el" href="baller__errors_8h.html#a62d5d2703fc6d8aa0585ee473d2ba69da1ec580c81b93e92587ec424d9ce9a849">BALLER_ERR_COMPUTING_DATA_INVALID</a> = 51027, 
+<br />
+&#160;&#160;<a class="el" href="baller__errors_8h.html#a62d5d2703fc6d8aa0585ee473d2ba69dae44c37ef281cdb662f5f1347c9a8facf">BALLER_ERR_CALLBACK_URL_INVALID</a> = 51028, 
+<a class="el" href="baller__errors_8h.html#a62d5d2703fc6d8aa0585ee473d2ba69da7ec96b2469b9445597fc52eac0301d2c">BALLER_ERR_REQUEST_STAFF_ROLE_INVALID</a> = 60001, 
+<a class="el" href="baller__errors_8h.html#a62d5d2703fc6d8aa0585ee473d2ba69dab4e5db1f5bfab2bcedb67f8eddce0508">BALLER_ERR_ORG_NAME_INVALID</a> = 60002, 
+<a class="el" href="baller__errors_8h.html#a62d5d2703fc6d8aa0585ee473d2ba69da64f3cf6f7d64b65d8625a05bb9f96999">BALLER_ERR_ORG_NAME_ALREADY_EXIST</a> = 60003, 
+<br />
+&#160;&#160;<a class="el" href="baller__errors_8h.html#a62d5d2703fc6d8aa0585ee473d2ba69daaca4d649d523e61815c5487a7822743a">BALLER_ERR_CREATE_ORG_INFO_FAILED</a> = 60004, 
+<a class="el" href="baller__errors_8h.html#a62d5d2703fc6d8aa0585ee473d2ba69dafc6c38faf16b6d251dfe93a7b5dbc5df">BALLER_ERR_MODIFY_ORG_INFO_FAILED</a> = 60005, 
+<a class="el" href="baller__errors_8h.html#a62d5d2703fc6d8aa0585ee473d2ba69da7adc77c16889f303cd6b4ab9ea7b2af3">BALLER_ERR_QUERY_ORG_INFO_FAILED</a> = 60006, 
+<a class="el" href="baller__errors_8h.html#a62d5d2703fc6d8aa0585ee473d2ba69da636222b6a16bc9110bad802937fa1455">BALLER_ERR_QUERY_ORG_APPS_FAILED</a> = 60007, 
+<br />
+&#160;&#160;<a class="el" href="baller__errors_8h.html#a62d5d2703fc6d8aa0585ee473d2ba69da79d7f8b2770ee1748a0d324a4eb00ed9">BALLER_ERR_CREATE_APP_INFO_FAILED</a> = 60008, 
+<a class="el" href="baller__errors_8h.html#a62d5d2703fc6d8aa0585ee473d2ba69da01f6c2c85ef0f059e99b725929e69e6b">BALLER_ERR_QUERY_APP_INFO_FAILED</a> = 60009, 
+<a class="el" href="baller__errors_8h.html#a62d5d2703fc6d8aa0585ee473d2ba69da0498e5463c61309bdafa7eefbb079e53">BALLER_ERR_ADD_ABILITY_INFO_FAILED</a> = 60010, 
+<a class="el" href="baller__errors_8h.html#a62d5d2703fc6d8aa0585ee473d2ba69da0c0f6d698542bb63453942b3e4a37055">BALLER_ERR_MODIFY_ABILITY_INFO_FAILED</a> = 60011, 
+<br />
+&#160;&#160;<a class="el" href="baller__errors_8h.html#a62d5d2703fc6d8aa0585ee473d2ba69daed40d390efbdee844c4084eb26817318">BALLER_ERR_QUERY_ABILITY_INFO_FAILED</a> = 60012, 
+<a class="el" href="baller__errors_8h.html#a62d5d2703fc6d8aa0585ee473d2ba69daed6e9c6bf82fe9e580f087d109c8f3bc">BALLER_ERR_ADD_PREORDER_DEVICE_FAILED</a> = 60013, 
+<a class="el" href="baller__errors_8h.html#a62d5d2703fc6d8aa0585ee473d2ba69da59878738bdbdbf2b18fa27581d40cf18">BALLER_ERR_PREORDER_DEVICE_INFO_INVALID</a> = 60014, 
+<a class="el" href="baller__errors_8h.html#a62d5d2703fc6d8aa0585ee473d2ba69da4b8e84e21aa919ca20ca9a35d7d7322c">BALLER_ERR_GENERATE_ORG_ID_FAILED</a> = 60015, 
+<br />
+&#160;&#160;<a class="el" href="baller__errors_8h.html#a62d5d2703fc6d8aa0585ee473d2ba69da5d4062f27423b550a464e6e03c060c73">BALLER_ERR_GENERATE_APP_ID_FAILED</a> = 60016, 
+<a class="el" href="baller__errors_8h.html#a62d5d2703fc6d8aa0585ee473d2ba69dad8c83fcd6723a8cdd0684f9b92d12886">BALLER_ERR_INTERNAL</a> = 90001
+<br />
+ }</td></tr>
+<tr class="memdesc:a62d5d2703fc6d8aa0585ee473d2ba69d"><td class="mdescLeft">&#160;</td><td class="mdescRight">描述 baller sdk 中可能出现的所有错误码  <a href="baller__errors_8h.html#a62d5d2703fc6d8aa0585ee473d2ba69d">更多...</a><br /></td></tr>
+<tr class="separator:a62d5d2703fc6d8aa0585ee473d2ba69d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table>
+<a name="details" id="details"></a><h2 class="groupheader">详细描述</h2>
+<div class="textblock"><p>描述了 baller sdk 接口返回的所有错误码信息 </p>
+
+<p class="definition">在文件 <a class="el" href="baller__errors_8h_source.html">baller_errors.h</a> 中定义.</p>
+</div><h2 class="groupheader">枚举类型说明</h2>
+<a id="a62d5d2703fc6d8aa0585ee473d2ba69d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a62d5d2703fc6d8aa0585ee473d2ba69d">&#9670;&nbsp;</a></span>EBallerErrorCode</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">enum <a class="el" href="baller__errors_8h.html#a62d5d2703fc6d8aa0585ee473d2ba69d">EBallerErrorCode</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>描述 baller sdk 中可能出现的所有错误码 </p>
+<table class="fieldtable">
+<tr><th colspan="2">枚举值</th></tr><tr><td class="fieldname"><a id="a62d5d2703fc6d8aa0585ee473d2ba69da5ef8ab1c6b896d786b054380668849f0"></a>BALLER_SUCCESS&#160;</td><td class="fielddoc"><p>成功 </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a62d5d2703fc6d8aa0585ee473d2ba69dae536fc1a4f7809cd48aa067665453f1b"></a>BALLER_ERR_NO_LICENSE&#160;</td><td class="fielddoc"><p>授权文件不存在 </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a62d5d2703fc6d8aa0585ee473d2ba69da46622234104d049adc007c892b9bec64"></a>BALLER_ERR_INV_LICENSE&#160;</td><td class="fielddoc"><p>无效的授权文件 </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a62d5d2703fc6d8aa0585ee473d2ba69da33c3c5a76e0e2aa00a70a3b91c34907a"></a>BALLER_ERR_AUTH_EXPIRED&#160;</td><td class="fielddoc"><p>授权过期 </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a62d5d2703fc6d8aa0585ee473d2ba69dadd49eb89944c25106c0e28fdebf02d3d"></a>BALLER_ERR_AUTH_NO_START&#160;</td><td class="fielddoc"><p>授权未开始 </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a62d5d2703fc6d8aa0585ee473d2ba69da6cb6b0d21131cda74e499b8237c0c986"></a>BALLER_ERR_ABILITY_NO_AUTH&#160;</td><td class="fielddoc"><p>能力未获得授权 </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a62d5d2703fc6d8aa0585ee473d2ba69dac592f9aa03d8950f0979f9b82a99a01f"></a>BALLER_ERR_MACHINE_NO_AUTH&#160;</td><td class="fielddoc"><p>设备未获得授权 </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a62d5d2703fc6d8aa0585ee473d2ba69da4825d2cdd4ab60c6a02201c7bb5ff0f9"></a>BALLER_ERR_RESULT_LIMIT&#160;</td><td class="fielddoc"><p>限制部分结果的获取 仅在使用测试授权的SDK中会出现 </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a62d5d2703fc6d8aa0585ee473d2ba69daca1582e8f28006bf22e6715cf3ca1d4a"></a>BALLER_ERR_CONCURRENCY_LIMIT&#160;</td><td class="fielddoc"><p>并发数限制 </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a62d5d2703fc6d8aa0585ee473d2ba69dae2a9e37d80dc22dc94ac5885dc44e0bf"></a>BALLER_ERR_CALL_INTERVAL_LIMIT&#160;</td><td class="fielddoc"><p>调用间隔限制 </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a62d5d2703fc6d8aa0585ee473d2ba69da763c79ad6af6eec46071e8842d46310b"></a>BALLER_ERR_WAKE_WORD_NUMBER_LIMIT&#160;</td><td class="fielddoc"><p>唤醒词个数限制 </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a62d5d2703fc6d8aa0585ee473d2ba69dad403c33d2fb6943db92226413dc7c60d"></a>BALLER_ERR_HARDWARE_LIMIT&#160;</td><td class="fielddoc"><p>计算使用的硬件类型被限制 </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a62d5d2703fc6d8aa0585ee473d2ba69da94b9fb33a2fa0074f3a2ec90685b7fb7"></a>BALLER_ERR_INPUT_MODE_LIMIT&#160;</td><td class="fielddoc"><p>input_mode被限制 </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a62d5d2703fc6d8aa0585ee473d2ba69da96c633a24ecfce38f5f54a683fa71565"></a>BALLER_ERR_SESSION_MODE_LIMIT&#160;</td><td class="fielddoc"><p>session mode被限制 </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a62d5d2703fc6d8aa0585ee473d2ba69da0556a08e4f3ce5cbdc2f34679e99298c"></a>BALLER_ERR_AUTH_TERMINATION&#160;</td><td class="fielddoc"><p>授权终止 </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a62d5d2703fc6d8aa0585ee473d2ba69da512d93a6db1252a41b09af1f47fb590a"></a>BALLER_ERR_VAD_NO_AUTH&#160;</td><td class="fielddoc"><p>VAD无授权 </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a62d5d2703fc6d8aa0585ee473d2ba69da32f78a9e239ff694397114678656c6bf"></a>BALLER_ERR_PUT_ONCE_CYCLE_SIZE_LIMIT&#160;</td><td class="fielddoc"><p>每一个PUT周期处理的数据量限制 </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a62d5d2703fc6d8aa0585ee473d2ba69dad5e4cc3020cd8984aef1f0ebf4a7b97b"></a>BALLER_ERR_GET_DEVICE_INFO_FAILED&#160;</td><td class="fielddoc"><p>获取设备信息失败 </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a62d5d2703fc6d8aa0585ee473d2ba69da46c79c96ba711bdf61ab2e44b4199e01"></a>BALLER_ERR_PUT_TOTAL_SIZE_LIMIT&#160;</td><td class="fielddoc"><p>PUT总的数据量限制 </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a62d5d2703fc6d8aa0585ee473d2ba69da25d413086b480deddeebab0993213084"></a>BALLER_ERR_PUT_TIMES_LIMIT&#160;</td><td class="fielddoc"><p>PUT次数限制 </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a62d5d2703fc6d8aa0585ee473d2ba69dac2202be4f5d50b657d88b7ba7eb44120"></a>BALLER_ERR_LICENSE_ENCRYPT_FAILED&#160;</td><td class="fielddoc"><p>加密授权信息失败 </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a62d5d2703fc6d8aa0585ee473d2ba69da3aaedaead75a81ae3594e425faf66445"></a>BALLER_ERR_LICENSE_SAVE_FAILED&#160;</td><td class="fielddoc"><p>保存授权文件失败 </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a62d5d2703fc6d8aa0585ee473d2ba69da4366ced17ba1d826a2e5e6d2bf691757"></a>BALLER_ERR_TIMING&#160;</td><td class="fielddoc"><p>校时失败 </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a62d5d2703fc6d8aa0585ee473d2ba69da625ad8e23e217c3866739277337af06a"></a>BALLER_ERR_TIMING_FAILED_TOO_MANY_TIMES&#160;</td><td class="fielddoc"><p>校时失败太多次 </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a62d5d2703fc6d8aa0585ee473d2ba69dac4de34b8829c6281367b154747ab1ee4"></a>BALLER_ERR_CLOUD_METERING_FAILED_TOO_MANY_TIMES&#160;</td><td class="fielddoc"><p>服务器计量失败太多次 </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a62d5d2703fc6d8aa0585ee473d2ba69da8c4a927c71a4c604f5a6081782d9d821"></a>BALLER_ERR_GET_PROCESS_INFO_FAILED&#160;</td><td class="fielddoc"><p>获取进程相关信息失败 </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a62d5d2703fc6d8aa0585ee473d2ba69da773f93e73ee922499de9775e3be43e1a"></a>BALLER_ERR_PARAM_INVALID&#160;</td><td class="fielddoc"><p>无效的参数 </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a62d5d2703fc6d8aa0585ee473d2ba69da591d780bbea22eadc63bcd970c5d2281"></a>BALLER_ERR_SESSION_ID_INVALID&#160;</td><td class="fielddoc"><p>无效的SESSION ID </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a62d5d2703fc6d8aa0585ee473d2ba69daa5a3309dfdcbb0bc10a2e73821e8043c"></a>BALLER_ERR_NO_RESOURCE_DIR&#160;</td><td class="fielddoc"><p>资源路径未设置 </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a62d5d2703fc6d8aa0585ee473d2ba69da94ebc057f63bf9b77d2679fa016cb53b"></a>BALLER_ERR_WAKEUP_WORD_INVALID&#160;</td><td class="fielddoc"><p>唤醒词无效 </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a62d5d2703fc6d8aa0585ee473d2ba69da881b291fc69ace216eb306b736e07c00"></a>BALLER_ERR_ABILITY_UN_KNOW&#160;</td><td class="fielddoc"><p>未知的能力 </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a62d5d2703fc6d8aa0585ee473d2ba69da9339d71ead7bab233622d800350467c4"></a>BALLER_ERR_PARAM_UN_SUPPORT&#160;</td><td class="fielddoc"><p>不支持的参数 </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a62d5d2703fc6d8aa0585ee473d2ba69dacc965d2874de94f4c45020a6c28ebe00"></a>BALLER_ERR_RESOURCE_FILE_MISS&#160;</td><td class="fielddoc"><p>未找到资源文件 </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a62d5d2703fc6d8aa0585ee473d2ba69da3916eb585b36b87480b3545198c14305"></a>BALLER_ERR_RESOURCE_FILE_MISMATCH&#160;</td><td class="fielddoc"><p>资源文件不匹配 </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a62d5d2703fc6d8aa0585ee473d2ba69da15cf9451c49853b850948afc185925cc"></a>BALLER_ERR_RESOURCE_FILE_BROKEN&#160;</td><td class="fielddoc"><p>资源文件被破坏 </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a62d5d2703fc6d8aa0585ee473d2ba69daedef4f657be5f19a5e99c81612dc2209"></a>BALLER_ERR_CPU_MEM&#160;</td><td class="fielddoc"><p>CPU内存不足 </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a62d5d2703fc6d8aa0585ee473d2ba69dabbcb8bb66b85aa0eab7416c67a72ba50"></a>BALLER_ERR_GPU_MEM&#160;</td><td class="fielddoc"><p>GPU内存不足 </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a62d5d2703fc6d8aa0585ee473d2ba69dad300b042ab1f3946e2a8b3401faf6dd6"></a>BALLER_ERR_NO_GPU&#160;</td><td class="fielddoc"><p>未找到GPU设备 </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a62d5d2703fc6d8aa0585ee473d2ba69da4a9a5acea2a3af703d2ab7fa49ba003b"></a>BALLER_ERR_HARDWARE_INVALID&#160;</td><td class="fielddoc"><p>设置的硬件信息无效 </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a62d5d2703fc6d8aa0585ee473d2ba69da3540ca958369a64c0a3a82b80a5e5fb0"></a>BALLER_ERR_SAMPLE_RATE_INVALID&#160;</td><td class="fielddoc"><p>设置的采样率无效 </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a62d5d2703fc6d8aa0585ee473d2ba69da52a3d90c470e72e50abea4c7286b81e6"></a>BALLER_ERR_SAMPLE_SIZE_INVALID&#160;</td><td class="fielddoc"><p>设置的采样点大小无效 </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a62d5d2703fc6d8aa0585ee473d2ba69da60cd7c999897d955fe9babe2f864cccd"></a>BALLER_ERR_ENGINE_TYPE_INVALID&#160;</td><td class="fielddoc"><p>设置的引擎类型无效 </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a62d5d2703fc6d8aa0585ee473d2ba69da2c97232812301ccd56a2f9ddb6985227"></a>BALLER_ERR_ENGINE_TYPE_NO_SUPPORT&#160;</td><td class="fielddoc"><p>不支持的引擎类型 </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a62d5d2703fc6d8aa0585ee473d2ba69da8e95c372955aac1ea80d8543ec215394"></a>BALLER_ERR_ENGINE_TYPE_NO_AUTH&#160;</td><td class="fielddoc"><p>引擎类型未授权 </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a62d5d2703fc6d8aa0585ee473d2ba69da01ab88689f79f8430a25031c5dc72c99"></a>BALLER_ERR_INPUT_MODE_INVALID&#160;</td><td class="fielddoc"><p>设置的input_mode无效 </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a62d5d2703fc6d8aa0585ee473d2ba69da795549bb8912cacb58abbcb5ffe86fdc"></a>BALLER_ERR_LOG_LEVEL&#160;</td><td class="fielddoc"><p>日志级别错误 </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a62d5d2703fc6d8aa0585ee473d2ba69dac21dbdacb4b579bb2123465df5a4c1fb"></a>BALLER_ERR_DATA_LEN_INVALID&#160;</td><td class="fielddoc"><p>数据长度无效 </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a62d5d2703fc6d8aa0585ee473d2ba69da3a814dbda20ae254c903a81be267f861"></a>BALLER_ERR_VAD&#160;</td><td class="fielddoc"><p>VAD错误 </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a62d5d2703fc6d8aa0585ee473d2ba69daefdb22e06ebccdd4ae84f8525b8ceec6"></a>BALLER_ERR_ORG_ID_INVALID&#160;</td><td class="fielddoc"><p>组织ID无效 </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a62d5d2703fc6d8aa0585ee473d2ba69da20360c781c9ef755c9a1d51fab7d8fcf"></a>BALLER_ERR_APP_ID_INVALID&#160;</td><td class="fielddoc"><p>应用ID无效 </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a62d5d2703fc6d8aa0585ee473d2ba69da6c061fc1089661259de6750b6a1337d3"></a>BALLER_ERR_APP_KEY_INVALID&#160;</td><td class="fielddoc"><p>应用KEY无效 </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a62d5d2703fc6d8aa0585ee473d2ba69da16ea220891316a35812a12d3c446bd7c"></a>BALLER_ERR_ABILITY_ID_INVALID&#160;</td><td class="fielddoc"><p>能力ID无效 </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a62d5d2703fc6d8aa0585ee473d2ba69da0207a000dc2befbf112e2ded42ce95ad"></a>BALLER_ERR_LANGUAGE_INVALID&#160;</td><td class="fielddoc"><p>语言无效 </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a62d5d2703fc6d8aa0585ee473d2ba69dad217052157fb435fef4c3179841f4038"></a>BALLER_ERR_AUDIO_FORMAT_INVALID&#160;</td><td class="fielddoc"><p>音频格式错误 </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a62d5d2703fc6d8aa0585ee473d2ba69daedabe7a58fa77c71e8991548f97da820"></a>BALLER_ERR_DOMAIN_INVALID&#160;</td><td class="fielddoc"><p>域名无效 </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a62d5d2703fc6d8aa0585ee473d2ba69da547a46ec4ffbcadf4233f91d2f64bc84"></a>BALLER_ERR_PUNCTUATION&#160;</td><td class="fielddoc"><p>获取标点信息失败 </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a62d5d2703fc6d8aa0585ee473d2ba69da6564bfac13fe1b347238f9b4d63b0267"></a>BALLER_ERR_REPEAT_LOGIN&#160;</td><td class="fielddoc"><p>重复调用Login接口 </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a62d5d2703fc6d8aa0585ee473d2ba69da1dd2761715aeadb8161ae9781f6615b9"></a>BALLER_ERR_MISS_LOGIN&#160;</td><td class="fielddoc"><p>未登录 </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a62d5d2703fc6d8aa0585ee473d2ba69dae84fa8bf84c0ec11a807c5a6d2e4f238"></a>BALLER_ERR_MISS_SESSION_END&#160;</td><td class="fielddoc"><p>还有正在工作中的SESSION </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a62d5d2703fc6d8aa0585ee473d2ba69da0f883667bfcce8e129c64053a14598a7"></a>BALLER_MORE_RESULT&#160;</td><td class="fielddoc"><p>还有未取完的结构 需继续调用Get接口获取结果 </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a62d5d2703fc6d8aa0585ee473d2ba69da8576efbab3bb5abbd64f971b89ee3508"></a>BALLER_ERR_NO_RESULT&#160;</td><td class="fielddoc"><p>没有结果 </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a62d5d2703fc6d8aa0585ee473d2ba69dad6c310ccae8d4c6c6090523b54b4e5cb"></a>BALLER_ERR_SHARE_MEMORY_EMPTY&#160;</td><td class="fielddoc"><p>共享数据为空 </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a62d5d2703fc6d8aa0585ee473d2ba69daace6169dc00c65b6da8a0b7bca7c94ff"></a>BALLER_ERR_READ_SHARE_MEMORY_FAILED&#160;</td><td class="fielddoc"><p>读取共享数据失败 </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a62d5d2703fc6d8aa0585ee473d2ba69daaa4b06846d1f9cce6e17ce99814f07ab"></a>BALLER_ERR_WRITE_SHARE_MEMORY_FAILED&#160;</td><td class="fielddoc"><p>写入共享数据失败 </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a62d5d2703fc6d8aa0585ee473d2ba69dac724dbfeba5272ca76f8f23ab4577bfa"></a>BALLER_ERR_SHARE_MEMORY_CONTENT_INVALID&#160;</td><td class="fielddoc"><p>共享数据无效 </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a62d5d2703fc6d8aa0585ee473d2ba69daaef7962d382a682bac8678f95596f9a7"></a>BALLER_ERR_SHARE_MEMORY_CONFLICTING&#160;</td><td class="fielddoc"><p>共享数据冲突 </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a62d5d2703fc6d8aa0585ee473d2ba69da63d741596ac8a24bb0d27e463c2cf02d"></a>BALLER_ERR_TOO_MANY_PROCESS&#160;</td><td class="fielddoc"><p>打开进程数太多 </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a62d5d2703fc6d8aa0585ee473d2ba69daf6ff40f0cbf752f81c55db2884600873"></a>BALLER_ERR_LOCK_FILE_FAILED&#160;</td><td class="fielddoc"><p>锁文件失败 </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a62d5d2703fc6d8aa0585ee473d2ba69da94dcd95bc82536e5ce982842512a9b96"></a>BALLER_ERR_HTTP_REQUEST&#160;</td><td class="fielddoc"><p>HTTP请求出错 </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a62d5d2703fc6d8aa0585ee473d2ba69da9612918ae810515e4bb86514701de88d"></a>BALLER_ERR_HTTP_TIME_OUT&#160;</td><td class="fielddoc"><p>HTTP请求超时 </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a62d5d2703fc6d8aa0585ee473d2ba69da9f79d5583bb25affc9428fdca4ceb362"></a>BALLER_ERR_HTTP_BUSY&#160;</td><td class="fielddoc"><p>HTTP请求忙，请稍后在试 </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a62d5d2703fc6d8aa0585ee473d2ba69dac21ec7ecdea26d42daafe82fa20dd87f"></a>BALLER_ERR_HTTP_RESPONSE_EMPTY&#160;</td><td class="fielddoc"><p>HTTP应答内容为空 </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a62d5d2703fc6d8aa0585ee473d2ba69da48999699d0b7c77d04f3e0f67e759a2d"></a>BALLER_ERR_HTTP_RESPONSE_FORMAT_INVALID&#160;</td><td class="fielddoc"><p>HTTP应答格式错误 </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a62d5d2703fc6d8aa0585ee473d2ba69da94744472d2ae046d5e8b0d7a8dc6da85"></a>BALLER_ERR_REQUEST_TIME_MISS&#160;</td><td class="fielddoc"><p>未找到请求时间 </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a62d5d2703fc6d8aa0585ee473d2ba69da630db7e5522528849ffb363f1a9f8228"></a>BALLER_ERR_REQUEST_EXPIRES&#160;</td><td class="fielddoc"><p>请求已过期 </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a62d5d2703fc6d8aa0585ee473d2ba69da65bfc3ae84c6e5141930e782a7e9a8bc"></a>BALLER_ERR_REQUEST_HEADER_PARAM_MISS&#160;</td><td class="fielddoc"><p>未找到请求报文头部的参数 </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a62d5d2703fc6d8aa0585ee473d2ba69dab95da29c1560accd500448d159ea7e97"></a>BALLER_ERR_REQUEST_HEADER_PARAM_INVALID&#160;</td><td class="fielddoc"><p>请求报文头部的参数无效 </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a62d5d2703fc6d8aa0585ee473d2ba69da2a830590df60f5dae01366ef3a1e94ee"></a>BALLER_ERR_REQUEST_CHECK_SUM_MISS&#160;</td><td class="fielddoc"><p>未找到校验和 </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a62d5d2703fc6d8aa0585ee473d2ba69da340ec871b4ad77d273de23f7e1eb895d"></a>BALLER_ERR_REQUEST_CHECK_SUM_NOT_MATCH&#160;</td><td class="fielddoc"><p>校验和不匹配 </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a62d5d2703fc6d8aa0585ee473d2ba69da62904eb46498937ff2b2485bd26dbd04"></a>BALLER_ERR_REQUEST_DEVICE_INFO_INVALID&#160;</td><td class="fielddoc"><p>设备信息无效 </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a62d5d2703fc6d8aa0585ee473d2ba69da2e9611f65c1b88ce26c1bf88411715e8"></a>BALLER_ERR_REQUEST_BODY_FORMAT_INVALID&#160;</td><td class="fielddoc"><p>请求包体格式无效 </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a62d5d2703fc6d8aa0585ee473d2ba69da42689ee49d8f48d76db5232c62a71af4"></a>BALLER_ERR_REQUEST_ORG_ID_NOT_MATCH&#160;</td><td class="fielddoc"><p>组织ID不匹配 </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a62d5d2703fc6d8aa0585ee473d2ba69da8915c0f9c86ded91754924f314c073c0"></a>BALLER_ERR_REQUEST_APP_ID_NOT_MATCH&#160;</td><td class="fielddoc"><p>应用ID不匹配 </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a62d5d2703fc6d8aa0585ee473d2ba69da8565e65cc40575d351854375fa6b6ac8"></a>BALLER_ERR_REQUEST_APP_KEY_NOT_MATCH&#160;</td><td class="fielddoc"><p>应用KEY不匹配 </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a62d5d2703fc6d8aa0585ee473d2ba69dacadc61f583ee14928fc15b28ceb2c812"></a>BALLER_ERR_REQUEST_PUT_TIMES_INVALID&#160;</td><td class="fielddoc"><p>PUT次数参数无效 </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a62d5d2703fc6d8aa0585ee473d2ba69dafbf32dd84d0a75e7c793c425b43ba3b3"></a>BALLER_ERR_REQUEST_PUT_TOTAL_SIZE_INVALID&#160;</td><td class="fielddoc"><p>PUT总数据量参数无效 </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a62d5d2703fc6d8aa0585ee473d2ba69dacc333248ff33f2cd3abe897355751a62"></a>BALLER_ERR_ORG_NOT_EXIST&#160;</td><td class="fielddoc"><p>组织不存在 </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a62d5d2703fc6d8aa0585ee473d2ba69dab0fc082a366cb7789279278cd48d27ea"></a>BALLER_ERR_APP_NOT_EXIST&#160;</td><td class="fielddoc"><p>应用不存在 </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a62d5d2703fc6d8aa0585ee473d2ba69da9efaf42eb2f035f1cfd1709069828091"></a>BALLER_ERR_LICENSE_INFO_NOT_FOUND&#160;</td><td class="fielddoc"><p>未找到授权信息 </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a62d5d2703fc6d8aa0585ee473d2ba69dae567bd90d973f8291fae02494556bcf2"></a>BALLER_ERR_REQUEST_ID_INVALID&#160;</td><td class="fielddoc"><p>请求ID无效 </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a62d5d2703fc6d8aa0585ee473d2ba69daa59225674ff0a62d349d9dfbb947bae2"></a>BALLER_ERR_QUERY_REQUEST_STATUS_FAILED&#160;</td><td class="fielddoc"><p>检查请求ID状态失败 </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a62d5d2703fc6d8aa0585ee473d2ba69daea1725b6a60a2f18707f62a16b883025"></a>BALLER_ERR_QUERY_COMPUTING_SERVICE_FAILED&#160;</td><td class="fielddoc"><p>查询计算服务失败 </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a62d5d2703fc6d8aa0585ee473d2ba69da6c41bfdceef80c6ebeefff798749ce17"></a>BALLER_ERR_QUERY_COMPUTING_RESULT_FAILED&#160;</td><td class="fielddoc"><p>获取结果失败 </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a62d5d2703fc6d8aa0585ee473d2ba69da0ea99c43eb333b2a42a26ac1517e73b3"></a>BALLER_ERR_COMPUTING_SERVICE_IS_BUSY&#160;</td><td class="fielddoc"><p>计算服务正忙，请求稍后重试 </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a62d5d2703fc6d8aa0585ee473d2ba69da7b5882b3c24dc43ae43bfccfdb573d00"></a>BALLER_ERR_COMPUTING_TASK_DISTRIBUTE_TIMEOUT&#160;</td><td class="fielddoc"><p>计算任务分发超时 </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a62d5d2703fc6d8aa0585ee473d2ba69daf864212373399e52e5f0be2a9dd7df61"></a>BALLER_ERR_COMPUTING_TASK_DISTRIBUTE_FAILED&#160;</td><td class="fielddoc"><p>计算任务分发超时 </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a62d5d2703fc6d8aa0585ee473d2ba69dad2678ff79ac550cc935be0a4e36cf403"></a>BALLER_ERR_SESSION_CACHE_OVERLOAD&#160;</td><td class="fielddoc"><p>session的缓存超载 </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a62d5d2703fc6d8aa0585ee473d2ba69da903263c5c483eaf7889674ccd1306ef7"></a>BALLER_ERR_SESSION_STATUS_FAULT&#160;</td><td class="fielddoc"><p>session状态错误 </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a62d5d2703fc6d8aa0585ee473d2ba69daee97e60df69f1a0af782827204095df4"></a>BALLER_ERR_SESSION_TIME_OUT&#160;</td><td class="fielddoc"><p>session超时 </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a62d5d2703fc6d8aa0585ee473d2ba69da1ec580c81b93e92587ec424d9ce9a849"></a>BALLER_ERR_COMPUTING_DATA_INVALID&#160;</td><td class="fielddoc"><p>计算数据无效 </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a62d5d2703fc6d8aa0585ee473d2ba69dae44c37ef281cdb662f5f1347c9a8facf"></a>BALLER_ERR_CALLBACK_URL_INVALID&#160;</td><td class="fielddoc"><p>回调地址无效 </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a62d5d2703fc6d8aa0585ee473d2ba69da7ec96b2469b9445597fc52eac0301d2c"></a>BALLER_ERR_REQUEST_STAFF_ROLE_INVALID&#160;</td><td class="fielddoc"><p>管理员角色无效 </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a62d5d2703fc6d8aa0585ee473d2ba69dab4e5db1f5bfab2bcedb67f8eddce0508"></a>BALLER_ERR_ORG_NAME_INVALID&#160;</td><td class="fielddoc"><p>组织名称无效 </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a62d5d2703fc6d8aa0585ee473d2ba69da64f3cf6f7d64b65d8625a05bb9f96999"></a>BALLER_ERR_ORG_NAME_ALREADY_EXIST&#160;</td><td class="fielddoc"><p>组织名称已存在 </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a62d5d2703fc6d8aa0585ee473d2ba69daaca4d649d523e61815c5487a7822743a"></a>BALLER_ERR_CREATE_ORG_INFO_FAILED&#160;</td><td class="fielddoc"><p>创建组织信息失败 </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a62d5d2703fc6d8aa0585ee473d2ba69dafc6c38faf16b6d251dfe93a7b5dbc5df"></a>BALLER_ERR_MODIFY_ORG_INFO_FAILED&#160;</td><td class="fielddoc"><p>修改组织信息失败 </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a62d5d2703fc6d8aa0585ee473d2ba69da7adc77c16889f303cd6b4ab9ea7b2af3"></a>BALLER_ERR_QUERY_ORG_INFO_FAILED&#160;</td><td class="fielddoc"><p>查询组织信息失败 </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a62d5d2703fc6d8aa0585ee473d2ba69da636222b6a16bc9110bad802937fa1455"></a>BALLER_ERR_QUERY_ORG_APPS_FAILED&#160;</td><td class="fielddoc"><p>查询组织下有哪些应用失败 </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a62d5d2703fc6d8aa0585ee473d2ba69da79d7f8b2770ee1748a0d324a4eb00ed9"></a>BALLER_ERR_CREATE_APP_INFO_FAILED&#160;</td><td class="fielddoc"><p>创建应用失败 </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a62d5d2703fc6d8aa0585ee473d2ba69da01f6c2c85ef0f059e99b725929e69e6b"></a>BALLER_ERR_QUERY_APP_INFO_FAILED&#160;</td><td class="fielddoc"><p>查询应用失败 </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a62d5d2703fc6d8aa0585ee473d2ba69da0498e5463c61309bdafa7eefbb079e53"></a>BALLER_ERR_ADD_ABILITY_INFO_FAILED&#160;</td><td class="fielddoc"><p>添加能力失败 </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a62d5d2703fc6d8aa0585ee473d2ba69da0c0f6d698542bb63453942b3e4a37055"></a>BALLER_ERR_MODIFY_ABILITY_INFO_FAILED&#160;</td><td class="fielddoc"><p>修改能力失败 </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a62d5d2703fc6d8aa0585ee473d2ba69daed40d390efbdee844c4084eb26817318"></a>BALLER_ERR_QUERY_ABILITY_INFO_FAILED&#160;</td><td class="fielddoc"><p>查询能力失败 </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a62d5d2703fc6d8aa0585ee473d2ba69daed6e9c6bf82fe9e580f087d109c8f3bc"></a>BALLER_ERR_ADD_PREORDER_DEVICE_FAILED&#160;</td><td class="fielddoc"><p>添加预购设备失败 </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a62d5d2703fc6d8aa0585ee473d2ba69da59878738bdbdbf2b18fa27581d40cf18"></a>BALLER_ERR_PREORDER_DEVICE_INFO_INVALID&#160;</td><td class="fielddoc"><p>预购设备信息无效 </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a62d5d2703fc6d8aa0585ee473d2ba69da4b8e84e21aa919ca20ca9a35d7d7322c"></a>BALLER_ERR_GENERATE_ORG_ID_FAILED&#160;</td><td class="fielddoc"><p>生成组织ID失败 </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a62d5d2703fc6d8aa0585ee473d2ba69da5d4062f27423b550a464e6e03c060c73"></a>BALLER_ERR_GENERATE_APP_ID_FAILED&#160;</td><td class="fielddoc"><p>生成应用ID失败 </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a62d5d2703fc6d8aa0585ee473d2ba69dad8c83fcd6723a8cdd0684f9b92d12886"></a>BALLER_ERR_INTERNAL&#160;</td><td class="fielddoc"><p>内部错误 </p>
+</td></tr>
+</table>
+
+<p class="definition">在文件 <a class="el" href="baller__errors_8h_source.html">baller_errors.h</a> 第 <a class="el" href="baller__errors_8h_source.html#l00015">15</a> 行定义.</p>
+
+</div>
+</div>
+</div><!-- contents -->
+</div><!-- doc-content -->
+<!-- start footer part -->
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="navelem"><a class="el" href="dir_1148ebc2b25b55095aebf6f4cbb6efca.html">Doxygen</a></li><li class="navelem"><a class="el" href="baller__errors_8h.html">baller_errors.h</a></li>
+    <li class="footer">制作者
+    <a href="http://www.doxygen.org/index.html">
+    <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.16 </li>
+  </ul>
+</div>
+</body>
+</html>

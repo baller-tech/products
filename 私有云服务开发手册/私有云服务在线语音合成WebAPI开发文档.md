@@ -64,6 +64,7 @@ input_mode | string | 仅支持"once"
 关键字 | 类型 | 说明
 ---|---|---
 B-Code| int | 处理的结果码 
+B-Message| string | 描述信息 |
 B-Request-Id| string | 请求的唯一标示（与业务参数中的request_id相同）
 B-Is-End | int | 0-语音合成的结果未回调完毕；1-语音合成的结果已全部回调完毕，
 
@@ -72,6 +73,7 @@ B-Is-End | int | 0-语音合成的结果未回调完毕；1-语音合成的结�
 关键字 | 类型 | 说明
 ---|---|---
 code| int | 处理的结果码
+message| string | 描述信息 |
 request_id| string | 请求的唯一标示（与业务参数中的request_id相同）
 
 &nbsp;&nbsp;&nbsp;&nbsp; 调用者收到回调后，在回复的响应报文中，状态码200表示处理成功，其他状态码标示处理失败。服务器收到调用者回复的非200的错误码时，只会记录该信息，不会对相同的数据进行重新发送。
@@ -138,6 +140,7 @@ request_id | string | 请求的唯一标示 （后面会有详细介绍）
 关键字 | 类型 | 说明
 ---|---|---
 B-Code| int | 请求处理的结果码 |
+B-Message| string | 描述信息 |
 B-Request-Id| string | 请求的唯一标示（与业务参数中的request_id相同） |
 B-Is-End | int | 0-语音合成的结果未获取完毕，需继续发送get请求；1-语音合成的结果已全部获取完毕，不需再次发送get请求
 
@@ -147,6 +150,7 @@ B-Is-End | int | 0-语音合成的结果未获取完毕，需继续发送get请�
 关键字 | 类型 | 说明
 ---|---|---
 code| int | 请求处理的结果码 |
+message| string | 描述信息 |
 request_id| string | 请求的唯一标示（与业务参数中的request_id相同） ;当认为请求不合法时，没有该字段|
 
 ## 支持的语种以及音频格式

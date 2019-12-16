@@ -1,3 +1,9 @@
+20191216
+* 语音识别文档中http回调中添加了message字段
+* 语音识别文档中http get请求的回复中添加了message字段
+* 语音合成文档中http回调中添加了message/B-Message字段
+* 语音合成文档中http get请求的回复中添加了message/B-Message字段
+
 20191210
 * 语音识别文档中http回调中去掉了data_incomplete字段，添加了is_complete字段
 * 语音识别文档get请求的结果中去掉了data_incomplete字段，添加了is_complete字段

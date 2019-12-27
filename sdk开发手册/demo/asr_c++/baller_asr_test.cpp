@@ -25,19 +25,32 @@
 #include "baller_common.h"
 #include "baller_asr.h"
 
+/**
+ * 根据开发手册或baller_asr.h中的描述，baller asr sdk支持四种常用的使用场景，调用者根据自己的需求确定属于哪一类场景。
+ * 1. 音频数据一次性输入且不需要动态修正
+ * 2. 音频数据一次性输入且需要动态修正
+ * 3. 音频数据连续输入且不需要动态修正
+ * 4. 音频数据连续输入且需要动态修正
+ * 
+ * 本示例中分别显示了四种场景调用的核心代码的逻辑，场景与核心代码逻辑的对应关系为：
+ * 1. 音频数据一次性输入且不需要动态修正 请重点参考 test_once_whitout_dynamic_correction 方法
+ * 2. 音频数据一次性输入且需要动态修正 请重点参考 test_once_with_dynamic_correction 方法
+ * 3. 音频数据连续输入且不需要动态修正 请重点参考 test_continue_whitout_dynamic_correction 方法
+ * 4. 音频数据连续输入且需要动态修正  请重点参考 test_continue_with_dynamic_correction 方法
+ */
+
 #define DATA_PATH                       ("data")
-#define LANGUAGE                        ("tib_kb")
+#define LANGUAGE                        ("tib_ad")
 #define SAMPLE_RATE                     (8000)
 #define SAMPLE_SIZE                     (16)
+
 // pcm file
-#define PCM_FILE                        ("tib_kb.pcm")
+#define PCM_FILE                        ("tib_ad.pcm")
+
 // customer information
 #define ORG_ID                            (1)
-#define APP_ID                            (1)
-#define APP_KEY                           ("123")
-
-//#define TEST_ONCE
-#define TEST_COUTINUE
+#define APP_ID                            (2)
+#define APP_KEY                           ("3")
 
 #ifdef _WIN32
 #define get_thread_id   ::GetCurrentThreadId()
@@ -112,6 +125,335 @@ int ReadPCMData(const char* pszFile, char** ppPCMData, int* piPCMDataLen)
     return *piPCMDataLen;
 }
 
+void show_result(const std::vector<std::string>& vecResult)
+{
+    printf("result: ");
+    for (std::size_t iIndex = 0; iIndex < vecResult.size(); ++iIndex)
+    {
+#ifdef _WIN32
+        char * gb = u8_to_gb(vecResult[iIndex].c_str());
+        printf("%s", gb);
+        free(gb);
+#else
+        printf("%s", vecResult[iIndex].c_str());
+#endif
+    }
+
+    printf("\n");
+}
+
+void test_once_whitout_dynamic_correction(baller_session_id session_id, char* pPCMData, int iPCMDataLen)
+{
+    const char* params_once = "input_mode=once";
+    int iRet = BallerASRPut(session_id, params_once, pPCMData, iPCMDataLen);
+    if (BALLER_SUCCESS != iRet)
+    {
+        printf("Call BallerASRPut failed. Return Code: %d\n", iRet);
+        return;
+    }
+
+    std::vector<std::string> vecResult;
+    while (1)
+    {
+        char *pResult = NULL;
+        int iResultLen = 0;
+        int iStatus = 0;
+
+        iRet = BallerASRGet(session_id, &pResult, &iResultLen, &iStatus);
+        if (BALLER_MORE_RESULT == iRet || BALLER_SUCCESS == iRet)
+        {
+            // 不使用动态修正时只需关心子句完整的识别结果；iStatus==BALLER_ASR_STATUS_COMPLETE时的识别结果
+            if (iResultLen > 0 && pResult && BALLER_ASR_STATUS_COMPLETE == iStatus)
+            {
+                vecResult.push_back(std::string(pResult));
+                show_result(vecResult);
+            }
+
+            if (BALLER_MORE_RESULT == iRet)
+            {
+                // 还有识别结果需要获取 需继续调用BallerASRGet
+                BallerSleepMSec(150);
+                continue;
+            }
+            else if (BALLER_SUCCESS == iRet)
+            {
+                // 识别结果已获取完毕，不需要继续调用BallerASRGet
+                break;
+            }
+        }
+        else
+        {
+            // 获取结果出错 不需要继续调用BallerASRGet
+            printf("Call BallerASRGet failed. Return Code: %d\n", iRet);
+            break;
+        }
+    }
+} 
+
+void test_once_with_dynamic_correction(baller_session_id session_id, char* pPCMData, int iPCMDataLen)
+{
+    const char* params_once = "input_mode=once";
+    int iRet = BallerASRPut(session_id, params_once, pPCMData, iPCMDataLen);
+    if (BALLER_SUCCESS != iRet)
+    {
+        printf("Call BallerASRPut failed. Return Code: %d\n", iRet);
+        return;
+    }
+
+    std::vector<std::string> vecResult;
+    int iLastStatus = BALLER_ASR_STATUS_COMPLETE;
+
+    while (1)
+    {
+        char *pResult = NULL;
+        int iResultLen = 0;
+        int iStatus = 0;
+
+        iRet = BallerASRGet(session_id, &pResult, &iResultLen, &iStatus);
+        if (BALLER_MORE_RESULT == iRet || BALLER_SUCCESS == iRet)
+        {
+            // 使用动态修正时既需关心子句完整的识别结果；也需关心子句中间状态的结果
+            if (iResultLen > 0 && pResult)
+            {
+                if (BALLER_ASR_STATUS_INCOMPLETE == iLastStatus)
+                {
+                    // 如果上一次获取结果的状态为BALLER_ASR_STATUS_INCOMPLETE，表示上一次获取的结果是不完整的，本次获取的结果是对上一次获取结果的修正
+                    // 这里使用本次获取的结果替换上次获取的结果
+                    vecResult.pop_back();
+                    vecResult.push_back(std::string(pResult));
+                }
+                else
+                {
+                    // 如果上一次获取结果的状态为BALLER_ASR_STATUS_COMPLETE，表示上一次获取的结果是一个子句完整的结果，本次获取的结果是一个新子句的结果
+                    // 这里使用本次获取的结果替换上次获取的结果
+                    vecResult.push_back(std::string(pResult));
+                }
+
+                iLastStatus = iStatus;
+                show_result(vecResult);
+            }
+
+            if (BALLER_MORE_RESULT == iRet)
+            {
+                // 还有识别结果需要获取 需继续调用BallerASRGet
+                BallerSleepMSec(150);
+                continue;
+            }
+            else if (BALLER_SUCCESS == iRet)
+            {
+                // 识别结果已获取完毕，不需要继续调用BallerASRGet
+                break;
+            }
+        }
+        else
+        {
+            // 获取结果出错 不需要继续调用BallerASRGet
+            printf("Call BallerASRGet failed. Return Code: %d\n", iRet);
+            break;
+        }
+    }
+}
+
+void test_continue_whitout_dynamic_correction(baller_session_id session_id, char* pPCMData, int iPCMDataLen)
+{
+    // 模拟录音设备采集到音频数据后实时的将音频数据发送给sdk；每次向sdk发送40ms的8k16bit的音频数据
+    int iPackageSize = 16 * 40;
+    int iUsedSize = 0;
+    int iRet = BALLER_SUCCESS;
+    std::vector<std::string> vecResult;
+
+    char *pResult = NULL;
+    int iResultLen = 0;
+    int iStatus = 0;
+
+    for (; iPCMDataLen - iUsedSize > iPackageSize; iUsedSize += iPackageSize)
+    {
+        const char* params_continue = "input_mode=continue";
+        iRet = BallerASRPut(session_id, params_continue, pPCMData + iUsedSize, iPackageSize);
+        if (BALLER_SUCCESS != iRet)
+        {
+            printf("Call BallerASRPut failed. Return Code: %d\n", iRet);
+            return;
+        }
+
+        iRet = BallerASRGet(session_id, &pResult, &iResultLen, &iStatus);
+        // continue模式下BallerASRPut的input_mode没有传入end时，BallerASRGet不会返回BALLER_SUCCESS。
+        if (BALLER_MORE_RESULT == iRet)
+        {
+            // 不使用动态修正时只需关心子句完整的识别结果；iStatus==BALLER_ASR_STATUS_COMPLETE时的识别结果
+            if (iResultLen > 0 && pResult && BALLER_ASR_STATUS_COMPLETE == iStatus)
+            {
+                vecResult.push_back(std::string(pResult));
+                show_result(vecResult);
+            }
+        }
+        else
+        {
+            // 获取结果出错 不需要继续调用BallerASRGet
+            printf("Call BallerASRGet failed. Return Code: %d\n", iRet);
+            return;
+        }
+    }
+
+    const char* params_end = "input_mode=end";
+    iRet = BallerASRPut(session_id, params_end, pPCMData + iUsedSize, iPCMDataLen - iUsedSize);
+    if (BALLER_SUCCESS != iRet)
+    {
+        printf("Call BallerASRPut failed. Return Code: %d\n", iRet);
+        return;
+    }
+
+    while (1)
+    {
+        char *pResult = NULL;
+        int iResultLen = 0;
+        int iStatus = 0;
+
+        iRet = BallerASRGet(session_id, &pResult, &iResultLen, &iStatus);
+        if (BALLER_MORE_RESULT == iRet || BALLER_SUCCESS == iRet)
+        {
+            // 不使用动态修正时只需关心子句完整的识别结果；iStatus==BALLER_ASR_STATUS_COMPLETE时的识别结果
+            if (iResultLen > 0 && pResult && BALLER_ASR_STATUS_COMPLETE == iStatus)
+            {
+                vecResult.push_back(std::string(pResult));
+                show_result(vecResult);
+            }
+
+            if (BALLER_MORE_RESULT == iRet)
+            {
+                // 还有识别结果需要获取 需继续调用BallerASRGet
+                BallerSleepMSec(150);
+                continue;
+            }
+            else if (BALLER_SUCCESS == iRet)
+            {
+                // 识别结果已获取完毕，不需要继续调用BallerASRGet
+                break;
+            }
+        }
+        else
+        {
+            // 获取结果出错 不需要继续调用BallerASRGet
+            printf("Call BallerASRGet failed. Return Code: %d\n", iRet);
+            break;
+        }
+    }
+}
+
+void test_continue_with_dynamic_correction(baller_session_id session_id, char* pPCMData, int iPCMDataLen)
+{
+    // 模拟录音设备采集到音频数据后实时的将音频数据发送给sdk；每次向sdk发送40ms的8k16bit的音频数据
+    int iPackageSize = 16 * 40;
+    int iUsedSize = 0;
+    int iRet = BALLER_SUCCESS;
+    int iLastStatus = BALLER_ASR_STATUS_COMPLETE;
+    std::vector<std::string> vecResult;
+
+    char *pResult = NULL;
+    int iResultLen = 0;
+    int iStatus = 0;
+
+    for (; iPCMDataLen - iUsedSize > iPackageSize; iUsedSize += iPackageSize)
+    {
+        const char* params_continue = "input_mode=continue";
+        iRet = BallerASRPut(session_id, params_continue, pPCMData + iUsedSize, iPackageSize);
+        if (BALLER_SUCCESS != iRet)
+        {
+            printf("Call BallerASRPut failed. Return Code: %d\n", iRet);
+            return;
+        }
+
+        iRet = BallerASRGet(session_id, &pResult, &iResultLen, &iStatus);
+        // continue模式下BallerASRPut的input_mode没有传入end时，BallerASRGet不会返回BALLER_SUCCESS。
+        if (BALLER_MORE_RESULT == iRet)
+        {
+            if (iResultLen > 0 && pResult)
+            {
+                if (BALLER_ASR_STATUS_INCOMPLETE == iLastStatus)
+                {
+                    // 如果上一次获取结果的状态为BALLER_ASR_STATUS_INCOMPLETE，表示上一次获取的结果是不完整的，本次获取的结果是对上一次获取结果的修正
+                    // 这里使用本次获取的结果替换上次获取的结果
+                    vecResult.pop_back();
+                    vecResult.push_back(std::string(pResult));
+                }
+                else
+                {
+                    // 如果上一次获取结果的状态为BALLER_ASR_STATUS_COMPLETE，表示上一次获取的结果是一个子句完整的结果，本次获取的结果是一个新子句的结果
+                    // 这里使用本次获取的结果替换上次获取的结果
+                    vecResult.push_back(std::string(pResult));
+                }
+
+                iLastStatus = iStatus;
+                show_result(vecResult);
+            }
+        }
+        else
+        {
+            // 获取结果出错 不需要继续调用BallerASRGet
+            printf("Call BallerASRGet failed. Return Code: %d\n", iRet);
+            return;
+        }
+    }
+
+    const char* params_end = "input_mode=end";
+    iRet = BallerASRPut(session_id, params_end, pPCMData + iUsedSize, iPCMDataLen - iUsedSize);
+    if (BALLER_SUCCESS != iRet)
+    {
+        printf("Call BallerASRPut failed. Return Code: %d\n", iRet);
+        return;
+    }
+
+    while (1)
+    {
+        char *pResult = NULL;
+        int iResultLen = 0;
+        int iStatus = 0;
+
+        iRet = BallerASRGet(session_id, &pResult, &iResultLen, &iStatus);
+        if (BALLER_MORE_RESULT == iRet || BALLER_SUCCESS == iRet)
+        {
+            if (iResultLen > 0 && pResult)
+            {
+
+                if (BALLER_ASR_STATUS_INCOMPLETE == iLastStatus)
+                {
+                    // 如果上一次获取结果的状态为BALLER_ASR_STATUS_INCOMPLETE，表示上一次获取的结果是不完整的，本次获取的结果是对上一次获取结果的修正
+                    // 这里使用本次获取的结果替换上次获取的结果
+                    vecResult.pop_back();
+                    vecResult.push_back(std::string(pResult));
+                }
+                else
+                {
+                    // 如果上一次获取结果的状态为BALLER_ASR_STATUS_COMPLETE，表示上一次获取的结果是一个子句完整的结果，本次获取的结果是一个新子句的结果
+                    // 这里使用本次获取的结果替换上次获取的结果
+                    vecResult.push_back(std::string(pResult));
+                }
+
+                iLastStatus = iStatus;
+                show_result(vecResult);
+            }
+
+            if (BALLER_MORE_RESULT == iRet)
+            {
+                // 还有识别结果需要获取 需继续调用BallerASRGet
+                BallerSleepMSec(150);
+                continue;
+            }
+            else if (BALLER_SUCCESS == iRet)
+            {
+                // 识别结果已获取完毕，不需要继续调用BallerASRGet
+                break;
+            }
+        }
+        else
+        {
+            // 获取结果出错 不需要继续调用BallerASRGet
+            printf("Call BallerASRGet failed. Return Code: %d\n", iRet);
+            break;
+        }
+    }
+} 
+
 #ifdef _WIN32
 DWORD WINAPI TestASR(LPVOID param)
 #else  // unix-like
@@ -144,173 +486,17 @@ void * TestASR(void * param)
 
     for (int loop_index = 0; loop_index < thread_param->loop_cnt; ++loop_index)
     {
-#if defined(TEST_ONCE)
-        // Call the BallerASRPut interface to put pcm data
-        const char* params_once = "input_mode=once";
-        iRet = BallerASRPut(session_id, params_once, thread_param->pcm_data, thread_param->pcm_data_len);
-        if (iRet != BALLER_SUCCESS)
-        {
-            printf("Call BallerASRPut failed. Return Code: %d\n", iRet);
+        printf("start call test_once_whitout_dynamic_correction\n");
+        test_once_whitout_dynamic_correction(session_id, thread_param->pcm_data, thread_param->pcm_data_len);
 
-            iRet = BallerASRSessionEnd(session_id);
-            if (iRet != BALLER_SUCCESS)
-            {
-                printf("Call BallerASRSessionEnd failed. Return Code: %d\n", iRet);
-            }
+        printf("\nstart call test_once_with_dynamic_correction\n");
+        test_once_with_dynamic_correction(session_id, thread_param->pcm_data, thread_param->pcm_data_len);
 
-            return 0;
-        }
+        printf("\nstart call test_continue_whitout_dynamic_correction\n");
+        test_continue_whitout_dynamic_correction(session_id, thread_param->pcm_data, thread_param->pcm_data_len);
 
-        // Call the BallerASRGet interface to get result
-        while (1)
-        {
-            char *pResult = NULL;
-            int iResultLen = 0;
-            int iStatus = 0;
-
-            iRet = BallerASRGet(session_id, &pResult, &iResultLen, &iStatus);
-            if (iRet == BALLER_MORE_RESULT)
-            {
-                if (iResultLen > 0 && pResult)
-                {
-#ifdef _WIN32
-                    char * gb = u8_to_gb((const char *)pResult);
-                    printf("BallerASRGet is complete: %d result: %s\n", iStatus, gb);
-                    free(gb);
-#else
-                    printf("BallerASRGet is complete: %d result: %s\n", iStatus, pResult);
-#endif
-                }
-
-                // There is also more result, please continue to call the BallerASRGet interface
-                continue;
-            }
-            else if (iRet == BALLER_SUCCESS)
-            {
-                if (iResultLen > 0 && pResult)
-                {
-#ifdef _WIN32
-                    char * gb = u8_to_gb((const char *)pResult);
-                    printf("BallerASRGet is complete: %d result: %s\n", iStatus, gb);
-                    free(gb);
-#else
-                    printf("BallerASRGet is complete: %d result: %s\n", iStatus, pResult);
-#endif
-                }
-                printf("BallerASRGet Finish\n");
-                break;
-            }
-            else
-            {
-                printf("Call BallerASRGet failed. Return Code: %d\n", iRet);
-
-                break;
-            }
-        }
-#elif defined(TEST_COUTINUE)
-        // 模拟录音设备采集到音频数据后实时的将音频数据发送给sdk；每次向sdk发送40ms的8k16bit的音频数据
-        int iPackageSize = 16 * 40;
-        int iUsedSize = 0;
-        for (; thread_param->pcm_data_len - iUsedSize > iPackageSize && (BALLER_SUCCESS == iRet || BALLER_MORE_RESULT == iRet); iUsedSize += iPackageSize)
-        {
-            const char *pszInputParam = "input_mode=continue";
-            iRet = BallerASRPut(session_id, pszInputParam, thread_param->pcm_data + iUsedSize, iPackageSize);
-            if (BALLER_SUCCESS == iRet)
-            {
-                char* pOutData = 0;
-                int iOutDataLen = 0;
-                int iStatus = 0;
-                iRet = BallerASRGet(session_id, &pOutData, &iOutDataLen, &iStatus);
-
-                if (BALLER_SUCCESS == iRet || BALLER_MORE_RESULT == iRet)
-                {
-                    if (pOutData && iOutDataLen > 0)
-                    {
-#ifdef _WIN32
-                        char * gb = u8_to_gb((const char *)pOutData);
-                        printf("BallerASRGet is complete: %d result: %s\n", iStatus, gb);
-                        free(gb);
-#else
-                        printf("BallerASRGet is complete: %d result: %s\n", iStatus, pOutData);
-#endif
-                    }
-                }
-                else
-                {
-                    printf("Call BallerASRGet failed. Return Code: %d\n", iRet);
-                    break;
-                }
-            }
-            else
-            {
-                printf("Call BallerASRPut failed. Return Code: %d\n", iRet);
-                break;
-            }
-        }
-
-        if (BALLER_SUCCESS == iRet || BALLER_MORE_RESULT == iRet)
-        {
-            // 处理最后一包
-            if (thread_param->pcm_data_len - iUsedSize > 0)
-            {
-                const char *pszInputParam = "input_mode=end";
-                iRet = BallerASRPut(session_id, pszInputParam, thread_param->pcm_data + iUsedSize, thread_param->pcm_data_len - iUsedSize);
-                if (BALLER_SUCCESS != iRet)
-                {
-                    printf("Call BallerASRPut failed. Return Code: %d\n", iRet);
-                    break;
-                }
-            }
-
-            while (1)
-            {
-                char *pResult = NULL;
-                int iResultLen = 0;
-                int iStatus = 0;
-
-                iRet = BallerASRGet(session_id, &pResult, &iResultLen, &iStatus);
-                if (iRet == BALLER_MORE_RESULT)
-                {
-                    if (iResultLen > 0 && pResult)
-                    {
-#ifdef _WIN32
-                        char * gb = u8_to_gb((const char *)pResult);
-                        printf("BallerASRGet is complete: %d result: %s\n", iStatus, gb);
-                        free(gb);
-#else
-                        printf("BallerASRGet is complete: %d result: %s\n", iStatus, pResult);
-#endif
-                    }
-
-                    // There is also more result, please continue to call the BallerASRGet interface
-                    continue;
-                }
-                else if (iRet == BALLER_SUCCESS)
-                {
-                    if (iResultLen > 0 && pResult)
-                    {
-#ifdef _WIN32
-                        char * gb = u8_to_gb((const char *)pResult);
-                        printf("BallerASRGet is complete: %d result: %s\n", iStatus, gb);
-                        free(gb);
-#else
-                        printf("BallerASRGet is complete: %d result: %s\n", iStatus, pResult);
-#endif
-                    }
-                    printf("BallerASRGet Finish\n");
-                    break;
-                }
-                else
-                {
-                    printf("Call BallerASRGet failed. Return Code: %d\n", iRet);
-
-                    break;
-                }
-
-                BallerSleepMSec(150);
-            }
-        }
-#endif
+        printf("\nstart call test_continue_with_dynamic_correction\n");
+        test_continue_with_dynamic_correction(session_id, thread_param->pcm_data, thread_param->pcm_data_len);
     }
 
     // Call BallerASRSessionEnd interface to release session
@@ -354,7 +540,7 @@ int main()
     s_thread_param thread_param;
     thread_param.dir = "data";
     thread_param.language = LANGUAGE;
-    thread_param.loop_cnt = 10;
+    thread_param.loop_cnt = 1;
     thread_param.pcm_data = pPCMData;
     thread_param.pcm_data_len = iPCMLen;
     thread_param.sample_size = SAMPLE_SIZE;

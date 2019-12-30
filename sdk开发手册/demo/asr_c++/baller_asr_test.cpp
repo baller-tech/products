@@ -160,7 +160,18 @@ void test_once_whitout_dynamic_correction(baller_session_id session_id, char* pP
         int iStatus = 0;
 
         iRet = BallerASRGet(session_id, &pResult, &iResultLen, &iStatus);
-        if (BALLER_MORE_RESULT == iRet || BALLER_SUCCESS == iRet)
+        if (BALLER_SUCCESS == iRet)
+        {
+            // 当返回值为BALLER_SUCCESS时如果有识别结果，则识别结果的状态一定为BALLER_ASR_STATUS_COMPLETE。
+            if (iResultLen > 0 && pResult)
+            {
+                vecResult.push_back(std::string(pResult));
+                show_result(vecResult);
+            }
+            // 识别结果已获取完毕，不需要继续调用BallerASRGet
+            break;
+        }
+        else if (BALLER_MORE_RESULT == iRet)
         {
             // 不使用动态修正时只需关心子句完整的识别结果；iStatus==BALLER_ASR_STATUS_COMPLETE时的识别结果
             if (iResultLen > 0 && pResult && BALLER_ASR_STATUS_COMPLETE == iStatus)
@@ -169,17 +180,9 @@ void test_once_whitout_dynamic_correction(baller_session_id session_id, char* pP
                 show_result(vecResult);
             }
 
-            if (BALLER_MORE_RESULT == iRet)
-            {
-                // 还有识别结果需要获取 需继续调用BallerASRGet
-                BallerSleepMSec(150);
-                continue;
-            }
-            else if (BALLER_SUCCESS == iRet)
-            {
-                // 识别结果已获取完毕，不需要继续调用BallerASRGet
-                break;
-            }
+            // 还有识别结果需要获取 需继续调用BallerASRGet
+            BallerSleepMSec(150);
+            continue;
         }
         else
         {
@@ -210,7 +213,31 @@ void test_once_with_dynamic_correction(baller_session_id session_id, char* pPCMD
         int iStatus = 0;
 
         iRet = BallerASRGet(session_id, &pResult, &iResultLen, &iStatus);
-        if (BALLER_MORE_RESULT == iRet || BALLER_SUCCESS == iRet)
+        if (BALLER_SUCCESS == iRet)
+        {
+            if (iResultLen > 0 && pResult)
+            {
+                printf("[%d] %s\n", __LINE__, pResult);
+                if (BALLER_ASR_STATUS_INCOMPLETE == iLastStatus)
+                {
+                    // 如果上一次获取结果的状态为BALLER_ASR_STATUS_INCOMPLETE，表示上一次获取的结果是不完整的，本次获取的结果是对上一次获取结果的修正
+                    // 这里使用本次获取的结果替换上次获取的结果
+                    vecResult.pop_back();
+                    vecResult.push_back(std::string(pResult));
+                }
+                else
+                {
+                    // 如果上一次获取结果的状态为BALLER_ASR_STATUS_COMPLETE，表示上一次获取的结果是一个子句完整的结果，本次获取的结果是一个新子句的结果
+                    // 这里使用本次获取的结果替换上次获取的结果
+                    vecResult.push_back(std::string(pResult));
+                }
+                show_result(vecResult);
+            }
+
+            // 识别结果已获取完毕，不需要继续调用BallerASRGet
+            break;
+        }
+        else if (BALLER_MORE_RESULT == iRet)
         {
             // 使用动态修正时既需关心子句完整的识别结果；也需关心子句中间状态的结果
             if (iResultLen > 0 && pResult)
@@ -233,17 +260,9 @@ void test_once_with_dynamic_correction(baller_session_id session_id, char* pPCMD
                 show_result(vecResult);
             }
 
-            if (BALLER_MORE_RESULT == iRet)
-            {
-                // 还有识别结果需要获取 需继续调用BallerASRGet
-                BallerSleepMSec(150);
-                continue;
-            }
-            else if (BALLER_SUCCESS == iRet)
-            {
-                // 识别结果已获取完毕，不需要继续调用BallerASRGet
-                break;
-            }
+            // 还有识别结果需要获取 需继续调用BallerASRGet
+            BallerSleepMSec(150);
+            continue;
         }
         else
         {
@@ -310,7 +329,19 @@ void test_continue_whitout_dynamic_correction(baller_session_id session_id, char
         int iStatus = 0;
 
         iRet = BallerASRGet(session_id, &pResult, &iResultLen, &iStatus);
-        if (BALLER_MORE_RESULT == iRet || BALLER_SUCCESS == iRet)
+        if (BALLER_SUCCESS == iRet)
+        {
+            // 当返回值为BALLER_SUCCESS时如果有识别结果，则识别结果的状态一定为BALLER_ASR_STATUS_COMPLETE。
+            if (iResultLen > 0 && pResult)
+            {
+                vecResult.push_back(std::string(pResult));
+                show_result(vecResult);
+            }
+
+            // 识别结果已获取完毕，不需要继续调用BallerASRGet
+            break;
+        }
+        else if (BALLER_MORE_RESULT == iRet)
         {
             // 不使用动态修正时只需关心子句完整的识别结果；iStatus==BALLER_ASR_STATUS_COMPLETE时的识别结果
             if (iResultLen > 0 && pResult && BALLER_ASR_STATUS_COMPLETE == iStatus)
@@ -319,17 +350,9 @@ void test_continue_whitout_dynamic_correction(baller_session_id session_id, char
                 show_result(vecResult);
             }
 
-            if (BALLER_MORE_RESULT == iRet)
-            {
-                // 还有识别结果需要获取 需继续调用BallerASRGet
-                BallerSleepMSec(150);
-                continue;
-            }
-            else if (BALLER_SUCCESS == iRet)
-            {
-                // 识别结果已获取完毕，不需要继续调用BallerASRGet
-                break;
-            }
+            // 还有识别结果需要获取 需继续调用BallerASRGet
+            BallerSleepMSec(150);
+            continue;
         }
         else
         {
@@ -410,7 +433,31 @@ void test_continue_with_dynamic_correction(baller_session_id session_id, char* p
         int iStatus = 0;
 
         iRet = BallerASRGet(session_id, &pResult, &iResultLen, &iStatus);
-        if (BALLER_MORE_RESULT == iRet || BALLER_SUCCESS == iRet)
+        if (BALLER_SUCCESS == iRet)
+        {
+            if (iResultLen > 0 && pResult)
+            {
+
+                if (BALLER_ASR_STATUS_INCOMPLETE == iLastStatus)
+                {
+                    // 如果上一次获取结果的状态为BALLER_ASR_STATUS_INCOMPLETE，表示上一次获取的结果是不完整的，本次获取的结果是对上一次获取结果的修正
+                    // 这里使用本次获取的结果替换上次获取的结果
+                    vecResult.pop_back();
+                    vecResult.push_back(std::string(pResult));
+                }
+                else
+                {
+                    // 如果上一次获取结果的状态为BALLER_ASR_STATUS_COMPLETE，表示上一次获取的结果是一个子句完整的结果，本次获取的结果是一个新子句的结果
+                    // 这里使用本次获取的结果替换上次获取的结果
+                    vecResult.push_back(std::string(pResult));
+                }
+                show_result(vecResult);
+            }
+
+            // 识别结果已获取完毕，不需要继续调用BallerASRGet
+            break;
+        }
+        else if (BALLER_MORE_RESULT == iRet)
         {
             if (iResultLen > 0 && pResult)
             {
@@ -433,17 +480,9 @@ void test_continue_with_dynamic_correction(baller_session_id session_id, char* p
                 show_result(vecResult);
             }
 
-            if (BALLER_MORE_RESULT == iRet)
-            {
-                // 还有识别结果需要获取 需继续调用BallerASRGet
-                BallerSleepMSec(150);
-                continue;
-            }
-            else if (BALLER_SUCCESS == iRet)
-            {
-                // 识别结果已获取完毕，不需要继续调用BallerASRGet
-                break;
-            }
+            // 还有识别结果需要获取 需继续调用BallerASRGet
+            BallerSleepMSec(150);
+            continue;
         }
         else
         {

@@ -1,0 +1,3 @@
+DeviceInfoExplorer_Linux运行说明：
+1. 为了充分了解设备的信息，建议执行命令时使用root用户，或使用'sudo ./DeviceInfoExplorer_Linux'命令。
+2. 若无root或sudo权限，使用非管理员用户直接执行'./DeviceInfoExplorer_Linux'命令即可。

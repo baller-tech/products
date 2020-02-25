@@ -48,8 +48,8 @@
 #define PCM_FILE                        ("tib_ad.pcm")
 
 // customer information
-#define ORG_ID                            (1)
-#define APP_ID                            (2)
+#define ORG_ID                            (1LL)
+#define APP_ID                            (2LL)
 #define APP_KEY                           ("3")
 
 #ifdef _WIN32

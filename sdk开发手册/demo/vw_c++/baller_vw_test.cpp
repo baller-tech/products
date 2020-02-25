@@ -14,8 +14,8 @@
 #include "baller_vw.h"
 
 // customer information
-#define ORG_ID                            (1)
-#define APP_ID                            (11)
+#define ORG_ID                            (1LL)
+#define APP_ID                            (11LL)
 #define APP_KEY                           ("xxxx")
 
 // pcm file

@@ -28,8 +28,8 @@
 // image file
 #define IMAGE_FILE                        ("image.png")
 // customer information
-#define ORG_ID                            (1)
-#define APP_ID                            (11)
+#define ORG_ID                            (1LL)
+#define APP_ID                            (11LL)
 #define APP_KEY                           ("xxxx")
 
 #ifdef _WIN32
@@ -245,12 +245,12 @@ int main()
     // 资源文件存放的路径
     thread_param.dir = "data";
     // 每一个线程循环处理的次数
-    thread_param.loop_cnt = 10;
+    thread_param.loop_cnt = 1;
     // 图像文件的信息
     thread_param.image_data = pImageData;
     thread_param.image_data_len = iImageDataLen;
     // 启动的线程数；每一个线程会创建一个session
-    const int thread_cnt = 2;
+    const int thread_cnt = 1;
 
     // 测试图像识别
 #ifdef _WIN32

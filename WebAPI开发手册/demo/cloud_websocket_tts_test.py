@@ -21,7 +21,7 @@ app_id = 0
 app_key = ""
 
 # 请求的地址
-request_url = "ws://api.baller-tech.com/v1/service/ws/v1/asr"
+request_url = "ws://api.baller-tech.com/v1/service/ws/v1/tts"
 host = "api.baller-tech.com"
 
 # 测试使用的音频数据

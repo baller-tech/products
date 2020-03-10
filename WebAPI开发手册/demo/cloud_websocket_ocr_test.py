@@ -24,7 +24,7 @@ app_key = ""
 request_url = "ws://api.baller-tech.com/v1/service/ws/v1/ocr"
 host = "api.baller-tech.com"
 
-# 测试使用的音频数据
+# 测试使用的图像数据
 image_file = ""
 
 

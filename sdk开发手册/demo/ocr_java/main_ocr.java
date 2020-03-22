@@ -73,7 +73,7 @@ public class main_ocr {
 			System.out.println("ocr version: " + strOcrVersion);
 
 			// 2. 调用sessionBegin接口，启动一个session
-			String sessionParam = "res_dir=./data";
+			String sessionParam = "res_dir=./data, mode=multi_row";
 			iRet = ocrSession.sessionBegin(sessionParam);
 			if (BallerErrorCode.BALLER_SUCCESS != iRet) {
 				System.out.println("call sessionBegin faild(" + iRet + ") with param: " + sessionParam);

@@ -513,7 +513,7 @@ void * TestASR(void * param)
     // Call the BallerASRSessionBegin interface to get session
     std::string session_prams = std::string("res_dir=") + std::string(thread_param->dir) + std::string(",language=") + std::string(LANGUAGE)
         + std::string(",sample_size=") + std::to_string(thread_param->sample_size) + std::string(",sample_rate=") + std::to_string(thread_param->sample_rate)
-        + std::string(",engine_type=local,hardware=cpu_slow,mode=multi_row");
+        + std::string(",engine_type=local,hardware=cpu_slow");
 
     printf("%s\n", session_prams.c_str());
     iRet = BallerASRSessionBegin(session_prams.c_str(), &session_id);

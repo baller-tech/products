@@ -115,7 +115,11 @@ def get_result(request_id):
     # 当获取到该子句的完整识别结果时，在将完整的子句识别结果上屏，这样用户体验会更好。
 
     if response_content['data']:
-        print(f"{response_content['is_complete']}: {response_content['data']}")
+        if response_content['is_complete']:
+            print(f"{response_content['data']}", flush=True)
+        else:
+            print(f"{response_content['data']}", end='\r', flush=True)
+
     return 1 == int(response_content["is_end"])
 
 

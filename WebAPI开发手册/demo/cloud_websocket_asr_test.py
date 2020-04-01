@@ -59,7 +59,10 @@ def on_message(ws, message):
 
     # 打印识别的结果
     if message_values["data"]:
-        print(f"{message_values['is_complete']}: {message_values['data']}")
+        if message_values['is_complete']:
+            print(f"{message_values['data']}", flush=True)
+        else:
+            print(f"{message_values['data']}", end='\r', flush=True)
 
     # 最后一帧时关闭WebSocket连接
     if 1 == message_values["is_end"]:

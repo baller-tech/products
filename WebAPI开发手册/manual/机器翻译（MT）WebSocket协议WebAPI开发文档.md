@@ -128,15 +128,17 @@ host:api.baller-tech.com
 
 翻译语种 | 对应的language字段 
 ---|---
-中文翻译为英文|zho-eng
 中文翻译为藏文|zho-tib
 中文翻译为哈萨克文|zho-kaz
 中文翻译为蒙文|zho-mon
 中文翻译为维文|zho-uig
 中文翻译为彝文|zho-iii
-英文翻译为中文|eng-zho
+中文翻译为壮文|zho-zha
+中文翻译为韩文|zho-kor
 藏文翻译为中文|tib-zho
 哈萨克文翻译为中文|kaz-zho
 蒙文翻译为中文|mon-zho
 维文翻译为中文|uig-zho
 彝文翻译为中文|iii-zho
+壮文翻译为中文|zha-zho
+韩文翻译为中文|kor-zho

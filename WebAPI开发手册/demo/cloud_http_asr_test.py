@@ -32,10 +32,10 @@ callback_url = ""
 
 def post_data(request_id, input_mode, data):
     """
-    向服务器端发送文字数据
+    向服务器端发送音频数据
     :param request_id: 请求ID
     :param input_mode: 输入模式
-    :param data: 文字数据
+    :param data: 音频数据
     :return: True：成功；False：失败
     """
     business_params = {

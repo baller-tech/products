@@ -67,6 +67,15 @@ u8_to_gb(
 }
 #endif // _WIN32
 
+void BallerSleepMSec(int iMSec)
+{
+#ifdef _WIN32
+    Sleep(iMSec);
+#else
+    usleep(iMSec * 1000);
+#endif
+}
+
 int ReadImageData(const char* pszImage, char** ppImageData, int* piImageDataLen)
 {
     FILE* pFile = fopen(pszImage, "rb");
@@ -126,14 +135,7 @@ void * TestOCR(void * param)
         if (iRet != BALLER_SUCCESS)
         {
             printf("Call BallerOCRPut failed. Return Code: %d\n", iRet);
-
-            iRet = BallerOCRSessionEnd(session_id);
-            if (iRet != BALLER_SUCCESS)
-            {
-                printf("Call BallerOCRSessionEnd failed. Return Code: %d\n", iRet);
-            }
-
-            return 0;
+            continue;
         }
 
         // Call the BallerOCRGet interface to get result
@@ -143,39 +145,35 @@ void * TestOCR(void * param)
             int iResultLen = 0;
 
             iRet = BallerOCRGet(session_id, &pResult, &iResultLen);
-            if (iRet == BALLER_MORE_RESULT)
+            if (BALLER_MORE_RESULT == iRet)
             {
                 if (iResultLen > 0 && pResult)
                 {
-                    if (pResult && iResultLen > 0)
-                    {
-    #ifdef _WIN32
-                        char * gb = u8_to_gb((const char *)pResult);
-                        printf("%s\n", gb);
-                        free(gb);
-    #else
-                        printf("BallerOCRGet result: %s\n", (char*)pResult);
-    #endif
-                    }
+#ifdef _WIN32
+                    char * gb = u8_to_gb((const char *)pResult);
+                    printf("%s\n", gb);
+                    free(gb);
+#else
+                    printf("BallerOCRGet result: %s\n", (char*)pResult);
+#endif
                 }
 
-                // There is also more result, please continue to call the BallerOCRGet interface
+                // 还有识别结果需要获取 需继续调用BallerOCRGet
+                // 为了避免浪费CPU资源停10ms在继续获取，10ms为经验值，具体停留的时间需根据机器性能和业务需求综合考虑
+                BallerSleepMSec(10);
                 continue;
             }
-            else if (iRet == BALLER_SUCCESS)
+            else if (BALLER_SUCCESS == iRet)
             {
                 if (iResultLen > 0 && pResult)
                 {
-                    if (pResult && iResultLen > 0)
-                    {
-    #ifdef _WIN32
-                        char * gb = u8_to_gb((const char *)pResult);
-                        printf("%s\n", gb);
-                        free(gb);
-    #else
-                        printf("BallerOCRGet result: %s\n", (char*)pResult);
-    #endif
-                    }
+#ifdef _WIN32
+                    char * gb = u8_to_gb((const char *)pResult);
+                    printf("%s\n", gb);
+                    free(gb);
+#else
+                    printf("BallerOCRGet result: %s\n", (char*)pResult);
+#endif
                 }
                 printf("BallerOCRGet Finish\n");
                 break;
@@ -183,7 +181,6 @@ void * TestOCR(void * param)
             else
             {
                 printf("Call BallerOCRGet failed. Return Code: %d\n", iRet);
-
                 break;
             }
         }

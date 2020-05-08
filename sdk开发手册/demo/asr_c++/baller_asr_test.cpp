@@ -41,7 +41,7 @@
 
 #define DATA_PATH                       ("data")
 #define LANGUAGE                        ("tib_ad")
-#define SAMPLE_RATE                     (8000)
+#define SAMPLE_RATE                     (16000)
 #define SAMPLE_SIZE                     (16)
 
 // pcm file
@@ -144,7 +144,7 @@ void show_result(const std::vector<std::string>& vecResult)
 
 void test_once_whitout_dynamic_correction(baller_session_id session_id, char* pPCMData, int iPCMDataLen)
 {
-    const char* params_once = "input_mode=once";
+    const char* params_once = "input_mode=once, vad=on";
     int iRet = BallerASRPut(session_id, params_once, pPCMData, iPCMDataLen);
     if (BALLER_SUCCESS != iRet)
     {
@@ -181,7 +181,8 @@ void test_once_whitout_dynamic_correction(baller_session_id session_id, char* pP
             }
 
             // 还有识别结果需要获取 需继续调用BallerASRGet
-            BallerSleepMSec(150);
+            // 为了避免浪费CPU资源停10ms在继续获取，10ms为经验值，具体停留的时间需根据机器性能和业务需求综合考虑
+            BallerSleepMSec(10);
             continue;
         }
         else
@@ -195,7 +196,7 @@ void test_once_whitout_dynamic_correction(baller_session_id session_id, char* pP
 
 void test_once_with_dynamic_correction(baller_session_id session_id, char* pPCMData, int iPCMDataLen)
 {
-    const char* params_once = "input_mode=once";
+    const char* params_once = "input_mode=once, vad=on";
     int iRet = BallerASRPut(session_id, params_once, pPCMData, iPCMDataLen);
     if (BALLER_SUCCESS != iRet)
     {
@@ -261,7 +262,8 @@ void test_once_with_dynamic_correction(baller_session_id session_id, char* pPCMD
             }
 
             // 还有识别结果需要获取 需继续调用BallerASRGet
-            BallerSleepMSec(150);
+            // 为了避免浪费CPU资源停10ms在继续获取，10ms为经验值，具体停留的时间需根据机器性能和业务需求综合考虑
+            BallerSleepMSec(10);
             continue;
         }
         else
@@ -287,7 +289,7 @@ void test_continue_whitout_dynamic_correction(baller_session_id session_id, char
 
     for (; iPCMDataLen - iUsedSize > iPackageSize; iUsedSize += iPackageSize)
     {
-        const char* params_continue = "input_mode=continue";
+        const char* params_continue = "input_mode=continue, vad=on";
         iRet = BallerASRPut(session_id, params_continue, pPCMData + iUsedSize, iPackageSize);
         if (BALLER_SUCCESS != iRet)
         {
@@ -314,7 +316,7 @@ void test_continue_whitout_dynamic_correction(baller_session_id session_id, char
         }
     }
 
-    const char* params_end = "input_mode=end";
+    const char* params_end = "input_mode=end, vad=on";
     iRet = BallerASRPut(session_id, params_end, pPCMData + iUsedSize, iPCMDataLen - iUsedSize);
     if (BALLER_SUCCESS != iRet)
     {
@@ -351,7 +353,8 @@ void test_continue_whitout_dynamic_correction(baller_session_id session_id, char
             }
 
             // 还有识别结果需要获取 需继续调用BallerASRGet
-            BallerSleepMSec(150);
+            // 为了避免浪费CPU资源停10ms在继续获取，10ms为经验值，具体停留的时间需根据机器性能和业务需求综合考虑
+            BallerSleepMSec(10);
             continue;
         }
         else
@@ -378,7 +381,7 @@ void test_continue_with_dynamic_correction(baller_session_id session_id, char* p
 
     for (; iPCMDataLen - iUsedSize > iPackageSize; iUsedSize += iPackageSize)
     {
-        const char* params_continue = "input_mode=continue";
+        const char* params_continue = "input_mode=continue, vad=on";
         iRet = BallerASRPut(session_id, params_continue, pPCMData + iUsedSize, iPackageSize);
         if (BALLER_SUCCESS != iRet)
         {
@@ -418,7 +421,7 @@ void test_continue_with_dynamic_correction(baller_session_id session_id, char* p
         }
     }
 
-    const char* params_end = "input_mode=end";
+    const char* params_end = "input_mode=end, vad=on";
     iRet = BallerASRPut(session_id, params_end, pPCMData + iUsedSize, iPCMDataLen - iUsedSize);
     if (BALLER_SUCCESS != iRet)
     {
@@ -481,7 +484,8 @@ void test_continue_with_dynamic_correction(baller_session_id session_id, char* p
             }
 
             // 还有识别结果需要获取 需继续调用BallerASRGet
-            BallerSleepMSec(150);
+            // 为了避免浪费CPU资源停10ms在继续获取，10ms为经验值，具体停留的时间需根据机器性能和业务需求综合考虑
+            BallerSleepMSec(10);
             continue;
         }
         else

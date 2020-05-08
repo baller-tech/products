@@ -150,7 +150,7 @@ void TestPut(char *pPCMData, const int iPCMDataLen)
 #endif
 
         // Mimic the intervals between people speaking
-        BallerSleep(200);
+        BallerSleep(10);
     }
 
     if (iPCMDataLen - iPutIndex > 0)

@@ -179,7 +179,7 @@ int main(int argc, char ** argv)
         + "app_id=" + std::to_string(APP_ID) + ","
         + "app_key=" + APP_KEY + ","
         + "license=license/baller_sdk.license,"
-        + "log_level=error,log_path=./baller_log/,";
+        + "log_level=info,log_path=./baller_log/,";
     int iRet = BallerLogin(login_params.c_str());
     if (iRet != BALLER_SUCCESS)
     {

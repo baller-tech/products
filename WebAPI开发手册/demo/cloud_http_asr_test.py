@@ -42,7 +42,8 @@ def post_data(request_id, input_mode, data):
         'request_id': str(request_id),
         'language': language,
         'audio_format': audio_format,
-        'input_mode': input_mode
+        'input_mode': input_mode,
+        'vad': 'on'
     }
     if callback_url:
         business_params["callback_url"] = callback_url

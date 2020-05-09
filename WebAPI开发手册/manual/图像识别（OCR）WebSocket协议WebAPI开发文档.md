@@ -31,7 +31,7 @@ ws://api.baller-tech.com/v1/service/ws/v1/ocr?authorization=xxxx&host=xxxx&date=
 
 ### 握手和鉴权参数详细介绍
 #### date介绍
-1. date必须是GMT时区的RFC1123格式的时间
+1. date必须是GMT+0时区的符合RFC1123格式的日期和时间，星期和月份只能使用英文表示
 2. 服务端允许date的最大偏差为300秒，超出此偏差请求会被拒绝
 
 #### authorization介绍

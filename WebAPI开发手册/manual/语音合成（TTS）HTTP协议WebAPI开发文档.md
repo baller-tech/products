@@ -37,7 +37,7 @@
 参数 | 类型 | 说明 | 举例
 ---|---|---|---
 B-AppId | string |由北京大牛儿科技发展有限公司统一分配；</br>分配的值为64位的整型，此处需要转换为string | 1176611429127553031
-B-CurTime | string |GMT格式的请求时间时间；</br>需和接口签名时的请求时间一致；</br>服务器会拒绝处理请求时间与当前时间相差300秒的请求| Fri, 10 Jan 2020 07:31:50 GMT
+B-CurTime | string |GMT+0时区的符合RFC1123格式的日期和时间，星期和月份只能使用英文表示；</br>需和接口签名时的请求时间一致；</br>服务器会拒绝处理请求时间与当前时间相差300秒的请求| Fri, 10 Jan 2020 07:31:50 GMT
 B-Param | string | 经过BASE64编码后的业务参数，参见[业务参数](#post_business_param) | 
 B-CheckSum | string | 参见[接口签名](#signauter)。 | 
 Content-Type | string | 传输数据的类型，此处使用固定值 | application/octet-stream
@@ -80,7 +80,7 @@ request_id| string | 请求时传入的request_id |
 参数 | 类型 | 说明 | 举例
 ---|---|---|---
 B-AppId | string |由北京大牛儿科技发展有限公司统一分配；</br>分配的值为64位的整型，此处需要转换为string | 1176611429127553031
-B-CurTime | string |GMT格式的请求时间时间；</br>需和接口签名时的请求时间一致；</br>服务器会拒绝处理请求时间与当前时间相差300秒的请求| Fri, 10 Jan 2020 07:31:50 GMT
+B-CurTime | string |GMT+0时区的符合RFC1123格式的日期和时间，星期和月份只能使用英文表示；</br>需和接口签名时的请求时间一致；</br>服务器会拒绝处理请求时间与当前时间相差300秒的请求| Fri, 10 Jan 2020 07:31:50 GMT
 B-Param | string | 经过BASE64编码后的业务参数，参见[业务参数](#get_business_param) | 
 B-CheckSum | string | 参见[接口签名](#signauter)。 | 
 

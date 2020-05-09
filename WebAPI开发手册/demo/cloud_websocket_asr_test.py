@@ -81,6 +81,7 @@ def on_open(ws):
         business_params = {
             "language": language,
             "audio_format": audio_format,
+            "vad": "on",
         }
 
         send_size = 0

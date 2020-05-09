@@ -35,7 +35,7 @@ ws://api.baller-tech.com/v1/service/ws/v1/asr?authorization=xxxx&host=xxxx&date=
 
 ### 握手和鉴权参数详细介绍
 #### date介绍
-1. date必须是GMT时区的RFC1123格式的时间
+1. date必须是GMT+0时区的符合RFC1123格式的日期和时间，星期和月份只能使用英文表示
 2. 服务端允许date的最大偏差为300秒，超出此偏差请求会被拒绝
 
 #### authorization介绍
@@ -86,6 +86,7 @@ host:api.baller-tech.com
 | ------------ | ------------ | ------------ | ------------ |
 | language  | string  |  是 |   音频的语种；参见[支持的语种和音频格式](#support_language)
 | audio_format  | string  | 是  | 音频采样率；参见[支持的语种和音频格式](#support_language)  |
+| vad  | string  | 否  | 是否启用端点检测;<br/>on : 启用（不填写该参数时的默认值）<br/>off: 不启用  |
 
 ##### audio_format 介绍
 &#8195; &#8195;根据RFC对MIME格式的定义，使用audio/Lxx;rate=xxxxx 表明音频格式，audio/L后面的数字表示音频的采样点大小（单位bit）, rate=后面的数字表示音频 的采样率（单位hz）。</br>

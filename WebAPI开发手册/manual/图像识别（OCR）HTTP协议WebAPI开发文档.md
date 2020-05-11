@@ -52,8 +52,10 @@ request_id | string | 本次图像识别事务的请求ID；</br>获取该请求
 image_mode | string | 传入图片的文本模式，可选值为：</br>multi_row | multi_row
 callback_url | string | 识别结果推送的回调地址；</br>通过调用HTTP的GET方法获取识别结果时不需设置 | http://192.168.1.234:18888/ocr/callback
 
+#### 1.2 HTTP请求Body
+&#8195; &#8195;待识别的图像数据（二进制）。
 
-#### 1.2 响应报文
+#### 1.3 响应报文
 http响应数据为json格式，具体字段的含义如下
 
 参数 | 类型 | 说明

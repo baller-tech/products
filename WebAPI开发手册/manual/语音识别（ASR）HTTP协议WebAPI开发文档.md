@@ -52,8 +52,8 @@ Content-Type | string | 传输数据的类型，此处使用固定值 | applicat
 参数 | 类型 | 说明 | 举例
 ---|---|---|---
 request_id | string | 本次语音识别事务的请求ID；</br>获取该请求识别结果时需携带相同的请求ID；</br>调用者需保证请求ID的唯一性，建议使用UUID| 6497c282-9371-4c68-a9f1-522212b5ac1d
-audio_format| string | 合成的音频格式，参见[支持的语种和音频格式](#support_language) | audio/L16;rate=16000
-language| string | 合成音频的语种，参见[支持的语种和音频格式](#support_language)| zho
+audio_format| string | 音频格式，参见[支持的语种和音频格式](#support_language) | audio/L16;rate=16000
+language| string | 语种，参见[支持的语种和音频格式](#support_language)| zho
 input_mode| string | 音频数据的发送模式，支持以下字段:</br>  &#8195;once</br>  &#8195;continue</br>  &#8195;end</br>| once
 vad| string | 是否启用端点检测，支持以下字段:</br>  &#8195;on: 启用（不填写该参数时的默认值）</br>  &#8195;off: 不启用| on
 callback_url | string | 识别结果推送的回调地址；</br>通过调用HTTP的GET方法获取识别结果时不需设置 | http://192.168.1.234:18888/ocr/callback
@@ -65,7 +65,11 @@ callback_url | string | 识别结果推送的回调地址；</br>通过调用HTT
 ###### 1.1.1.2 input_mode 介绍
 &#8195; &#8195;一次性将音频数据发送到服务器时，input_mode应设置为once。当分多次将音频数据发送到服务器时，如果不是本次识别事务的最后一次，input_mode应设置为continue；如果是本次识别事务的最后一次应设置为end。
 
-#### 1.2 响应报文
+#### 1.2 HTTP请求Body
+&#8195; &#8195;待识别的音频数据（二进制）。
+
+
+#### 1.3 响应报文
 http响应数据为json格式，具体字段的含义如下
 
 参数 | 类型 | 说明

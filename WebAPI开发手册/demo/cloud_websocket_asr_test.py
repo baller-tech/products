@@ -2,10 +2,22 @@
 # -*- coding:utf-8 -*-
 
 """
-python 3.7
-pip install websocket-client
+1. 运行环境准备(需要使用conda中的python37)
+    conda：下载地址：https://docs.conda.io/en/latest/miniconda.html
+2. 创建虚拟环境
+    conda create -n baller_asr_test
+3. 进入虚拟环境
+    Linux:  source activate baller_asr_test
+    Windows: activate baller_asr_test
+4. 安装第三方依赖库
+    pip install websocket-client
+    pip install pysoundfile
+    conda install -c conda-forge librosa ffmpeg
+5. 运行程序
+    python cloud_websocket_asr_test.py
 """
 
+import os
 import websocket
 from email.utils import formatdate
 import hmac
@@ -14,6 +26,8 @@ import base64
 import json
 from urllib.parse import urlencode
 import _thread as thread
+import soundfile
+import librosa
 
 # 由北京市大牛儿科技发展有限公司统一分配
 org_id = 0
@@ -25,9 +39,30 @@ request_url = "ws://api.baller-tech.com/v1/service/ws/v1/asr"
 host = "api.baller-tech.com"
 
 # 测试使用的音频数据
-pcm_file = ""
+audio_file = ""
 language = ""
 audio_format = "audio/L16;rate=16000"
+
+
+def audio_to_pcm_16k16bit(file_name):
+    """
+    将音频文件转换为pcm，并保存到源音频文件同级的目录中
+    :param file_name: 音频文件路径
+    :return: 转换后的pcm文件路径
+    """
+    sig, sr = librosa.load(file_name)
+    # mono
+    if sig.ndim > 1:
+        sig = sig[:, 0]
+    # 16K
+    assert sr >= 16000, sr
+    if sr > 16000:
+        sig = librosa.resample(y=sig, orig_sr=sr, target_sr=16000, res_type='kaiser_best')
+    # write
+
+    pcm_16k16bit_file = file_name[:file_name.rfind(".")] + '.pcm'
+    soundfile.write(file=pcm_16k16bit_file, data=sig, samplerate=16000, format='RAW', subtype='PCM_16')
+    return pcm_16k16bit_file
 
 
 def on_error(ws, error):
@@ -73,7 +108,7 @@ def on_open(ws):
     def run_continue(**kwargs):
         frame_size = 40 * 16 * 2  # 每一帧时发送的音频时长
 
-        with open(pcm_file, "rb") as fp:
+        with open(audio_file, "rb") as fp:
             pcm_data = fp.read()
             fp.close()
 
@@ -155,4 +190,20 @@ def test_ws():
 
 
 if __name__ == '__main__':
+    if len(audio_file) <= 3:
+        print(f"输入的音频文件({audio_file})无效")
+        exit(0)
+
+    suffix = os.path.splitext(audio_file)[-1][1:]
+    if not suffix:
+        print(f"未知格式的音频文件({audio_file})")
+        exit(0)
+
+    suffix = suffix.lower()
+    if suffix in ("mp3", "wav"):
+        audio_file = audio_to_pcm_16k16bit(audio_file)
+    elif suffix != "pcm":
+        print(f"未知格式的音频文件({audio_file})")
+        exit(0)
+
     test_ws()

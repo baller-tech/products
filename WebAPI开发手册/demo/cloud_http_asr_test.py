@@ -2,18 +2,31 @@
 # -*- coding:utf-8 -*-
 
 """
-python 3.7
-pip install requests
+1. 运行环境准备(需要使用conda中的python37)
+    conda：下载地址：https://docs.conda.io/en/latest/miniconda.html
+2. 创建虚拟环境
+    conda create -n baller_asr_test
+3. 进入虚拟环境
+    Linux:  source activate baller_asr_test
+    Windows: activate baller_asr_test
+4. 安装第三方依赖库
+    pip install requests
+    pip install pysoundfile
+    conda install -c conda-forge librosa ffmpeg
+5. 运行程序
+    python cloud_websocket_asr_test.py
 """
 
 import base64
 import hashlib
 import json
+import os
 import time
 import uuid
 from email.utils import formatdate
-
 import requests
+import soundfile
+import librosa
 
 # 由北京市大牛儿科技发展有限公司统一分配
 org_id = 0
@@ -23,11 +36,32 @@ app_key = ""
 # 请求的地址
 request_url = "http://api.baller-tech.com/v1/service/v1/asr"
 # 测试使用的音频数据
-pcm_file = ""
+audio_file = ""
 language = ""
 audio_format = "audio/L16;rate=16000"
 # 推送结果的地址，该地址为调用者自己搭建的接收推送结果的Web服务地址
 callback_url = ""
+
+
+def audio_to_pcm_16k16bit(file_name):
+    """
+    将音频文件转换为pcm，并保存到源音频文件同级的目录中
+    :param file_name: 音频文件路径
+    :return: 转换后的pcm文件路径
+    """
+    sig, sr = librosa.load(file_name)
+    # mono
+    if sig.ndim > 1:
+        sig = sig[:, 0]
+    # 16K
+    assert sr >= 16000, sr
+    if sr > 16000:
+        sig = librosa.resample(y=sig, orig_sr=sr, target_sr=16000, res_type='kaiser_best')
+    # write
+
+    pcm_16k16bit_file = file_name[:file_name.rfind(".")] + '.pcm'
+    soundfile.write(file=pcm_16k16bit_file, data=sig, samplerate=16000, format='RAW', subtype='PCM_16')
+    return pcm_16k16bit_file
 
 
 def post_data(request_id, input_mode, data):
@@ -126,10 +160,10 @@ def get_result(request_id):
 
 def test_once():
     # 读取音频数据
-    with open(pcm_file, "rb") as file:
+    with open(audio_file, "rb") as file:
         pcm_data = file.read()
     if not pcm_data:
-        print(f"read pcm file {pcm_file} failed")
+        print(f"read pcm file {audio_file} failed")
         return
 
     # 发送音频数据
@@ -149,10 +183,10 @@ def test_once():
 
 def test_continue():
     # 读取音频数据
-    with open(pcm_file, "rb") as file:
+    with open(audio_file, "rb") as file:
         pcm_data = file.read()
     if not pcm_data:
-        print(f"read pcm file {pcm_file} failed")
+        print(f"read pcm file {audio_file} failed")
         return
 
     # 发送音频数据 每次发送3200字节的数据
@@ -191,5 +225,21 @@ def test_continue():
 
 
 if __name__ == '__main__':
+    if len(audio_file) <= 3:
+        print(f"输入的音频文件({audio_file})无效")
+        exit(0)
+
+    suffix = os.path.splitext(audio_file)[-1][1:]
+    if not suffix:
+        print(f"未知格式的音频文件({audio_file})")
+        exit(0)
+
+    suffix = suffix.lower()
+    if suffix in ("mp3", "wav"):
+        audio_file = audio_to_pcm_16k16bit(audio_file)
+    elif suffix != "pcm":
+        print(f"未知格式的音频文件({audio_file})")
+        exit(0)
+
     test_once()
     test_continue()

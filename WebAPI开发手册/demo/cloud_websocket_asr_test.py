@@ -26,6 +26,7 @@ import base64
 import json
 from urllib.parse import urlencode
 import _thread as thread
+import time
 import soundfile
 import librosa
 
@@ -106,7 +107,7 @@ def on_message(ws, message):
 
 def on_open(ws):
     def run_continue(**kwargs):
-        frame_size = 40 * 16 * 2  # 每一帧时发送的音频时长
+        frame_size = 40 * 16 * 2  # 每一帧发送40ms的音频数据
 
         with open(audio_file, "rb") as fp:
             pcm_data = fp.read()
@@ -134,6 +135,11 @@ def on_open(ws):
                 params.update(business=business_params)
             send_frame_count += 1
             ws.send(json.dumps(params))
+
+            # 停留40ms的作用：
+            # 1. 模拟人说话时间间隙。
+            # 2. 避免将音频数据瞬时全部发送到服务器而导致服务器任务缓存区满返回51024错误码的情况。
+            time.sleep(0.04)
 
         if len(pcm_data) - send_size > 0:
             # 发送最后一帧音频数据

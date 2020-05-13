@@ -24,6 +24,7 @@ import os
 import time
 import uuid
 from email.utils import formatdate
+import time
 import requests
 import soundfile
 import librosa
@@ -189,9 +190,9 @@ def test_continue():
         print(f"read pcm file {audio_file} failed")
         return
 
-    # 发送音频数据 每次发送3200字节的数据
+    # 发送音频数据 每次发送40ms的音频数据
     request_id = str(uuid.uuid1())
-    per_size = 3200
+    per_size = 40 * 16 * 2  # 每一次请求发送40ms的音频数据
     send_size = 0
     while len(pcm_data) - send_size > per_size:
         # 发送一次音频数据
@@ -207,6 +208,11 @@ def test_continue():
             if is_end:
                 print(f"{request_id} GET data finished")
                 return
+
+        # 停留40ms的作用：
+        # 1. 模拟人说话时间间隙。
+        # 2. 避免将音频数据瞬时全部发送到服务器而导致服务器任务缓存区满返回51024错误码的情况。
+        time.sleep(0.04)
 
     if len(pcm_data) - send_size > 0:
         # 发送本次事务的最后一包数据

@@ -75,7 +75,7 @@ public class main_ocr {
 			System.out.println("ocr version: " + strOcrVersion);
 
 			// 2. 调用sessionBegin接口，启动一个session，一个session启动后只能被一个线程使用，可以多次调用put和get接口对多张图片进行识别，但同时只能处理一张图片的识别。
-			String sessionParam = "res_dir=./data, mode=multi_row";
+			String sessionParam = "res_dir=./data, mode=multi_row, language=chs";
 			iRet = ocrSession.sessionBegin(sessionParam);
 			if (BallerErrorCode.BALLER_SUCCESS != iRet) {
 				System.out.println("call sessionBegin faild(" + iRet + ") with param: " + sessionParam);

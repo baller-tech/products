@@ -20,6 +20,11 @@ org_id = 0
 app_id = 0
 app_key = ""
 
+# 图片上文本的语种
+# chs： 简体中文
+# cht： 繁体中文
+language = "chs"
+
 # 请求的地址
 request_url = "http://api.baller-tech.com/v1/service/v1/ocr"
 # 测试使用的图像数据
@@ -38,6 +43,7 @@ def post_data(request_id, data):
     business_params = {
         'request_id': str(request_id),
         'image_mode': 'multi_row',
+        "language": language,
     }
     if callback_url:
         business_params["callback_url"] = callback_url

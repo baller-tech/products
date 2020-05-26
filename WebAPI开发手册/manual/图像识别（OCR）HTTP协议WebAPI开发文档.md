@@ -50,6 +50,7 @@ Content-Type | string | 传输数据的类型，此处使用固定值 | applicat
 ---|---|---|---
 request_id | string | 本次图像识别事务的请求ID；</br>获取该请求识别结果时需携带相同的请求ID；</br>调用者需保证请求ID的唯一性，建议使用UUID| 6497c282-9371-4c68-a9f1-522212b5ac1d
 image_mode | string | 传入图片的文本模式，可选值为：</br>multi_row | multi_row
+language | string| 识别图片的语种，可选值为：<br/> chs： 简体中文（默认值）<br/>  cht：繁体中文 | chs 
 callback_url | string | 识别结果推送的回调地址；</br>通过调用HTTP的GET方法获取识别结果时不需设置 | http://192.168.1.234:18888/ocr/callback
 
 #### 1.2 HTTP请求Body

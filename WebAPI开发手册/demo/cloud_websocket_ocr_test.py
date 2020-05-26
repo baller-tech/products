@@ -20,6 +20,11 @@ org_id = 0
 app_id = 0
 app_key = ""
 
+# 图片上文本的语种
+# chs： 简体中文
+# cht： 繁体中文
+language = "chs"
+
 # 请求的地址
 request_url = "ws://api.baller-tech.com/v1/service/ws/v1/ocr"
 host = "api.baller-tech.com"
@@ -73,6 +78,7 @@ def on_open(ws):
         # 业务参数
         business_params = {
             "image_mode": "multi_row",
+            "language": language,
         }
         data_params = {
             "image": base64.b64encode(image_data).decode(encoding='utf-8'),

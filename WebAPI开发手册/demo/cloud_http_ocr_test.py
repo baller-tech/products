@@ -3,6 +3,8 @@
 
 """
 python 3.7
+
+# requests版本要求不低于 2.23.0
 pip install requests
 """
 

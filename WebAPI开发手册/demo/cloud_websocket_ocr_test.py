@@ -3,6 +3,8 @@
 
 """
 python 3.7
+
+# websocket-client版本要求不低于 0.57.0
 pip install websocket-client
 """
 

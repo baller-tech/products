@@ -10,6 +10,12 @@
     Linux:  source activate baller_asr_test
     Windows: activate baller_asr_test
 4. 安装第三方依赖库
+    # 版本要求：
+    # websocket-client：0.57.0
+    # pysoundfile： 0.9.0.post1
+    # librosa： 0.6.3
+    # ffmpeg: 4.2.2
+
     pip install websocket-client
     pip install pysoundfile
     conda install -c conda-forge librosa ffmpeg

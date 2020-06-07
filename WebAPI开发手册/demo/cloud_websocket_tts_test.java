@@ -1,8 +1,10 @@
 package com.baller;
 
 import java.io.BufferedInputStream;
+import java.io.DataOutputStream;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
@@ -10,13 +12,9 @@ import java.net.URLEncoder;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Calendar;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.Locale;
-import java.util.Map;
 import java.util.TimeZone;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
@@ -25,7 +23,6 @@ import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.drafts.Draft_6455;
 import org.java_websocket.handshake.ServerHandshake;
 
-import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONException;
 import com.alibaba.fastjson.JSONObject;
 
@@ -35,7 +32,7 @@ import com.alibaba.fastjson.JSONObject;
  */
 class Common {
 	// 地址配置
-	public static String mUrl = "ws://api.baller-tech.com/v1/service/ws/v1/ocr";
+	public static String mUrl = "ws://api.baller-tech.com/v1/service/ws/v1/tts";
 	public static String mHost = "api.baller-tech.com";
 
 	// 账号信息 由北京市大牛儿科技发展有限公司统一分配
@@ -43,13 +40,15 @@ class Common {
 	public static String mAppkey = "";
 
 	// 测试使用的文件
-	public static String mImageFile = "chs.png";
-	// 测试使用的语种 chs: 简体中文； cht: 繁体中文
-	public static String mLanguage = "chs";
+	public static String mTxtFile = "tib_ad.txt";
+	// 测试使用的语种
+	public static String mLanguage = "tib_ad";
 	// 测试的图像模式
-	public static String mImageMode = "multi_row";
-
-	// 读取图片
+	public static String mSampleFormat = "audio/L16;rate=16000";
+	// 合成后的音频文件
+	public static String mOutPcmFile = "out.pcm";
+			
+	// 读取文件
 	@SuppressWarnings("resource")
 	public static byte[] readFile(String strFile) {
 		byte[] fileData = null;
@@ -98,7 +97,7 @@ class SendFrameThread extends Thread {
 			JSONObject jsonBusiness = new JSONObject();
 			try {
 				jsonBusiness.put("language", Common.mLanguage);
-				jsonBusiness.put("image_mode", Common.mImageMode);
+				jsonBusiness.put("audio_format", Common.mSampleFormat);
 				jsonParams.put("business", jsonBusiness);
 			} catch (JSONException e) {
 				e.printStackTrace();
@@ -110,7 +109,7 @@ class SendFrameThread extends Thread {
 
 		JSONObject jsonData = new JSONObject();
 		try {
-			jsonData.put("image", Base64.getEncoder().encodeToString(data));
+			jsonData.put("txt", Base64.getEncoder().encodeToString(data));
 			jsonParams.put("data", jsonData);
 		} catch (JSONException e) {
 			e.printStackTrace();
@@ -122,9 +121,9 @@ class SendFrameThread extends Thread {
 
 	public void run() {
 		// 读取测试文件
-		byte[] imageData = Common.readFile(Common.mImageFile);
+		byte[] imageData = Common.readFile(Common.mTxtFile);
 		if (imageData == null || imageData.length == 0) {
-			System.out.println("读取图像文件出错");
+			System.out.println("读取测试文件出错");
 			return;
 		}
 
@@ -140,8 +139,10 @@ class SendFrameThread extends Thread {
 	}
 }
 
-public class cloud_websocket_ocr_test {
+public class cloud_websocket_tts_test {
 
+	private static DataOutputStream mOutFile = null;
+	
 	private static String HMACSHA256AndBase64(byte[] data, byte[] key) {
 		try {
 			SecretKeySpec signingKey = new SecretKeySpec(key, "HmacSHA256");
@@ -197,6 +198,14 @@ public class cloud_websocket_ocr_test {
 			return;
 		}
 
+		try {
+			mOutFile = new DataOutputStream(new FileOutputStream(Common.mOutPcmFile, true));
+		} catch (FileNotFoundException e1) {
+			System.out.println("打开结果文件" + Common.mOutPcmFile + "失败");
+			e1.printStackTrace();
+			return;
+		}
+		
 		// 开始连接
 		WebSocketClient wsClient = null;
 		try {
@@ -217,24 +226,19 @@ public class cloud_websocket_ocr_test {
 					if (0 == iCode) {
 						// 正常流程
 						boolean isEnd = jsonObject.getBoolean("is_end");
-						JSONArray arData = jsonObject.getJSONArray("data");
-
-						// 图像识别时，会将图片中的信息按照一定的规则（目前按行）分为不同的子项，每个GET获取的是一个或多个子项的结果
-						Map<Integer, String> mapOrderAndResult = new HashMap<Integer, String>();
-						for (int iIndex = 0; iIndex < arData.size(); ++iIndex) {
-							JSONObject jsObj = arData.getJSONObject(iIndex);
-							mapOrderAndResult.put(jsObj.getInteger("order"), jsObj.getString("result"));
+						String strDataAfterBase64 = jsonObject.getString("data");
+						byte[] arData = Base64.getDecoder().decode(strDataAfterBase64);
+						
+						try {
+							mOutFile.write(arData);
+						} catch (IOException e) {
+							e.printStackTrace();
 						}
-						// 按照order排序
-						ArrayList<Integer> lsKeys = new ArrayList<Integer>(mapOrderAndResult.keySet());
-						Collections.sort(lsKeys);
-						for (int iIndex = 0; iIndex < lsKeys.size(); ++iIndex) {
-							System.out.println(mapOrderAndResult.get(lsKeys.get(iIndex)));
-						}
-
+						
 						if (isEnd) {
 							// 处理完毕主动关闭连接
 							this.close();
+							System.out.println("语音合成完毕");
 						}
 					} else {
 						// 出错流程

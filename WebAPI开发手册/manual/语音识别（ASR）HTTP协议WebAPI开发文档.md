@@ -55,7 +55,9 @@ request_id | string | 本次语音识别事务的请求ID；</br>获取该请求
 audio_format| string | 音频格式，参见[支持的语种和音频格式](#support_language) | audio/L16;rate=16000
 language| string | 语种，参见[支持的语种和音频格式](#support_language)| zho
 input_mode| string | 音频数据的发送模式，支持以下字段:</br>  &#8195;once</br>  &#8195;continue</br>  &#8195;end</br>| once
-vad| string | 是否启用端点检测，支持以下字段:</br>  &#8195;on: 启用（不填写该参数时的默认值）</br>  &#8195;off: 不启用| on
+service_type  | string  | 服务类型，支持以下字段:<br/> &#8195;sentence: 句子识别（默认值，任务有时长限制）<br/> &#8195;realtime: 实时识别（任务无时长限制）| sentence
+dynamic_correction| string | 是否启用动态纠正:<br/>&#8195; on : 启用（暂不支持） <br/>&#8195;off: 不启用（默认值）| off
+vad| string | 是否启用端点检测，支持以下字段:</br>  &#8195;on: 启用（默认值）</br>  &#8195;off: 不启用| on
 callback_url | string | 识别结果推送的回调地址；</br>通过调用HTTP的GET方法获取识别结果时不需设置 | http://192.168.1.234:18888/ocr/callback
 
 ###### 1.1.1.1 audio_format 介绍

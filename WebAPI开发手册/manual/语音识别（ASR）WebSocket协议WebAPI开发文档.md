@@ -86,7 +86,9 @@ host:api.baller-tech.com
 | ------------ | ------------ | ------------ | ------------ |
 | language  | string  |  是 |   音频的语种；参见[支持的语种和音频格式](#support_language)
 | audio_format  | string  | 是  | 音频采样率；参见[支持的语种和音频格式](#support_language)  |
-| vad  | string  | 否  | 是否启用端点检测;<br/>on : 启用（不填写该参数时的默认值）<br/>off: 不启用  |
+| service_type  | string  | 否  | 服务类型;<br/> sentence: 句子识别（默认值，任务有时长限制）<br/> realtime: 实时识别（任务无时长限制）|
+| dynamic_correction| string | 否 | 是否启用动态纠正:<br/> on : 启用（暂不支持） <br/>off: 不启用（默认值）
+| vad  | string  | 否  | 是否启用端点检测:<br/>on : 启用（默认值）<br/>off: 不启用  |
 
 ##### audio_format 介绍
 &#8195; &#8195;根据RFC对MIME格式的定义，使用audio/Lxx;rate=xxxxx 表明音频格式，audio/L后面的数字表示音频的采样点大小（单位bit）, rate=后面的数字表示音频 的采样率（单位hz）。</br>
@@ -110,6 +112,7 @@ host:api.baller-tech.com
     },
     "business": {
         "language": "mon",
+        "service_type": "sentence",
         "audio_format": "audio/L16;rate=16000",
     }
 }

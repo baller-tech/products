@@ -15,6 +15,7 @@
     # pysoundfile： 0.9.0.post1
     # librosa： 0.6.3
     # ffmpeg: 4.2.2
+    # conda-forge
 
     pip install websocket-client
     pip install pysoundfile
@@ -36,40 +37,49 @@ import time
 import soundfile
 import librosa
 
+# 请求的地址
+request_url = "ws://api.baller-tech.com/v1/service/ws/v1/asr"
+host = "api.baller-tech.com"
+
 # 由北京市大牛儿科技发展有限公司统一分配
 org_id = 0
 app_id = 0
 app_key = ""
 
-# 请求的地址
-request_url = "ws://api.baller-tech.com/v1/service/ws/v1/asr"
-host = "api.baller-tech.com"
-
 # 测试使用的音频数据
 audio_file = ""
+# 语种
 language = ""
-audio_format = "audio/L16;rate=16000"
+# 采样率
+sample_rate = 16000
+sample_format = "audio/L16;rate=" + str(sample_rate)
+# 服务类型
+# sentence: 整句识别 结果实时返回 每个任务限制时长
+# realtime: 实时识别 结果实时返回 每个任务无时长限制
+service_type = "sentence"
+# 结果是否保存到文件中
+save_to_file = True
 
 
-def audio_to_pcm_16k16bit(file_name):
+def audio_to_pcm(file_name, out_sample_rate):
     """
     将音频文件转换为pcm，并保存到源音频文件同级的目录中
     :param file_name: 音频文件路径
+    :param out_sample_rate: 输出pcm的采样率
     :return: 转换后的pcm文件路径
     """
     sig, sr = librosa.load(file_name)
     # mono
     if sig.ndim > 1:
         sig = sig[:, 0]
-    # 16K
-    assert sr >= 16000, sr
-    if sr > 16000:
-        sig = librosa.resample(y=sig, orig_sr=sr, target_sr=16000, res_type='kaiser_best')
-    # write
 
-    pcm_16k16bit_file = file_name[:file_name.rfind(".")] + '.pcm'
-    soundfile.write(file=pcm_16k16bit_file, data=sig, samplerate=16000, format='RAW', subtype='PCM_16')
-    return pcm_16k16bit_file
+    assert sr >= out_sample_rate, sr
+    if sr > out_sample_rate:
+        sig = librosa.resample(y=sig, orig_sr=sr, target_sr=out_sample_rate, res_type='kaiser_best')
+
+    out_pcm_file = file_name[:file_name.rfind(".")] + '.pcm'
+    soundfile.write(file=out_pcm_file, data=sig, samplerate=out_sample_rate, format='RAW', subtype='PCM_16')
+    return out_pcm_file
 
 
 def on_error(ws, error):
@@ -89,7 +99,10 @@ def on_message(ws, message):
 
     if 0 != message_values["code"]:
         print(f"asr failed {message_values['code']} {message_values['message']}")
-        return
+
+    # 最后一帧时关闭WebSocket连接
+    if 1 == message_values["is_end"]:
+        ws.close()
 
     # 语音识别时，会将传入的语音根据一定的规则分为不同的子句，每次GET请求返回的一个子句的识别结果
     # 一个子句的识别结果有两种状态完整的识别结果(is_complete等于1)和不完整的识别结果(is_complete等于0)；
@@ -103,12 +116,10 @@ def on_message(ws, message):
     if message_values["data"]:
         if message_values['is_complete']:
             print(f"{message_values['data']}", flush=True)
-        else:
-            print(f"{message_values['data']}", end='\r', flush=True)
-
-    # 最后一帧时关闭WebSocket连接
-    if 1 == message_values["is_end"]:
-        ws.close()
+            if ws.out_file:
+                ws.out_file.write(message_values['data'])
+        # else:
+        #     print(f"{message_values['data']}", end='\r', flush=True)
 
 
 def on_open(ws):
@@ -119,10 +130,15 @@ def on_open(ws):
             pcm_data = fp.read()
             fp.close()
 
+        if save_to_file:
+            out_file_name = audio_file + ".txt"
+            ws.out_file = open(out_file_name, "w", encoding='utf-8')
+
         # 业务参数
         business_params = {
             "language": language,
-            "audio_format": audio_format,
+            "audio_format": sample_format,
+            "service_type": service_type,
             "vad": "on",
         }
 
@@ -213,7 +229,7 @@ if __name__ == '__main__':
 
     suffix = suffix.lower()
     if suffix in ("mp3", "wav"):
-        audio_file = audio_to_pcm_16k16bit(audio_file)
+        audio_file = audio_to_pcm(audio_file, sample_rate)
     elif suffix != "pcm":
         print(f"未知格式的音频文件({audio_file})")
         exit(0)

@@ -15,6 +15,7 @@
     # pysoundfile： 0.9.0.post1
     # librosa： 0.6.3
     # ffmpeg: 4.2.2
+    # conda-forge
 
     pip install requests
     pip install pysoundfile
@@ -35,40 +36,50 @@ import requests
 import soundfile
 import librosa
 
+# 请求的地址
+request_url = "http://api.baller-tech.com/v1/service/v1/asr"
+
 # 由北京市大牛儿科技发展有限公司统一分配
 org_id = 0
 app_id = 0
 app_key = ""
 
-# 请求的地址
-request_url = "http://api.baller-tech.com/v1/service/v1/asr"
 # 测试使用的音频数据
 audio_file = ""
+# 语种
 language = ""
-audio_format = "audio/L16;rate=16000"
+# 采样率
+sample_rate = 16000
+sample_format = "audio/L16;rate=" + str(sample_rate)
+# 服务类型
+# sentence: 整句识别 结果实时返回 每个任务限制时长
+# realtime: 实时识别 结果实时返回 每个任务无时长限制
+service_type = "sentence"
+# 结果是否保存到文件中
+save_to_file = True
 # 推送结果的地址，该地址为调用者自己搭建的接收推送结果的Web服务地址
 callback_url = ""
 
 
-def audio_to_pcm_16k16bit(file_name):
+def audio_to_pcm(file_name, out_sample_rate):
     """
     将音频文件转换为pcm，并保存到源音频文件同级的目录中
     :param file_name: 音频文件路径
+    :param out_sample_rate: 输出pcm的采样率
     :return: 转换后的pcm文件路径
     """
     sig, sr = librosa.load(file_name)
     # mono
     if sig.ndim > 1:
         sig = sig[:, 0]
-    # 16K
-    assert sr >= 16000, sr
-    if sr > 16000:
-        sig = librosa.resample(y=sig, orig_sr=sr, target_sr=16000, res_type='kaiser_best')
-    # write
 
-    pcm_16k16bit_file = file_name[:file_name.rfind(".")] + '.pcm'
-    soundfile.write(file=pcm_16k16bit_file, data=sig, samplerate=16000, format='RAW', subtype='PCM_16')
-    return pcm_16k16bit_file
+    assert sr >= out_sample_rate, sr
+    if sr > out_sample_rate:
+        sig = librosa.resample(y=sig, orig_sr=sr, target_sr=out_sample_rate, res_type='kaiser_best')
+
+    out_pcm_file = file_name[:file_name.rfind(".")] + '.pcm'
+    soundfile.write(file=out_pcm_file, data=sig, samplerate=out_sample_rate, format='RAW', subtype='PCM_16')
+    return out_pcm_file
 
 
 def post_data(request_id, input_mode, data):
@@ -82,7 +93,7 @@ def post_data(request_id, input_mode, data):
     business_params = {
         'request_id': str(request_id),
         'language': language,
-        'audio_format': audio_format,
+        'audio_format': sample_format,
         'input_mode': input_mode,
         'vad': 'on'
     }
@@ -116,10 +127,11 @@ def post_data(request_id, input_mode, data):
     return True
 
 
-def get_result(request_id):
+def get_result(request_id, out_file):
     """
     获取合成结果
     :param request_id: 请求ID
+    :param out_file: 输出结果保存的文件
     :return: True：结果获取结束；False：结果获取未结束
     """
     business_params = {
@@ -159,8 +171,10 @@ def get_result(request_id):
     if response_content['data']:
         if response_content['is_complete']:
             print(f"{response_content['data']}", flush=True)
-        else:
-            print(f"{response_content['data']}", end='\r', flush=True)
+            if out_file:
+                out_file.write(response_content['data'])
+        # else:
+        #     print(f"{response_content['data']}", end='\r', flush=True)
 
     return 1 == int(response_content["is_end"])
 
@@ -173,6 +187,11 @@ def test_once():
         print(f"read pcm file {audio_file} failed")
         return
 
+    out_file = None
+    if save_to_file:
+        out_file_name = audio_file + "_once.txt"
+        out_file = open(out_file_name, "w", encoding='utf-8')
+
     # 发送音频数据
     request_id = str(uuid.uuid1())
     put_success = post_data(request_id, "once", pcm_data)
@@ -184,9 +203,10 @@ def test_once():
     if not callback_url:
         is_end = False
         while not is_end:
-            is_end = get_result(request_id)
+            is_end = get_result(request_id, out_file)
             time.sleep(0.150)
         print(f"{request_id} GET result finished")
+
 
 def test_continue():
     # 读取音频数据
@@ -195,6 +215,11 @@ def test_continue():
     if not pcm_data:
         print(f"read pcm file {audio_file} failed")
         return
+
+    out_file = None
+    if save_to_file:
+        out_file_name = audio_file + "_continue.txt"
+        out_file = open(out_file_name, "w", encoding='utf-8')
 
     # 发送音频数据 每次发送40ms的音频数据
     request_id = str(uuid.uuid1())
@@ -210,7 +235,7 @@ def test_continue():
 
         # 获取一次音频数据
         if not callback_url:
-            is_end = get_result(request_id)
+            is_end = get_result(request_id, out_file)
             if is_end:
                 print(f"{request_id} GET data finished")
                 return
@@ -231,7 +256,7 @@ def test_continue():
     if not callback_url:
         is_end = False
         while not is_end:
-            is_end = get_result(request_id)
+            is_end = get_result(request_id, out_file)
             time.sleep(0.150)
         print(f"{request_id} GET result finished")
 
@@ -248,7 +273,7 @@ if __name__ == '__main__':
 
     suffix = suffix.lower()
     if suffix in ("mp3", "wav"):
-        audio_file = audio_to_pcm_16k16bit(audio_file)
+        audio_file = audio_to_pcm(audio_file, sample_rate)
     elif suffix != "pcm":
         print(f"未知格式的音频文件({audio_file})")
         exit(0)

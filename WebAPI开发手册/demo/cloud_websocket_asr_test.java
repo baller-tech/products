@@ -42,8 +42,12 @@ class Common {
 	public static String mPcmFile = "tib_ad.pcm";
 	// 测试使用的语种
 	public static String mLanguage = "tib_ad";
-	// 测试使用的额音频格式
+	// 测试使用的音频格式
 	public static String mSampleFormat = "audio/L16;rate=16000";
+	// 测试使用的服务模式
+	// sentence: 句子模式（默认值，任务有时长限制）
+	// realtime: 实时模式（任务无时长限制）
+	public static String mServiceType = "sentence";
 
 	// 读取图片
 	@SuppressWarnings("resource")
@@ -95,6 +99,7 @@ class SendFrameThread extends Thread {
 			try {
 				jsonBusiness.put("language", Common.mLanguage);
 				jsonBusiness.put("audio_format", Common.mSampleFormat);
+				jsonBusiness.put("service_type", Common.mServiceType);
 				jsonParams.put("business", jsonBusiness);
 			} catch (JSONException e) {
 				e.printStackTrace();

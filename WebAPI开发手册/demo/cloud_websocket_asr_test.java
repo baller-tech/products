@@ -49,7 +49,7 @@ class Common {
 	// realtime: 实时模式（任务无时长限制）
 	public static String mServiceType = "sentence";
 
-	// 读取图片
+	// 读取测试数据
 	@SuppressWarnings("resource")
 	public static byte[] readFile(String strFile) {
 		byte[] fileData = null;

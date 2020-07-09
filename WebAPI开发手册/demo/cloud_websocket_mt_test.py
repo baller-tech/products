@@ -23,13 +23,16 @@ app_id = 0
 app_key = ""
 
 # 请求的地址
-request_url = "ws://api.baller-tech.com/v1/service/ws/v1/tts"
+request_url = "ws://api.baller-tech.com/v1/service/ws/v1/mt"
 host = "api.baller-tech.com"
 
-# 测试使用的音频数据
+# 测试语种
+# tib-chs: 藏文翻译为中文
+language = "tib-chs"
+# 存储测试数据的文件
 txt_file = ""
-language = ""
-audio_format = "audio/L16;rate=16000"
+# 结果是否保存到文件中
+save_to_file = True
 
 
 def on_error(ws, error):
@@ -43,19 +46,18 @@ def on_message(ws, message):
         print(f"load message {message} failed {e}")
         return
 
-    # task_id只在服务器推送的第一帧中出现
     if "task_id" in message_values:
-        ws.result_file = open(f"{message_values['task_id']}.pcm", "wb")
         print(f"task id {message_values['task_id']}")
 
     if 0 != message_values["code"]:
-        print(f"tts failed {message_values['code']} {message_values['message']}")
-        return
-
-    # 将合成结果保存到文件
-    if message_values["data"]:
-        if ws.result_file:
-            ws.result_file.write(base64.b64decode(message_values['data']))
+        print(f"mt failed {message_values['code']} {message_values['message']}")
+    else:
+        # 获取结果
+        if message_values["data"]:
+            result = message_values['data']
+            if ws.out_file:
+                ws.out_file.write(result)
+            print(result)
 
     # 最后一帧时关闭WebSocket连接
     if 1 == message_values["is_end"]:
@@ -68,10 +70,14 @@ def on_open(ws):
             txt_data = fp.read()
             fp.close()
 
+        ws.out_file = None
+        if save_to_file:
+            out_file_name = txt_file + ".out.txt"
+            ws.out_file = open(out_file_name, "w", encoding='utf-8')
+
         # 业务参数
         business_params = {
             "language": language,
-            "audio_format": audio_format,
         }
         data_params = {
             "txt": base64.b64encode(txt_data).decode(encoding='utf-8'),

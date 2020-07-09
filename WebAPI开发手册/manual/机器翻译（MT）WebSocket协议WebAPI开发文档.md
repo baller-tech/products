@@ -1,9 +1,9 @@
 ## 接口说明
   &#8195; &#8195;机器翻译（MT）可以将源语种文字转换为目标语种文字。该能力通过WebSocket API的方式提供给开发者，相较于SDK，该方式具有轻量、跨平台、跨开发语言的特点。</br>
 
- 
+
  ## 接口要求
- 
+
 项目 | 说明
 ---|---
 请求地址 | ws://api.baller-tech.com/v1/service/ws/v1/mt
@@ -78,26 +78,21 @@ host:api.baller-tech.com
 #### 业务参数(business)
 | 参数名   | 类型  | 是否必须  | 描述  |
 | ------------ | ------------ | ------------ | ------------ |
-| language  | string  |  是 |   源语种和目标语种；参见[支持的翻译语种](#support_language)
+| language  | string  |  是 |   源语种和目标语种；参见[支持的翻译语种](#support_language) |
 
 #### 数据流参数（data）
 
 | 参数名   | 类型  | 是否必须  | 描述  |
 | ------------ | ------------ | ------------ | ------------ |
-| input_mode  | int  |  是 | 可选值为:</br> &#8195;once</br> &#8195;continue</br> &#8195;end</br> |
-| txt  | string  | 是  | 经过base64编码后的源语种的文本数据 |
-
-##### input_mode 介绍
-&#8195; &#8195;一次性将源语种文本数据发送到服务器时，input_mode应设置为once。当分多次将源语种文本数据发送到服务器时，如果不是本次翻译事务的最后一次，input_mode应设置为continue；如果是本次翻译事务的最后一次应设置为end。
+| txt    | string | 是       | 经过base64编码后的源语种的文本数据 |
 
 ```
 {
     "data": {
-        "input_mode": "once",
         "txt": "AAAFAAoADwAXAB0AJgA0AEIATABPAE8AUQBRAEgAOwA0AC8AJwAcABUAEQAJAAIAAgADAAAA+P="
     },
     "business": {
-        "language": "zho-tib"
+        "language": "tib-chs"
     }
 }
 ```
@@ -126,19 +121,19 @@ host:api.baller-tech.com
 
 ## <span id="support_language">支持的翻译语种</span>
 
-翻译语种 | 对应的language字段 
----|---
-中文翻译为藏文|zho-tib
-中文翻译为哈萨克文|zho-kaz
-中文翻译为蒙文|zho-mon
-中文翻译为维文|zho-uig
-中文翻译为彝文|zho-iii
-中文翻译为壮文|zho-zha
-中文翻译为韩文|zho-kor
-藏文翻译为中文|tib-zho
-哈萨克文翻译为中文|kaz-zho
-蒙文翻译为中文|mon-zho
-维文翻译为中文|uig-zho
-彝文翻译为中文|iii-zho
-壮文翻译为中文|zha-zho
-韩文翻译为中文|kor-zho
+| 翻译语种                       | 对应的language字段 |
+| :----------------------------- | ------------------ |
+| 藏文翻译为中文                 | tib-chs            |
+| 哈萨克文翻译为中文【暂不支持】 | kaz-chs            |
+| 蒙文翻译为中文【暂不支持】     | mon-chs            |
+| 维文翻译为中文【暂不支持】     | uig-chs            |
+| 彝文翻译为中文【暂不支持】     | iii-chs            |
+| 壮文翻译为中文【暂不支持】     | zha-chs            |
+| 韩文翻译为中文【暂不支持】     | kor-chs            |
+| 中文翻译为藏文【暂不支持】     | chs-tib            |
+| 中文翻译为哈萨克文【暂不支持】 | chs-kaz            |
+| 中文翻译为蒙文【暂不支持】     | chs-mon            |
+| 中文翻译为维文【暂不支持】     | chs-uig            |
+| 中文翻译为彝文【暂不支持】     | chs-iii            |
+| 中文翻译为壮文【暂不支持】     | chs-zha            |
+| 中文翻译为韩文【暂不支持】     | chs-kor            |

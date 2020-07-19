@@ -1,10 +1,10 @@
 ## 接口说明
  &#8195; &#8195;语音合成（TTS）可以将文字信息转换为不同语种的声音信息。该能力通过HTTP API的方式提供给开发者，相较于SDK，该方式具有轻量、跨平台、跨开发语言的特点。</br>
  &#8195; &#8195;使用时请求方通过HTTP协议的POST方法将文字信息一次性的发送到服务器，然后通过HTTP协议的GET方法去服务器获取合成结果。与一次性交互的方式（既将文字信息一次性发送到服务器，然后等服务器处理完成之后该请求才携带合成结果返回）相比，发送文字的请求会在服务器收到文字之后就返回，不会阻塞到服务器合成完成，减少调用等待的时间，应用处理起来更灵活。
- 
- 
+
+
  ## 接口要求
- 
+
 项目 | 说明
 ---|---
 请求地址 | http://api.baller-tech.com/v1/service/v1/tts
@@ -36,8 +36,8 @@
 
 参数 | 类型 | 说明 | 举例
 ---|---|---|---
-B-AppId | string |由北京大牛儿科技发展有限公司统一分配；</br>分配的值为64位的整型，此处需要转换为string | 1176611429127553031
-B-CurTime | string |GMT+0时区的符合RFC1123格式的日期和时间，星期和月份只能使用英文表示；</br>需和接口签名时的请求时间一致；</br>服务器会拒绝处理请求时间与当前时间相差300秒的请求| Fri, 10 Jan 2020 07:31:50 GMT
+B-AppId | string |由北京大牛儿科技发展有限公司统一分配；<br>分配的值为64位的整型，此处需要转换为string | 1176611429127553031
+B-CurTime | string |GMT+0时区的符合RFC1123格式的日期和时间，星期和月份只能使用英文表示；<br>需和接口签名时的请求时间一致；<br>服务器会拒绝处理请求时间与当前时间相差300秒的请求| Fri, 10 Jan 2020 07:31:50 GMT
 B-Param | string | 经过BASE64编码后的业务参数，参见[业务参数](#post_business_param) | 
 B-CheckSum | string | 参见[接口签名](#signauter)。 | 
 Content-Type | string | 传输数据的类型，此处使用固定值 | application/octet-stream
@@ -46,13 +46,13 @@ Content-Type | string | 传输数据的类型，此处使用固定值 | applicat
 
 参数 | 类型 | 说明 | 举例
 ---|---|---|---
-request_id | string | 本次语音合成事务的请求ID；</br>获取该请求合成结果时需携带相同的请求ID；</br>调用者需保证请求ID的唯一性，建议使用UUID| 6497c282-9371-4c68-a9f1-522212b5ac1d
+request_id | string | 本次语音合成事务的请求ID；<br>获取该请求合成结果时需携带相同的请求ID；<br>调用者需保证请求ID的唯一性，建议使用UUID | 6497c282-9371-4c68-a9f1-522212b5ac1d
 audio_format| string | 合成的音频格式，参见[支持的语种和音频格式](#support_language) | audio/L16;rate=16000
 language| string | 合成音频的语种，参见[支持的语种和音频格式](#support_language)| zho
 callback_url | string | 合成结果推送的回调地址；</br>通过调用HTTP的GET方法获取合成结果时不需设置 | http://192.168.1.234:18888/tts/callback
 
 ###### 1.1.1.1 audio_format 介绍
-&#8195; &#8195;根据RFC对MIME格式的定义，使用audio/Lxx;rate=xxxxx 表明音频格式，audio/L后面的数字表示音频的采样点大小（单位bit）, rate=后面的数字表示音频 的采样率（单位hz）。</br>
+&#8195; &#8195;根据RFC对MIME格式的定义，使用audio/Lxx;rate=xxxxx 表明音频格式，audio/L后面的数字表示音频的采样点大小（单位bit）, rate=后面的数字表示音频 的采样率（单位hz）。<br>
 &#8195; &#8195;比如audio/L16;rate=16000表示合成的音频数据为16000hz，16bit的pcm音频数据
 
 #### 1.2 HTTP请求Body
@@ -82,8 +82,8 @@ request_id| string | 请求时传入的request_id |
 
 参数 | 类型 | 说明 | 举例
 ---|---|---|---
-B-AppId | string |由北京大牛儿科技发展有限公司统一分配；</br>分配的值为64位的整型，此处需要转换为string | 1176611429127553031
-B-CurTime | string |GMT+0时区的符合RFC1123格式的日期和时间，星期和月份只能使用英文表示；</br>需和接口签名时的请求时间一致；</br>服务器会拒绝处理请求时间与当前时间相差300秒的请求| Fri, 10 Jan 2020 07:31:50 GMT
+B-AppId | string |由北京大牛儿科技发展有限公司统一分配；<br>分配的值为64位的整型，此处需要转换为string | 1176611429127553031
+B-CurTime | string |GMT+0时区的符合RFC1123格式的日期和时间，星期和月份只能使用英文表示；<br>需和接口签名时的请求时间一致；<br>服务器会拒绝处理请求时间与当前时间相差300秒的请求| Fri, 10 Jan 2020 07:31:50 GMT
 B-Param | string | 经过BASE64编码后的业务参数，参见[业务参数](#get_business_param) | 
 B-CheckSum | string | 参见[接口签名](#signauter)。 | 
 
@@ -91,7 +91,7 @@ B-CheckSum | string | 参见[接口签名](#signauter)。 |
 
 参数 | 类型 | 说明 | 举例
 ---|---|---|---
-request_id | string | 本次语音合成事务的请求ID；</br>需与POST时保持一致| 6497c282-9371-4c68-a9f1-522212b5ac1d
+request_id | string | 本次语音合成事务的请求ID；<br>需与POST时保持一致 | 6497c282-9371-4c68-a9f1-522212b5ac1d
 
 #### 2.2 响应报文
 &#8195; &#8195;合成的语音数据位于响应报文的主体中，一些状态的控制信息位于响应报文的头部中，如下所示

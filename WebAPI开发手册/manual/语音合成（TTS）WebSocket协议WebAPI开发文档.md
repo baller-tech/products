@@ -1,9 +1,9 @@
 ## 接口说明
   &#8195; &#8195;语音合成（TTS）可以将文字信息转换为不同语种的声音信息。该能力通过WebSocket API的方式提供给开发者，相较于SDK，该方式具有轻量、跨平台、跨开发语言的特点。</br>
 
- 
+
  ## 接口要求
- 
+
 项目 | 说明
 ---|---
 请求地址 | ws://api.baller-tech.com/v1/service/ws/v1/tts
@@ -76,13 +76,14 @@ host:api.baller-tech.com
 | data  | obj  | 是  |  数据流参数，握手成功后所有帧中都需要上传 |
 
 #### 业务参数(business)
+
 | 参数名   | 类型  | 是否必须  | 描述  |
 | ------------ | ------------ | ------------ | ------------ |
-| language  | string  |  是 |   音频的语种；参见[支持的语种和音频格式](#support_language)
+| language  | string  |  是 |   音频的语种；参见[支持的语种和音频格式](#support_language) |
 | audio_format  | string  | 是  | 音频采样率；参见[支持的语种和音频格式](#support_language)  |
 
 ##### audio_format 介绍
-&#8195; &#8195;根据RFC对MIME格式的定义，使用audio/Lxx;rate=xxxxx 表明音频格式，audio/L后面的数字表示音频的采样点大小（单位bit）, rate=后面的数字表示音频 的采样率（单位hz）。</br>
+&#8195; &#8195;根据RFC对MIME格式的定义，使用audio/Lxx;rate=xxxxx 表明音频格式，audio/L后面的数字表示音频的采样点大小（单位bit）, rate=后面的数字表示音频 的采样率（单位hz）。<br>
 &#8195; &#8195;比如audio/L16;rate=16000表示音频数据为16000hz，16bit的pcm音频数据
 
 #### 数据流参数（data）

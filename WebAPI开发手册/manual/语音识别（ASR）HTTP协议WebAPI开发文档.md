@@ -1,9 +1,9 @@
 ## 接口说明
  &#8195; &#8195;语音识别（ASR）可以将语音信息转换为文字信息。该能力通过HTTP API的方式提供给开发者，相较于SDK，该方式具有轻量、跨平台、跨开发语言的特点。</br>
- 
- 
+
+
  ## 接口要求
- 
+
 项目 | 说明
 ---|---
 请求地址 | http://api.baller-tech.com/v1/service/v1/asr
@@ -41,8 +41,8 @@
 
 参数 | 类型 | 说明 | 举例
 ---|---|---|---
-B-AppId | string |由北京大牛儿科技发展有限公司统一分配；</br>分配的值为64位的整型，此处需要转换为string | 1176611429127553031
-B-CurTime | string |GMT+0时区的符合RFC1123格式的日期和时间，星期和月份只能使用英文表示；</br>需和接口签名时的请求时间一致；</br>服务器会拒绝处理请求时间与当前时间相差300秒的请求| Fri, 10 Jan 2020 07:31:50 GMT
+B-AppId | string |由北京大牛儿科技发展有限公司统一分配；<br>分配的值为64位的整型，此处需要转换为string | 1176611429127553031
+B-CurTime | string |GMT+0时区的符合RFC1123格式的日期和时间，星期和月份只能使用英文表示；<br>需和接口签名时的请求时间一致；<br>服务器会拒绝处理请求时间与当前时间相差300秒的请求| Fri, 10 Jan 2020 07:31:50 GMT
 B-Param | string | 经过BASE64编码后的业务参数，参见[业务参数](#post_business_param) | 
 B-CheckSum | string | 参见[接口签名](#signauter)。 | 
 Content-Type | string | 传输数据的类型，此处使用固定值 | application/octet-stream
@@ -51,14 +51,14 @@ Content-Type | string | 传输数据的类型，此处使用固定值 | applicat
 
 参数 | 类型 | 说明 | 举例
 ---|---|---|---
-request_id | string | 本次语音识别事务的请求ID；</br>获取该请求识别结果时需携带相同的请求ID；</br>调用者需保证请求ID的唯一性，建议使用UUID| 6497c282-9371-4c68-a9f1-522212b5ac1d
+request_id | string | 本次语音识别事务的请求ID；<br>获取该请求识别结果时需携带相同的请求ID；<br>调用者需保证请求ID的唯一性，建议使用UUID | 6497c282-9371-4c68-a9f1-522212b5ac1d
 audio_format| string | 音频格式，参见[支持的语种和音频格式](#support_language) | audio/L16;rate=16000
 language| string | 语种，参见[支持的语种和音频格式](#support_language)| zho
-input_mode| string | 音频数据的发送模式，支持以下字段:</br>  &#8195;once</br>  &#8195;continue</br>  &#8195;end</br>| once
-service_type  | string  | 服务类型，支持以下字段:<br/> &#8195;sentence: 句子识别（默认值，任务有时长限制）<br/> &#8195;realtime: 实时识别（任务无时长限制）| sentence
-dynamic_correction| string | 是否启用动态纠正:<br/>&#8195; on : 启用（暂不支持） <br/>&#8195;off: 不启用（默认值）| off
-vad| string | 是否启用端点检测，支持以下字段:</br>  &#8195;on: 启用（默认值）</br>  &#8195;off: 不启用| on
-callback_url | string | 识别结果推送的回调地址；</br>通过调用HTTP的GET方法获取识别结果时不需设置 | http://192.168.1.234:18888/ocr/callback
+input_mode| string | 音频数据的发送模式，支持以下字段:<br>  &#8195;once<br>  &#8195;continue<br>  &#8195;end | once
+service_type  | string  | 服务类型，支持以下字段:<br> &#8195;sentence: 句子识别（默认值，任务有时长限制）<br> &#8195;realtime: 实时识别（任务无时长限制） | sentence
+dynamic_correction| string | 是否启用动态纠正:<br>&#8195; on : 启用（暂不支持） <br>&#8195;off: 不启用（默认值） | off
+vad| string | 是否启用端点检测，支持以下字段:<br>  &#8195;on: 启用（默认值）<br>  &#8195;off: 不启用 | on
+callback_url | string | 识别结果推送的回调地址；<br>通过调用HTTP的GET方法获取识别结果时不需设置 | http://192.168.1.234:18888/ocr/callback
 
 ###### 1.1.1.1 audio_format 介绍
 &#8195; &#8195;根据RFC对MIME格式的定义，使用audio/Lxx;rate=xxxxx 表明音频格式，audio/L后面的数字表示音频的采样点大小（单位bit）, rate=后面的数字表示音频 的采样率（单位hz）。</br>
@@ -94,8 +94,8 @@ request_id| string | 请求时传入的request_id |
 
 参数 | 类型 | 说明 | 举例
 ---|---|---|---
-B-AppId | string |由北京大牛儿科技发展有限公司统一分配；</br>分配的值为64位的整型，此处需要转换为string | 1176611429127553031
-B-CurTime | string |GMT+0时区的符合RFC1123格式的日期和时间，星期和月份只能使用英文表示；</br>需和接口签名时的请求时间一致；</br>服务器会拒绝处理请求时间与当前时间相差300秒的请求| Fri, 10 Jan 2020 07:31:50 GMT
+B-AppId | string |由北京大牛儿科技发展有限公司统一分配；<br>分配的值为64位的整型，此处需要转换为string | 1176611429127553031
+B-CurTime | string |GMT+0时区的符合RFC1123格式的日期和时间，星期和月份只能使用英文表示；<br>需和接口签名时的请求时间一致；<br>服务器会拒绝处理请求时间与当前时间相差300秒的请求| Fri, 10 Jan 2020 07:31:50 GMT
 B-Param | string | 经过BASE64编码后的业务参数，参见[业务参数](#get_business_param) | 
 B-CheckSum | string | 参见[接口签名](#signauter)。 | 
 
@@ -103,7 +103,7 @@ B-CheckSum | string | 参见[接口签名](#signauter)。 |
 
 参数 | 类型 | 说明 | 举例
 ---|---|---|---
-request_id | string | 本次语音识别事务的请求ID；</br>需与POST时保持一致| 6497c282-9371-4c68-a9f1-522212b5ac1d
+request_id | string | 本次语音识别事务的请求ID；<br>需与POST时保持一致 | 6497c282-9371-4c68-a9f1-522212b5ac1d
 
 #### 2.2 响应报文
 &#8195; &#8195;语音识别时，会将传入的音频分为不同的子句，每次GET请求返回的是一个子句的结果。子句的识别结果分为最终结果和非最终结果两种状态；最终状态表示结果为当前子句的最终结果，之后再获取到的结果为新子句的结果；非最终状态表示结果为当前子句的中间状态的结果，之后再获取到的结果还是该子句的识别结果。</br>

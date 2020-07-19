@@ -1,10 +1,10 @@
 ## 接口说明
  &#8195; &#8195;图像识别（OCR）可以将图片中的文字转换为计算机可编程的文字。该能力通过HTTP API的方式提供给开发者，相较于SDK，该方式具有轻量、跨平台、跨开发语言的特点。</br>
  &#8195; &#8195;使用时请求方通过HTTP协议的POST方法将图片信息一次性的发送到服务器，然后通过HTTP协议的GET方法去服务器获取识别结果。与一次性交互的方式（既将图片信息一次性发送到服务器，然后等服务器处理完成之后该请求才携带识别结果返回）相比，发送图片的请求会在服务器收到图片之后就返回，不会阻塞到服务器识别完图片，减少调用等待的时间，应用处理起来更灵活。
- 
- 
+
+
  ## 接口要求
- 
+
 项目 | 说明
 ---|---
 请求地址 | http://api.baller-tech.com/v1/service/v1/ocr
@@ -38,8 +38,8 @@
 
 参数 | 类型 | 说明 | 举例
 ---|---|---|---
-B-AppId | string |由北京大牛儿科技发展有限公司统一分配；</br>分配的值为64位的整型，此处需要转换为string | 1176611429127553031
-B-CurTime | string |GMT+0时区的符合RFC1123格式的日期和时间，星期和月份只能使用英文表示；</br>需和接口签名时的请求时间一致；</br>服务器会拒绝处理请求时间与当前时间相差300秒的请求| Fri, 10 Jan 2020 07:31:50 GMT
+B-AppId | string |由北京大牛儿科技发展有限公司统一分配；<br>分配的值为64位的整型，此处需要转换为string | 1176611429127553031
+B-CurTime | string |GMT+0时区的符合RFC1123格式的日期和时间，星期和月份只能使用英文表示；<br>需和接口签名时的请求时间一致；<br>服务器会拒绝处理请求时间与当前时间相差300秒的请求| Fri, 10 Jan 2020 07:31:50 GMT
 B-Param | string | 经过BASE64编码后的业务参数，参见[业务参数](#post_business_param) | 
 B-CheckSum | string | 参见[接口签名](#signauter)。 | 
 Content-Type | string | 传输数据的类型，此处使用固定值 | application/octet-stream
@@ -48,10 +48,10 @@ Content-Type | string | 传输数据的类型，此处使用固定值 | applicat
 
 参数 | 类型 | 说明 | 举例
 ---|---|---|---
-request_id | string | 本次图像识别事务的请求ID；</br>获取该请求识别结果时需携带相同的请求ID；</br>调用者需保证请求ID的唯一性，建议使用UUID| 6497c282-9371-4c68-a9f1-522212b5ac1d
-image_mode | string | 传入图片的文本模式，可选值为：</br>multi_row | multi_row
-language | string| 识别图片的语种，可选值为：<br/> chs： 简体中文（默认值）<br/>  cht：繁体中文 | chs 
-callback_url | string | 识别结果推送的回调地址；</br>通过调用HTTP的GET方法获取识别结果时不需设置 | http://192.168.1.234:18888/ocr/callback
+request_id | string | 本次图像识别事务的请求ID；<br>获取该请求识别结果时需携带相同的请求ID；<br>调用者需保证请求ID的唯一性，建议使用UUID | 6497c282-9371-4c68-a9f1-522212b5ac1d
+image_mode | string | 传入图片的文本模式，可选值为：<br>multi_row | multi_row
+language | string| 识别图片的语种，可选值为：<br> chs： 简体中文（默认值）<br>  cht：繁体中文 | chs 
+callback_url | string | 识别结果推送的回调地址；<br>通过调用HTTP的GET方法获取识别结果时不需设置 | http://192.168.1.234:18888/ocr/callback
 
 #### 1.2 HTTP请求Body
 &#8195; &#8195;待识别的图像数据（二进制）。
@@ -79,8 +79,8 @@ request_id| string | 请求时传入的request_id |
 
 参数 | 类型 | 说明 | 举例
 ---|---|---|---
-B-AppId | string |由北京大牛儿科技发展有限公司统一分配；</br>分配的值为64位的整型，此处需要转换为string | 1176611429127553031
-B-CurTime | string |GMT+0时区的符合RFC1123格式的日期和时间，星期和月份只能使用英文表示；</br>需和接口签名时的请求时间一致；</br>服务器会拒绝处理请求时间与当前时间相差300秒的请求| Fri, 10 Jan 2020 07:31:50 GMT
+B-AppId | string |由北京大牛儿科技发展有限公司统一分配；<br>分配的值为64位的整型，此处需要转换为string | 1176611429127553031
+B-CurTime | string |GMT+0时区的符合RFC1123格式的日期和时间，星期和月份只能使用英文表示；<br>需和接口签名时的请求时间一致；<br>服务器会拒绝处理请求时间与当前时间相差300秒的请求| Fri, 10 Jan 2020 07:31:50 GMT
 B-Param | string | 经过BASE64编码后的业务参数，参见[业务参数](#get_business_param) | 
 B-CheckSum | string | 参见[接口签名](#signauter)。 | 
 
@@ -88,7 +88,7 @@ B-CheckSum | string | 参见[接口签名](#signauter)。 |
 
 参数 | 类型 | 说明 | 举例
 ---|---|---|---
-request_id | string | 本次图像识别事务的请求ID；</br>需与POST时保持一致| 6497c282-9371-4c68-a9f1-522212b5ac1d
+request_id | string | 本次图像识别事务的请求ID；<br>需与POST时保持一致 | 6497c282-9371-4c68-a9f1-522212b5ac1d
 
 #### 2.2 响应报文
 &#8195; &#8195;图像识别时，会将图像按一定的规则（目前为按行）分为不同的子项，每次返回的识别结果是一个或多个子项的识别结果。响应数据为json格式，具体字段的含义如下

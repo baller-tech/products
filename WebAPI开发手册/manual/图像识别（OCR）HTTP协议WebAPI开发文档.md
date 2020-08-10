@@ -50,7 +50,7 @@ Content-Type | string | 传输数据的类型，此处使用固定值 | applicat
 ---|---|---|---
 request_id | string | 本次图像识别事务的请求ID；<br>获取该请求识别结果时需携带相同的请求ID；<br>调用者需保证请求ID的唯一性，建议使用UUID | 6497c282-9371-4c68-a9f1-522212b5ac1d
 image_mode | string | 传入图片的文本模式，可选值为：<br>multi_row | multi_row
-language | string| 识别图片的语种，可选值为：<br> chs： 简体中文（默认值）<br>  cht：繁体中文 | chs 
+language | string| 识别语种参见[支持的图像识别语种](#support_language)| chs 
 callback_url | string | 识别结果推送的回调地址；<br>通过调用HTTP的GET方法获取识别结果时不需设置 | http://192.168.1.234:18888/ocr/callback
 
 #### 1.2 HTTP请求Body
@@ -142,3 +142,18 @@ result|  string | 该子句的识别结果 |
     ]
 }
 ```
+
+## <span id="support_language">支持的语种</span>
+
+| 图像识别语种                       | 对应的language字段 |
+| :----------------------------- | ------------------ |
+| 简体中文               | chs            |
+| 繁体中文     			| cht            |
+| 藏文     	   | tib            |
+| 蒙文(内蒙)     | mon            |
+| 蒙文(外蒙)     | mon_o            |
+| 维文【暂不支持】     | uig            |
+| 彝文【暂不支持】     | iii            |
+| 壮文【暂不支持】     | zha            |
+| 韩文【暂不支持】     | kor            |
+| 哈萨克文【暂不支持】 | kaz            |

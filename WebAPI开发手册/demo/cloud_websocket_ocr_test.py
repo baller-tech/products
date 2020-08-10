@@ -23,8 +23,7 @@ app_id = 0
 app_key = ""
 
 # 图片上文本的语种
-# chs： 简体中文
-# cht： 繁体中文
+# 请查考《图像识别（OCR）WebSocket协议WebAPI开发文档.pdf》中“支持的语种”章节
 language = "chs"
 
 # 请求的地址

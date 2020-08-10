@@ -44,7 +44,7 @@ class Common {
 
 	// 测试使用的文件
 	public static String mImageFile = "chs.png";
-	// 测试使用的语种 chs: 简体中文； cht: 繁体中文
+	// 测试使用的语种 请查考《图像识别（OCR）WebSocket协议WebAPI开发文档.pdf》中“支持的语种”章节
 	public static String mLanguage = "chs";
 	// 测试的图像模式
 	public static String mImageMode = "multi_row";

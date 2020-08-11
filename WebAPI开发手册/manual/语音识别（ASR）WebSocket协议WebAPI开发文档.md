@@ -161,3 +161,4 @@ host:api.baller-tech.com
 汉语|zho|采样率：16000hz 采样点大小：16bits|audio/L16;rate=16000
 状语|zha|采样率：16000hz 采样点大小：16bits|audio/L16;rate=16000
 彝语|iii|采样率：16000hz 采样点大小：16bits|audio/L16;rate=16000
+韩语|kor|采样率：16000hz 采样点大小：16bits|audio/L16;rate=16000

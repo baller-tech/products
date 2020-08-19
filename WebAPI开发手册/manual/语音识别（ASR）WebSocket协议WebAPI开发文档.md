@@ -84,16 +84,17 @@ host:api.baller-tech.com
 #### 业务参数(business)
 | 参数名   | 类型  | 是否必须  | 描述  |
 | ------------ | ------------ | ------------ | ------------ |
-| language  | string  |  是 |   音频的语种；参见[支持的语种和音频格式](#support_language) |
-| audio_format  | string  | 是  | 音频采样率；参见[支持的语种和音频格式](#support_language)  |
+| language  | string  |  是 | 音频的语种；参见[支持的语种和采样格式](#support_language) |
+| sample_format | string  | 是  | 音频采样格式；参见[支持的语种和采样格式](#support_language)  |
+| audio_format | string | 是 | 音频格式；参见 参见[支持的音频格式](#support_audio_format)  |
 | service_type  | string  | 否  | 服务类型:<br> sentence: 句子识别（默认值，任务有时长限制）<br/> realtime: 实时识别（任务无时长限制） |
 | vad  | string  | 否  | 是否启用端点检测:<br> on : 启用（默认值）<br> off: 不启用 |
 | dynamic_correction | string | 否 | 是否启用动态纠正:<br> on : 启用（暂不支持）<br> off: 不启用（默认值） |
 
 
-##### audio_format 介绍
+##### sample_format 介绍
 
-&#8195; &#8195;根据RFC对MIME格式的定义，使用audio/Lxx;rate=xxxxx 表明音频格式，audio/L后面的数字表示音频的采样点大小（单位bit）, rate=后面的数字表示音频 的采样率（单位hz）。<br>
+&#8195; &#8195;根据RFC对MIME格式的定义，使用audio/Lxx;rate=xxxxx 表明采样格式，audio/L后面的数字表示音频的采样点大小（单位bit）, rate=后面的数字表示音频 的采样率（单位hz）。<br>
 &#8195; &#8195;比如audio/L16;rate=16000表示音频数据为16000hz，16bit的pcm音频数据
 
 #### 数据流参数（data）
@@ -115,7 +116,8 @@ host:api.baller-tech.com
     "business": {
         "language": "mon",
         "service_type": "sentence",
-        "audio_format": "audio/L16;rate=16000",
+        "sample_format": "audio/L16;rate=16000",
+        "audio_format": "raw",
     }
 }
 ```
@@ -135,6 +137,18 @@ host:api.baller-tech.com
 | is_end  | int    | 结果返回是否结束（0-未结束; 1-结束），当为1时，请求方需关闭WebSocket |
 | data  | string    | 子句的识别结果|
 | is_complete  | int    | 子句结果是否是最终的（0：非最终结果；1：最终结果） |
+| begin | int  | 子句的起始位移，单位毫秒      |
+| end   | int  | 子句的结束位移，单位毫秒      |
+
+#### 子句位移的介绍
+需在以下条件都满足时begin、end字段的值有效：
+1. 业务参数中启用了vad。
+2. 推送结果中is_complete字段的值为1。
+3. 推送结果data字段包含识别的结构。
+
+##### 特殊请情况说明：
+
+当启用vad后，每个任务最后一次推送的识别结果只有一个标点符号，此时推送结果的is_complete字段为1，但begin和end字段为0。
 
 ```
 {
@@ -142,15 +156,18 @@ host:api.baller-tech.com
     "message": "success",
     "is_end": 0,
     "data": "xxxxx",
-    "is_complete": 0,
+    "is_complete": 1,
+    "begin": 245,
+    "end": 5600,
     "task_id": "1172448516240310275-2903dc7e3ab65879b4fc66055720ec09"
+    
 }
 ```
 
 
-## <span id="support_language">支持的语种以及音频格式</span>
+## <span id="support_language">支持的语种以及采样格式</span>
 
-语种 | 对应的language字段 | 支持的音频格式 | 对应的audio_format
+语种 | 对应的language字段 | 支持的采样格式 | 对应的sample_format 
 ---|---|---|---
 哈语|kaz|采样率：16000hz 采样点大小：16bits|audio/L16;rate=16000
 蒙语|mon|采样率：16000hz 采样点大小：16bits|audio/L16;rate=16000
@@ -162,3 +179,11 @@ host:api.baller-tech.com
 状语|zha|采样率：16000hz 采样点大小：16bits|audio/L16;rate=16000
 彝语|iii|采样率：16000hz 采样点大小：16bits|audio/L16;rate=16000
 韩语|kor|采样率：16000hz 采样点大小：16bits|audio/L16;rate=16000
+
+## <span id="support_audio_format">支持的音频格式</span>
+
+| 音频格式     | 对应的audio_format字段  |
+| ------------ | ----------------------|
+| raw | 未压缩的pcm |
+| mp3 | mp3格式 |
+| wav | wav格式 |

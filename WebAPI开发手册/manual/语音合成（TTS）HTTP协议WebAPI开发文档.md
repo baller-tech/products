@@ -47,12 +47,12 @@ Content-Type | string | 传输数据的类型，此处使用固定值 | applicat
 参数 | 类型 | 说明 | 举例
 ---|---|---|---
 request_id | string | 本次语音合成事务的请求ID；<br>获取该请求合成结果时需携带相同的请求ID；<br>调用者需保证请求ID的唯一性，建议使用UUID | 6497c282-9371-4c68-a9f1-522212b5ac1d
-audio_format| string | 合成的音频格式，参见[支持的语种和音频格式](#support_language) | audio/L16;rate=16000
-language| string | 合成音频的语种，参见[支持的语种和音频格式](#support_language)| zho
+sample_format| string | 合成的采样格式，参见[支持的语种和采样格式](#support_language) | audio/L16;rate=16000
+language| string | 合成音频的语种，参见[支持的语种和采样格式](#support_language)| zho
 callback_url | string | 合成结果推送的回调地址；</br>通过调用HTTP的GET方法获取合成结果时不需设置 | http://192.168.1.234:18888/tts/callback
 
-###### 1.1.1.1 audio_format 介绍
-&#8195; &#8195;根据RFC对MIME格式的定义，使用audio/Lxx;rate=xxxxx 表明音频格式，audio/L后面的数字表示音频的采样点大小（单位bit）, rate=后面的数字表示音频 的采样率（单位hz）。<br>
+###### 1.1.1.1 sample_format 介绍
+&#8195; &#8195;根据RFC对MIME格式的定义，使用audio/Lxx;rate=xxxxx 表明采样格式，audio/L后面的数字表示音频的采样点大小（单位bit）, rate=后面的数字表示音频 的采样率（单位hz）。<br>
 &#8195; &#8195;比如audio/L16;rate=16000表示合成的音频数据为16000hz，16bit的pcm音频数据
 
 #### 1.2 HTTP请求Body
@@ -108,9 +108,9 @@ B-Is-End | string | 合成结果是否获取结束（"1"：结束；"0"：未结
 采用服务器推送合成结果时，推送的消息格式与GET请求的响应报文格式基本一致。不一样的地方是会在响应的Header中添加B-Order参数，表示本次事务推送的次序，从0开始依次递增。
 
 
-## <span id="support_language">支持的语种以及音频格式</span>
+## <span id="support_language">支持的语种以及采样格式</span>
 
-语种 | 对应的language字段 | 支持的音频格式 | 对应的audio_format
+语种 | 对应的language字段 | 支持的采样格式 | 对应的sample_format 
 ---|---|---|---
 彝语|iii|采样率：16000hz 采样点大小：16bits|audio/L16;rate=16000
 哈语|kaz|采样率：16000hz 采样点大小：16bits|audio/L16;rate=16000

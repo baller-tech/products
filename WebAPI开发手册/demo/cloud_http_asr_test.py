@@ -2,25 +2,11 @@
 # -*- coding:utf-8 -*-
 
 """
-1. 运行环境准备(需要使用conda中的python37)
-    conda：下载地址：https://docs.conda.io/en/latest/miniconda.html
-2. 创建虚拟环境
-    conda create -n baller_asr_test
-3. 进入虚拟环境
-    Linux:  source activate baller_asr_test
-    Windows: activate baller_asr_test
-4. 安装第三方依赖库
-    # 版本要求：
-    # requests：2.23.0
-    # pysoundfile： 0.9.0.post1
-    # librosa： 0.6.3
-    # ffmpeg: 4.2.2
-    # conda-forge
-
-    pip install requests
-    pip install pysoundfile
-    conda install -c conda-forge librosa ffmpeg
-5. 运行程序
+1. 运行环境准备:
+    python 3.7
+2. 安装第三方依赖库
+    pip install requests==2.23.0
+3. 运行程序
     python cloud_websocket_asr_test.py
 """
 
@@ -28,13 +14,10 @@ import base64
 import hashlib
 import json
 import os
-import time
 import uuid
 from email.utils import formatdate
 import time
 import requests
-import soundfile
-import librosa
 
 # 请求的地址
 request_url = "http://api.baller-tech.com/v1/service/v1/asr"
@@ -51,35 +34,18 @@ language = ""
 # 采样率
 sample_rate = 16000
 sample_format = "audio/L16;rate=" + str(sample_rate)
+# 音频格式 (测试代码会自动判断)
+audio_format = "raw"
 # 服务类型
 # sentence: 整句识别 结果实时返回 每个任务限制时长
 # realtime: 实时识别 结果实时返回 每个任务无时长限制
 service_type = "sentence"
-# 结果是否保存到文件中
-save_to_file = True
 # 推送结果的地址，该地址为调用者自己搭建的接收推送结果的Web服务地址
 callback_url = ""
-
-
-def audio_to_pcm(file_name, out_sample_rate):
-    """
-    将音频文件转换为pcm，并保存到源音频文件同级的目录中
-    :param file_name: 音频文件路径
-    :param out_sample_rate: 输出pcm的采样率
-    :return: 转换后的pcm文件路径
-    """
-    sig, sr = librosa.load(file_name)
-    # mono
-    if sig.ndim > 1:
-        sig = sig[:, 0]
-
-    assert sr >= out_sample_rate, sr
-    if sr > out_sample_rate:
-        sig = librosa.resample(y=sig, orig_sr=sr, target_sr=out_sample_rate, res_type='kaiser_best')
-
-    out_pcm_file = file_name[:file_name.rfind(".")] + '.pcm'
-    soundfile.write(file=out_pcm_file, data=sig, samplerate=out_sample_rate, format='RAW', subtype='PCM_16')
-    return out_pcm_file
+# 结果是否保存到文件中
+save_to_file = True
+# 是否显示子句的位移信息
+show_offset = False
 
 
 def post_data(request_id, input_mode, data):
@@ -93,7 +59,8 @@ def post_data(request_id, input_mode, data):
     business_params = {
         'request_id': str(request_id),
         'language': language,
-        'audio_format': sample_format,
+        'sample_format': sample_format,
+        'audio_format': audio_format,
         'input_mode': input_mode,
         'vad': 'on'
     }
@@ -170,11 +137,11 @@ def get_result(request_id, out_file):
 
     if response_content['data']:
         if response_content['is_complete']:
-            print(f"{response_content['data']}", flush=True)
+            print(f"{response_content['data']}")
             if out_file:
                 out_file.write(response_content['data'])
-        # else:
-        #     print(f"{response_content['data']}", end='\r', flush=True)
+            if show_offset:
+                print(f"begin = {response_content['begin']} ms end = {response_content['end']} ms")
 
     return 1 == int(response_content["is_end"])
 
@@ -223,7 +190,7 @@ def test_continue():
 
     # 发送音频数据 每次发送40ms的音频数据
     request_id = str(uuid.uuid1())
-    per_size = 40 * 16 * 2  # 每一次请求发送40ms的音频数据
+    per_size = 400 * 16 * 2  # 每一次请求发送400ms的音频数据
     send_size = 0
     while len(pcm_data) - send_size > per_size:
         # 发送一次音频数据
@@ -272,9 +239,13 @@ if __name__ == '__main__':
         exit(0)
 
     suffix = suffix.lower()
-    if suffix in ("mp3", "wav"):
-        audio_file = audio_to_pcm(audio_file, sample_rate)
-    elif suffix != "pcm":
+    if suffix == "mp3":
+        audio_format = "mp3"
+    elif suffix == "wav":
+        audio_format = "wav"
+    elif suffix == "pcm":
+        audio_format = "raw"
+    else:
         print(f"未知格式的音频文件({audio_file})")
         exit(0)
 

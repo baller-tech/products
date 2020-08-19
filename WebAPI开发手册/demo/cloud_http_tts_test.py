@@ -5,7 +5,7 @@
 python 3.7
 
 # requests版本要求不低于 2.23.0
-pip install requests
+pip install requests==2.230
 """
 
 import base64
@@ -27,7 +27,7 @@ request_url = "http://api.baller-tech.com/v1/service/v1/tts"
 # 测试使用的文本数据及参数
 txt_file = ""
 language = ""
-audio_format = "audio/L16;rate=16000"
+sample_format = "audio/L16;rate=16000"
 # 推送结果的地址，该地址为调用者自己搭建的接收推送结果的Web服务地址
 callback_url = ""
 
@@ -42,7 +42,7 @@ def post_data(request_id, data):
     business_params = {
         'request_id': str(request_id),
         'language': language,
-        'audio_format': audio_format,
+        'sample_format': sample_format,
     }
     if callback_url:
         business_params["callback_url"] = callback_url

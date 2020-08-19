@@ -42,12 +42,16 @@ class Common {
 	public static String mPcmFile = "tib_ad.pcm";
 	// 测试使用的语种
 	public static String mLanguage = "tib_ad";
-	// 测试使用的音频格式
+	// 测试使用的采样格式
 	public static String mSampleFormat = "audio/L16;rate=16000";
+	// 测试使用的音频格式
+	public static String mAudioFormat = "raw";
 	// 测试使用的服务模式
 	// sentence: 句子模式（默认值，任务有时长限制）
 	// realtime: 实时模式（任务无时长限制）
 	public static String mServiceType = "sentence";
+	// 显示子句的位移信息
+	public static boolean mShowOffset = false;
 
 	// 读取测试数据
 	@SuppressWarnings("resource")
@@ -98,7 +102,8 @@ class SendFrameThread extends Thread {
 			JSONObject jsonBusiness = new JSONObject();
 			try {
 				jsonBusiness.put("language", Common.mLanguage);
-				jsonBusiness.put("audio_format", Common.mSampleFormat);
+				jsonBusiness.put("sample_format", Common.mSampleFormat);
+				jsonBusiness.put("audio_format", Common.mAudioFormat);
 				jsonBusiness.put("service_type", Common.mServiceType);
 				jsonParams.put("business", jsonBusiness);
 			} catch (JSONException e) {
@@ -130,8 +135,8 @@ class SendFrameThread extends Thread {
 			return;
 		}
 
-		// 每一帧发送40ms的音频数据
-		int iInputPerSize = 40 * 16 * 2;
+		// 每一帧发送400ms的音频数据
+		int iInputPerSize = 400 * 16 * 2;
 		int iInputIndex = 0;
 		for (iInputIndex = 0; pcmData.length - iInputIndex > iInputPerSize; iInputIndex += iInputPerSize) {
 			byte[] audio = new byte[iInputPerSize];
@@ -263,8 +268,10 @@ public class cloud_websocket_asr_test {
 
 						if (isComplete) {
 							System.out.println("子句完整结果： " + strText);
-						} else {
-							System.out.println("子句待修正结果：" + strText);
+							if (Common.mShowOffset)
+							{
+								System.out.println("begin = " + jsonObject.getInteger("begin") + " ms end = " + jsonObject.getInteger("end") + " ms");
+							}
 						}
 
 						if (isEnd) {

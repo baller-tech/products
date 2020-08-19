@@ -79,11 +79,11 @@ host:api.baller-tech.com
 
 | 参数名   | 类型  | 是否必须  | 描述  |
 | ------------ | ------------ | ------------ | ------------ |
-| language  | string  |  是 |   音频的语种；参见[支持的语种和音频格式](#support_language) |
-| audio_format  | string  | 是  | 音频采样率；参见[支持的语种和音频格式](#support_language)  |
+| language  | string  |  是 |   音频的语种；参见[支持的语种和采样格式](#support_language) |
+| sample_format | string  | 是  | 音频采样格式；参见[支持的语种和采样格式](#support_language) |
 
-##### audio_format 介绍
-&#8195; &#8195;根据RFC对MIME格式的定义，使用audio/Lxx;rate=xxxxx 表明音频格式，audio/L后面的数字表示音频的采样点大小（单位bit）, rate=后面的数字表示音频 的采样率（单位hz）。<br>
+##### sample_format 介绍
+&#8195; &#8195;根据RFC对MIME格式的定义，使用audio/Lxx;rate=xxxxx 表明采样格式，audio/L后面的数字表示音频的采样点大小（单位bit）, rate=后面的数字表示音频 的采样率（单位hz）。<br>
 &#8195; &#8195;比如audio/L16;rate=16000表示音频数据为16000hz，16bit的pcm音频数据
 
 #### 数据流参数（data）
@@ -100,7 +100,7 @@ host:api.baller-tech.com
     },
     "business": {
         "language": "mon",
-        "audio_format": "audio/L16;rate=16000",
+        "sample_format": "audio/L16;rate=16000",
     }
 }
 ```
@@ -127,9 +127,9 @@ host:api.baller-tech.com
 ```
 
 
-## <span id="support_language">支持的语种以及音频格式</span>
+## <span id="support_language">支持的语种以及采样格式</span>
 
-语种 | 对应的language字段 | 支持的音频格式 | 对应的audio_format
+语种 | 对应的language字段 | 支持的采样格式 | 对应的sample_format 
 ---|---|---|---
 彝语|iii|采样率：16000hz 采样点大小：16bits|audio/L16;rate=16000
 哈语|kaz|采样率：16000hz 采样点大小：16bits|audio/L16;rate=16000

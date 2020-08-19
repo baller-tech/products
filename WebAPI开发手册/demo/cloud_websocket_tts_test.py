@@ -5,7 +5,7 @@
 python 3.7
 
 # websocket-client版本要求不低于 0.57.0
-pip install websocket-client
+pip install websocket-client==0.57.0
 """
 
 import websocket
@@ -29,7 +29,7 @@ host = "api.baller-tech.com"
 # 测试使用的音频数据
 txt_file = ""
 language = ""
-audio_format = "audio/L16;rate=16000"
+sample_format = "audio/L16;rate=16000"
 
 
 def on_error(ws, error):
@@ -71,7 +71,7 @@ def on_open(ws):
         # 业务参数
         business_params = {
             "language": language,
-            "audio_format": audio_format,
+            "sample_format": sample_format,
         }
         data_params = {
             "txt": base64.b64encode(txt_data).decode(encoding='utf-8'),

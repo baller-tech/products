@@ -97,7 +97,7 @@ class SendFrameThread extends Thread {
 			JSONObject jsonBusiness = new JSONObject();
 			try {
 				jsonBusiness.put("language", Common.mLanguage);
-				jsonBusiness.put("audio_format", Common.mSampleFormat);
+				jsonBusiness.put("sample_format", Common.mSampleFormat);
 				jsonParams.put("business", jsonBusiness);
 			} catch (JSONException e) {
 				e.printStackTrace();

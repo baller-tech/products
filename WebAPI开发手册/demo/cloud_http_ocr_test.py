@@ -32,6 +32,8 @@ request_url = "http://api.baller-tech.com/v1/service/v1/ocr"
 image_file = ""
 # 推送结果的地址，该地址为调用者自己搭建的接收推送结果的Web服务地址
 callback_url = ""
+# 结果是否保存到文件中
+save_to_file = True
 
 
 def post_data(request_id, data):
@@ -76,10 +78,11 @@ def post_data(request_id, data):
     return True
 
 
-def get_result(request_id):
+def get_result(request_id, out_file):
     """
     获取识别结果
     :param request_id: 请求ID
+    :param out_file: 输出结果保存的文件
     :return: True：结果获取结束；False：结果获取未结束
     """
     business_params = {
@@ -116,6 +119,9 @@ def get_result(request_id):
             sorted(recognition_result.keys())
             for _, value in recognition_result.items():
                 print(value)
+                if out_file:
+                    out_file.write(value + "\n")
+
     else:
         print(f"{request_id} GET failed {response_content['code']} {response_content['message']}")
     return 1 == response_content["is_end"]
@@ -129,6 +135,11 @@ def main():
         print(f"read image file {image_file} failed")
         return
 
+    out_file = None
+    if save_to_file:
+        out_file_name = image_file + ".txt"
+        out_file = open(out_file_name, "w", encoding='utf-8')
+
     # 发送图像数据
     request_id = str(uuid.uuid1())
     put_success = post_data(request_id, image_data)
@@ -140,7 +151,7 @@ def main():
     if not callback_url:
         is_end = False
         while not is_end:
-            is_end = get_result(request_id)
+            is_end = get_result(request_id, out_file)
             time.sleep(0.150)
         print(f"{request_id} GET result finished")
 

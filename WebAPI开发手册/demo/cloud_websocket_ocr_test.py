@@ -32,6 +32,8 @@ host = "api.baller-tech.com"
 
 # 测试使用的图像数据
 image_file = ""
+# 是否将结果保存到文件
+save_to_file = True
 
 
 def on_error(ws, error):
@@ -64,6 +66,8 @@ def on_message(ws, message):
         sorted(recognition_result.keys())
         for _, value in recognition_result.items():
             print(value)
+            if ws.out_file:
+                ws.out_file.write(value + "\n")
 
     # 最后一帧时关闭WebSocket连接
     if 1 == message_values["is_end"]:
@@ -75,6 +79,10 @@ def on_open(ws):
         with open(image_file, "rb") as fp:
             image_data = fp.read()
             fp.close()
+
+        if save_to_file:
+            out_file_name = image_file + ".txt"
+            ws.out_file = open(out_file_name, "w", encoding='utf-8')
 
         # 业务参数
         business_params = {

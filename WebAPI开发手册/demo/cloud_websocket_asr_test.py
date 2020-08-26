@@ -31,14 +31,17 @@ app_id = 0
 app_key = ""
 
 # 测试使用的音频数据
-audio_file = ""
+audio_file = r""
+# 音频格式
+# 请查考《语音识别（ASR）WebSocket协议WebAPI开发文档.pdf》中“支持的音频格式”章节
+audio_format = "raw"
 # 语种
+# 请查考《语音识别（ASR）WebSocket协议WebAPI开发文档.pdf》中“支持的语种以及采样格式”章节
 language = ""
 # 采样率
+# 请查考《语音识别（ASR）WebSocket协议WebAPI开发文档.pdf》中“支持的语种以及采样格式”章节
 sample_rate = 16000
 sample_format = "audio/L16;rate=" + str(sample_rate)
-# 音频格式 (测试代码会自动判断)
-audio_format = "raw"
 # 服务类型
 # sentence: 整句识别 结果实时返回 每个任务限制时长
 # realtime: 实时识别 结果实时返回 每个任务无时长限制
@@ -196,13 +199,7 @@ if __name__ == '__main__':
         exit(0)
 
     suffix = suffix.lower()
-    if suffix == "mp3":
-        audio_format = "mp3"
-    elif suffix == "wav":
-        audio_format = "wav"
-    elif suffix == "pcm":
-        audio_format = "raw"
-    else:
+    if suffix not in ("mp3", "wav", "m4a", "ogg", "pcm"):
         print(f"未知格式的音频文件({audio_file})")
         exit(0)
 

@@ -40,12 +40,15 @@ class Common {
 
 	// 测试使用的音频文件
 	public static String mPcmFile = "tib_ad.pcm";
+	// 测试使用的音频格式
+	// 请查考《语音识别（ASR）WebSocket协议WebAPI开发文档.pdf》中“支持的音频格式”章节
+	public static String mAudioFormat = "raw";
 	// 测试使用的语种
+	// 请查考《语音识别（ASR）WebSocket协议WebAPI开发文档.pdf》中“支持的语种以及采样格式”章节
 	public static String mLanguage = "tib_ad";
 	// 测试使用的采样格式
+	// 请查考《语音识别（ASR）WebSocket协议WebAPI开发文档.pdf》中“支持的语种以及采样格式”章节
 	public static String mSampleFormat = "audio/L16;rate=16000";
-	// 测试使用的音频格式
-	public static String mAudioFormat = "raw";
 	// 测试使用的服务模式
 	// sentence: 句子模式（默认值，任务有时长限制）
 	// realtime: 实时模式（任务无时长限制）

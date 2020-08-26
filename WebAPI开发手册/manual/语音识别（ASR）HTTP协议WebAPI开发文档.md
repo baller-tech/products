@@ -187,3 +187,12 @@ is_complete| int | 子句结果是否是最终的（0：非最终结果；1：�
 | raw      | 未压缩的pcm            |
 | mp3      | mp3格式                |
 | wav      | wav格式                |
+| m4a      | m4a格式                |
+| ogg_opus | ogg封装后的opus音频编码             |
+| ogg_speex | ogg封装后的speex音频编码        |
+
+### m4a格式说明
+部分m4a文件的moov atom位于文件的尾部，无法做的实时解码。本 接口处理的m4a文件，需要moov atom位于文件的头部，可以使用ffmpeg将moov atom移动到文件头部
+```
+ffmpeg -i input.m4a -movflags faststart -acodec copy output.m4a
+```

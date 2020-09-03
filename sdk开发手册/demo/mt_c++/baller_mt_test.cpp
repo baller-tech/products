@@ -187,6 +187,7 @@ void * teset_mt(void * param)
     s_thread_param* thread_param = (s_thread_param *)param;
 
     // 调用SessionBegin接口
+    // 可通过修改hardware参数，控制使用GPU还是CPU，具体取值请参考开发手册。
     std::string session_prams = std::string("res_dir=") + BALLER_RES_DIR
         + std::string(",language=") + BALLER_LANG
         + std::string(",engine_type=local,hardware=cpu_slow");

@@ -39,18 +39,24 @@
  * 4. 音频数据连续输入且需要动态修正  请重点参考 test_continue_with_dynamic_correction 方法
  */
 
+ // 由北京市大牛儿科技发展有限公司统一分配
+#define ORG_ID                            (0LL)
+#define APP_ID                            (0LL)
+#define APP_KEY                           ("")
+
+// 资源文件存放的路径
 #define DATA_PATH                       ("data")
-#define LANGUAGE                        ("tib_ad")
+// 音频采样格式
 #define SAMPLE_RATE                     (16000)
 #define SAMPLE_SIZE                     (16)
-
-// pcm file
+// 可用语种请参考SDK对应的开发手册
+#define LANGUAGE                        ("tib_ad")
+// 支持的音频格式请参考SDK对应的开发手册
+#define AUDIO_FROMAT                    ("raw")
+// 测试音频
 #define PCM_FILE                        ("tib_ad.pcm")
-
-// customer information
-#define ORG_ID                            (1LL)
-#define APP_ID                            (2LL)
-#define APP_KEY                           ("3")
+// 是否打印子句的偏移信息
+#define PRINT_OFFSET                    (0)
 
 #ifdef _WIN32
 #define get_thread_id   ::GetCurrentThreadId()
@@ -68,6 +74,13 @@ typedef struct t_s_thread_param {
     int sample_rate;
     int sample_size;
 } s_thread_param;
+
+typedef struct tag_sentence_info {
+    std::string strResult;
+    int iStatus;
+    unsigned int uStartTime;
+    unsigned int uEndTime;
+} s_sentence_info;
 
 #ifdef _WIN32
 static char *
@@ -125,18 +138,24 @@ int ReadPCMData(const char* pszFile, char** ppPCMData, int* piPCMDataLen)
     return *piPCMDataLen;
 }
 
-void show_result(const std::vector<std::string>& vecResult)
+void show_full_result(const std::vector<s_sentence_info>& vecResult)
 {
-    printf("result: ");
     for (std::size_t iIndex = 0; iIndex < vecResult.size(); ++iIndex)
     {
 #ifdef _WIN32
-        char * gb = u8_to_gb(vecResult[iIndex].c_str());
-        printf("%s", gb);
+        char * gb = u8_to_gb(vecResult[iIndex].strResult.c_str());
+        printf("%s\n", gb);
         free(gb);
 #else
-        printf("%s", vecResult[iIndex].c_str());
+        printf("%s\n", vecResult[iIndex].strResult.c_str());
 #endif
+
+#if PRINT_OFFSET
+        if (BALLER_ASR_STATUS_COMPLETE  == vecResult[iIndex].iStatus && vecResult[iIndex].uEndTime != 0)
+        {
+            printf("start: %u ms end: %u\n", vecResult[iIndex].uStartTime, vecResult[iIndex].uEndTime);
+        }
+#endif /*PRINT_OFFSET*/
     }
 
     printf("\n");
@@ -144,29 +163,36 @@ void show_result(const std::vector<std::string>& vecResult)
 
 void test_once_whitout_dynamic_correction(baller_session_id session_id, char* pPCMData, int iPCMDataLen)
 {
-    const char* params_once = "input_mode=once, vad=on";
-    int iRet = BallerASRPut(session_id, params_once, pPCMData, iPCMDataLen);
+    std::string strOnceParams = std::string("input_mode=once, vad=on, audio_format=") + std::string(AUDIO_FROMAT);
+    int iRet = BallerASRPut(session_id, strOnceParams.c_str(), pPCMData, iPCMDataLen);
     if (BALLER_SUCCESS != iRet)
     {
         printf("Call BallerASRPut failed. Return Code: %d\n", iRet);
         return;
     }
 
-    std::vector<std::string> vecResult;
+    std::vector<s_sentence_info> vecResult;
     while (1)
     {
         char *pResult = NULL;
         int iResultLen = 0;
         int iStatus = 0;
+        unsigned int uStartTime = 0;
+        unsigned int uEndTime = 0;
 
-        iRet = BallerASRGet(session_id, &pResult, &iResultLen, &iStatus);
+        iRet = BallerASRGet(session_id, &pResult, &iResultLen, &iStatus, &uStartTime, &uEndTime);
         if (BALLER_SUCCESS == iRet)
         {
             // 当返回值为BALLER_SUCCESS时如果有识别结果，则识别结果的状态一定为BALLER_ASR_STATUS_COMPLETE。
             if (iResultLen > 0 && pResult)
             {
-                vecResult.push_back(std::string(pResult));
-                show_result(vecResult);
+                s_sentence_info sSentenceInfo;
+                sSentenceInfo.strResult = std::string(pResult);
+                sSentenceInfo.uStartTime = uStartTime;
+                sSentenceInfo.uEndTime = uEndTime;
+                sSentenceInfo.iStatus = iStatus;
+                vecResult.push_back(sSentenceInfo);
+                show_full_result(vecResult);
             }
             // 识别结果已获取完毕，不需要继续调用BallerASRGet
             break;
@@ -176,8 +202,13 @@ void test_once_whitout_dynamic_correction(baller_session_id session_id, char* pP
             // 不使用动态修正时只需关心子句完整的识别结果；iStatus==BALLER_ASR_STATUS_COMPLETE时的识别结果
             if (iResultLen > 0 && pResult && BALLER_ASR_STATUS_COMPLETE == iStatus)
             {
-                vecResult.push_back(std::string(pResult));
-                show_result(vecResult);
+                s_sentence_info sSentenceInfo;
+                sSentenceInfo.strResult = std::string(pResult);
+                sSentenceInfo.uStartTime = uStartTime;
+                sSentenceInfo.uEndTime = uEndTime;
+                sSentenceInfo.iStatus = iStatus;
+                vecResult.push_back(sSentenceInfo);
+                show_full_result(vecResult);
             }
 
             // 还有识别结果需要获取 需继续调用BallerASRGet
@@ -196,15 +227,15 @@ void test_once_whitout_dynamic_correction(baller_session_id session_id, char* pP
 
 void test_once_with_dynamic_correction(baller_session_id session_id, char* pPCMData, int iPCMDataLen)
 {
-    const char* params_once = "input_mode=once, vad=on";
-    int iRet = BallerASRPut(session_id, params_once, pPCMData, iPCMDataLen);
+    std::string strOnceParams = std::string("input_mode=once, vad=on, audio_format=") + std::string(AUDIO_FROMAT);
+    int iRet = BallerASRPut(session_id, strOnceParams.c_str(), pPCMData, iPCMDataLen);
     if (BALLER_SUCCESS != iRet)
     {
         printf("Call BallerASRPut failed. Return Code: %d\n", iRet);
         return;
     }
 
-    std::vector<std::string> vecResult;
+    std::vector<s_sentence_info> vecResult;
     int iLastStatus = BALLER_ASR_STATUS_COMPLETE;
 
     while (1)
@@ -212,27 +243,38 @@ void test_once_with_dynamic_correction(baller_session_id session_id, char* pPCMD
         char *pResult = NULL;
         int iResultLen = 0;
         int iStatus = 0;
+        unsigned int uStartTime = 0;
+        unsigned int uEndTime = 0;
 
-        iRet = BallerASRGet(session_id, &pResult, &iResultLen, &iStatus);
+        iRet = BallerASRGet(session_id, &pResult, &iResultLen, &iStatus, &uStartTime, &uEndTime);
         if (BALLER_SUCCESS == iRet)
         {
             if (iResultLen > 0 && pResult)
             {
-                printf("[%d] %s\n", __LINE__, pResult);
                 if (BALLER_ASR_STATUS_INCOMPLETE == iLastStatus)
                 {
                     // 如果上一次获取结果的状态为BALLER_ASR_STATUS_INCOMPLETE，表示上一次获取的结果是不完整的，本次获取的结果是对上一次获取结果的修正
                     // 这里使用本次获取的结果替换上次获取的结果
                     vecResult.pop_back();
-                    vecResult.push_back(std::string(pResult));
+                    s_sentence_info sSentenceInfo;
+                    sSentenceInfo.strResult = std::string(pResult);
+                    sSentenceInfo.uStartTime = uStartTime;
+                    sSentenceInfo.uEndTime = uEndTime;
+                    sSentenceInfo.iStatus = iStatus;
+                    vecResult.push_back(sSentenceInfo);
                 }
                 else
                 {
                     // 如果上一次获取结果的状态为BALLER_ASR_STATUS_COMPLETE，表示上一次获取的结果是一个子句完整的结果，本次获取的结果是一个新子句的结果
                     // 这里使用本次获取的结果替换上次获取的结果
-                    vecResult.push_back(std::string(pResult));
+                    s_sentence_info sSentenceInfo;
+                    sSentenceInfo.strResult = std::string(pResult);
+                    sSentenceInfo.uStartTime = uStartTime;
+                    sSentenceInfo.uEndTime = uEndTime;
+                    sSentenceInfo.iStatus = iStatus;
+                    vecResult.push_back(sSentenceInfo);
                 }
-                show_result(vecResult);
+                show_full_result(vecResult);
             }
 
             // 识别结果已获取完毕，不需要继续调用BallerASRGet
@@ -248,17 +290,27 @@ void test_once_with_dynamic_correction(baller_session_id session_id, char* pPCMD
                     // 如果上一次获取结果的状态为BALLER_ASR_STATUS_INCOMPLETE，表示上一次获取的结果是不完整的，本次获取的结果是对上一次获取结果的修正
                     // 这里使用本次获取的结果替换上次获取的结果
                     vecResult.pop_back();
-                    vecResult.push_back(std::string(pResult));
+                    s_sentence_info sSentenceInfo;
+                    sSentenceInfo.strResult = std::string(pResult);
+                    sSentenceInfo.uStartTime = uStartTime;
+                    sSentenceInfo.uEndTime = uEndTime;
+                    sSentenceInfo.iStatus = iStatus;
+                    vecResult.push_back(sSentenceInfo);
                 }
                 else
                 {
                     // 如果上一次获取结果的状态为BALLER_ASR_STATUS_COMPLETE，表示上一次获取的结果是一个子句完整的结果，本次获取的结果是一个新子句的结果
                     // 这里使用本次获取的结果替换上次获取的结果
-                    vecResult.push_back(std::string(pResult));
+                    s_sentence_info sSentenceInfo;
+                    sSentenceInfo.strResult = std::string(pResult);
+                    sSentenceInfo.uStartTime = uStartTime;
+                    sSentenceInfo.uEndTime = uEndTime;
+                    sSentenceInfo.iStatus = iStatus;
+                    vecResult.push_back(sSentenceInfo);
                 }
 
                 iLastStatus = iStatus;
-                show_result(vecResult);
+                show_full_result(vecResult);
             }
 
             // 还有识别结果需要获取 需继续调用BallerASRGet
@@ -281,31 +333,38 @@ void test_continue_whitout_dynamic_correction(baller_session_id session_id, char
     int iPackageSize = 16 * 40;
     int iUsedSize = 0;
     int iRet = BALLER_SUCCESS;
-    std::vector<std::string> vecResult;
+    std::vector<s_sentence_info> vecResult;
 
     char *pResult = NULL;
     int iResultLen = 0;
     int iStatus = 0;
+    unsigned int uStartTime = 0;
+    unsigned int uEndTime = 0;
 
     for (; iPCMDataLen - iUsedSize > iPackageSize; iUsedSize += iPackageSize)
     {
-        const char* params_continue = "input_mode=continue, vad=on";
-        iRet = BallerASRPut(session_id, params_continue, pPCMData + iUsedSize, iPackageSize);
+        std::string strContinueParams = std::string("input_mode=continue, vad=on, audio_format=") + std::string(AUDIO_FROMAT);
+        iRet = BallerASRPut(session_id, strContinueParams.c_str(), pPCMData + iUsedSize, iPackageSize);
         if (BALLER_SUCCESS != iRet)
         {
             printf("Call BallerASRPut failed. Return Code: %d\n", iRet);
             return;
         }
 
-        iRet = BallerASRGet(session_id, &pResult, &iResultLen, &iStatus);
+        iRet = BallerASRGet(session_id, &pResult, &iResultLen, &iStatus, &uStartTime, &uEndTime);
         // continue模式下BallerASRPut的input_mode没有传入end时，BallerASRGet不会返回BALLER_SUCCESS。
         if (BALLER_MORE_RESULT == iRet)
         {
             // 不使用动态修正时只需关心子句完整的识别结果；iStatus==BALLER_ASR_STATUS_COMPLETE时的识别结果
             if (iResultLen > 0 && pResult && BALLER_ASR_STATUS_COMPLETE == iStatus)
             {
-                vecResult.push_back(std::string(pResult));
-                show_result(vecResult);
+                s_sentence_info sSentenceInfo;
+                sSentenceInfo.strResult = std::string(pResult);
+                sSentenceInfo.uStartTime = uStartTime;
+                sSentenceInfo.uEndTime = uEndTime;
+                sSentenceInfo.iStatus = iStatus;
+                vecResult.push_back(sSentenceInfo);
+                show_full_result(vecResult);
             }
         }
         else
@@ -316,8 +375,8 @@ void test_continue_whitout_dynamic_correction(baller_session_id session_id, char
         }
     }
 
-    const char* params_end = "input_mode=end, vad=on";
-    iRet = BallerASRPut(session_id, params_end, pPCMData + iUsedSize, iPCMDataLen - iUsedSize);
+    std::string strEndParams = std::string("input_mode=end, vad=on, audio_format=") + std::string(AUDIO_FROMAT);
+    iRet = BallerASRPut(session_id, strEndParams.c_str(), pPCMData + iUsedSize, iPCMDataLen - iUsedSize);
     if (BALLER_SUCCESS != iRet)
     {
         printf("Call BallerASRPut failed. Return Code: %d\n", iRet);
@@ -329,15 +388,22 @@ void test_continue_whitout_dynamic_correction(baller_session_id session_id, char
         char *pResult = NULL;
         int iResultLen = 0;
         int iStatus = 0;
+        unsigned int uStartTime = 0;
+        unsigned int uEndTime = 0;
 
-        iRet = BallerASRGet(session_id, &pResult, &iResultLen, &iStatus);
+        iRet = BallerASRGet(session_id, &pResult, &iResultLen, &iStatus, &uStartTime, &uEndTime);
         if (BALLER_SUCCESS == iRet)
         {
             // 当返回值为BALLER_SUCCESS时如果有识别结果，则识别结果的状态一定为BALLER_ASR_STATUS_COMPLETE。
             if (iResultLen > 0 && pResult)
             {
-                vecResult.push_back(std::string(pResult));
-                show_result(vecResult);
+                s_sentence_info sSentenceInfo;
+                sSentenceInfo.strResult = std::string(pResult);
+                sSentenceInfo.uStartTime = uStartTime;
+                sSentenceInfo.uEndTime = uEndTime;
+                sSentenceInfo.iStatus = iStatus;
+                vecResult.push_back(sSentenceInfo);
+                show_full_result(vecResult);
             }
 
             // 识别结果已获取完毕，不需要继续调用BallerASRGet
@@ -348,8 +414,13 @@ void test_continue_whitout_dynamic_correction(baller_session_id session_id, char
             // 不使用动态修正时只需关心子句完整的识别结果；iStatus==BALLER_ASR_STATUS_COMPLETE时的识别结果
             if (iResultLen > 0 && pResult && BALLER_ASR_STATUS_COMPLETE == iStatus)
             {
-                vecResult.push_back(std::string(pResult));
-                show_result(vecResult);
+                s_sentence_info sSentenceInfo;
+                sSentenceInfo.strResult = std::string(pResult);
+                sSentenceInfo.uStartTime = uStartTime;
+                sSentenceInfo.uEndTime = uEndTime;
+                sSentenceInfo.iStatus = iStatus;
+                vecResult.push_back(sSentenceInfo);
+                show_full_result(vecResult);
             }
 
             // 还有识别结果需要获取 需继续调用BallerASRGet
@@ -373,23 +444,25 @@ void test_continue_with_dynamic_correction(baller_session_id session_id, char* p
     int iUsedSize = 0;
     int iRet = BALLER_SUCCESS;
     int iLastStatus = BALLER_ASR_STATUS_COMPLETE;
-    std::vector<std::string> vecResult;
+    std::vector<s_sentence_info> vecResult;
 
     char *pResult = NULL;
     int iResultLen = 0;
     int iStatus = 0;
+    unsigned int uStartTime = 0;
+    unsigned int uEndTime = 0;
 
     for (; iPCMDataLen - iUsedSize > iPackageSize; iUsedSize += iPackageSize)
     {
-        const char* params_continue = "input_mode=continue, vad=on";
-        iRet = BallerASRPut(session_id, params_continue, pPCMData + iUsedSize, iPackageSize);
+        std::string strContinueParams = std::string("input_mode=continue, vad=on, audio_format=") + std::string(AUDIO_FROMAT);
+        iRet = BallerASRPut(session_id, strContinueParams.c_str(), pPCMData + iUsedSize, iPackageSize);
         if (BALLER_SUCCESS != iRet)
         {
             printf("Call BallerASRPut failed. Return Code: %d\n", iRet);
             return;
         }
 
-        iRet = BallerASRGet(session_id, &pResult, &iResultLen, &iStatus);
+        iRet = BallerASRGet(session_id, &pResult, &iResultLen, &iStatus, &uStartTime, &uEndTime);
         // continue模式下BallerASRPut的input_mode没有传入end时，BallerASRGet不会返回BALLER_SUCCESS。
         if (BALLER_MORE_RESULT == iRet)
         {
@@ -400,17 +473,27 @@ void test_continue_with_dynamic_correction(baller_session_id session_id, char* p
                     // 如果上一次获取结果的状态为BALLER_ASR_STATUS_INCOMPLETE，表示上一次获取的结果是不完整的，本次获取的结果是对上一次获取结果的修正
                     // 这里使用本次获取的结果替换上次获取的结果
                     vecResult.pop_back();
-                    vecResult.push_back(std::string(pResult));
+                    s_sentence_info sSentenceInfo;
+                    sSentenceInfo.strResult = std::string(pResult);
+                    sSentenceInfo.uStartTime = uStartTime;
+                    sSentenceInfo.uEndTime = uEndTime;
+                    sSentenceInfo.iStatus = iStatus;
+                    vecResult.push_back(sSentenceInfo);
                 }
                 else
                 {
                     // 如果上一次获取结果的状态为BALLER_ASR_STATUS_COMPLETE，表示上一次获取的结果是一个子句完整的结果，本次获取的结果是一个新子句的结果
                     // 这里使用本次获取的结果替换上次获取的结果
-                    vecResult.push_back(std::string(pResult));
+                    s_sentence_info sSentenceInfo;
+                    sSentenceInfo.strResult = std::string(pResult);
+                    sSentenceInfo.uStartTime = uStartTime;
+                    sSentenceInfo.uEndTime = uEndTime;
+                    sSentenceInfo.iStatus = iStatus;
+                    vecResult.push_back(sSentenceInfo);
                 }
 
                 iLastStatus = iStatus;
-                show_result(vecResult);
+                show_full_result(vecResult);
             }
         }
         else
@@ -421,8 +504,8 @@ void test_continue_with_dynamic_correction(baller_session_id session_id, char* p
         }
     }
 
-    const char* params_end = "input_mode=end, vad=on";
-    iRet = BallerASRPut(session_id, params_end, pPCMData + iUsedSize, iPCMDataLen - iUsedSize);
+    std::string strEndParams = std::string("input_mode=end, vad=on, audio_format=") + std::string(AUDIO_FROMAT);
+    iRet = BallerASRPut(session_id, strEndParams.c_str(), pPCMData + iUsedSize, iPCMDataLen - iUsedSize);
     if (BALLER_SUCCESS != iRet)
     {
         printf("Call BallerASRPut failed. Return Code: %d\n", iRet);
@@ -434,8 +517,10 @@ void test_continue_with_dynamic_correction(baller_session_id session_id, char* p
         char *pResult = NULL;
         int iResultLen = 0;
         int iStatus = 0;
+        unsigned int uStartTime = 0;
+        unsigned int uEndTime = 0;
 
-        iRet = BallerASRGet(session_id, &pResult, &iResultLen, &iStatus);
+        iRet = BallerASRGet(session_id, &pResult, &iResultLen, &iStatus, &uStartTime, &uEndTime);
         if (BALLER_SUCCESS == iRet)
         {
             if (iResultLen > 0 && pResult)
@@ -446,15 +531,25 @@ void test_continue_with_dynamic_correction(baller_session_id session_id, char* p
                     // 如果上一次获取结果的状态为BALLER_ASR_STATUS_INCOMPLETE，表示上一次获取的结果是不完整的，本次获取的结果是对上一次获取结果的修正
                     // 这里使用本次获取的结果替换上次获取的结果
                     vecResult.pop_back();
-                    vecResult.push_back(std::string(pResult));
+                    s_sentence_info sSentenceInfo;
+                    sSentenceInfo.strResult = std::string(pResult);
+                    sSentenceInfo.uStartTime = uStartTime;
+                    sSentenceInfo.uEndTime = uEndTime;
+                    sSentenceInfo.iStatus = iStatus;
+                    vecResult.push_back(sSentenceInfo);
                 }
                 else
                 {
                     // 如果上一次获取结果的状态为BALLER_ASR_STATUS_COMPLETE，表示上一次获取的结果是一个子句完整的结果，本次获取的结果是一个新子句的结果
                     // 这里使用本次获取的结果替换上次获取的结果
-                    vecResult.push_back(std::string(pResult));
+                    s_sentence_info sSentenceInfo;
+                    sSentenceInfo.strResult = std::string(pResult);
+                    sSentenceInfo.uStartTime = uStartTime;
+                    sSentenceInfo.uEndTime = uEndTime;
+                    sSentenceInfo.iStatus = iStatus;
+                    vecResult.push_back(sSentenceInfo);
                 }
-                show_result(vecResult);
+                show_full_result(vecResult);
             }
 
             // 识别结果已获取完毕，不需要继续调用BallerASRGet
@@ -470,17 +565,27 @@ void test_continue_with_dynamic_correction(baller_session_id session_id, char* p
                     // 如果上一次获取结果的状态为BALLER_ASR_STATUS_INCOMPLETE，表示上一次获取的结果是不完整的，本次获取的结果是对上一次获取结果的修正
                     // 这里使用本次获取的结果替换上次获取的结果
                     vecResult.pop_back();
-                    vecResult.push_back(std::string(pResult));
+                    s_sentence_info sSentenceInfo;
+                    sSentenceInfo.strResult = std::string(pResult);
+                    sSentenceInfo.uStartTime = uStartTime;
+                    sSentenceInfo.uEndTime = uEndTime;
+                    sSentenceInfo.iStatus = iStatus;
+                    vecResult.push_back(sSentenceInfo);
                 }
                 else
                 {
                     // 如果上一次获取结果的状态为BALLER_ASR_STATUS_COMPLETE，表示上一次获取的结果是一个子句完整的结果，本次获取的结果是一个新子句的结果
                     // 这里使用本次获取的结果替换上次获取的结果
-                    vecResult.push_back(std::string(pResult));
+                    s_sentence_info sSentenceInfo;
+                    sSentenceInfo.strResult = std::string(pResult);
+                    sSentenceInfo.uStartTime = uStartTime;
+                    sSentenceInfo.uEndTime = uEndTime;
+                    sSentenceInfo.iStatus = iStatus;
+                    vecResult.push_back(sSentenceInfo);
                 }
 
                 iLastStatus = iStatus;
-                show_result(vecResult);
+                show_full_result(vecResult);
             }
 
             // 还有识别结果需要获取 需继续调用BallerASRGet
@@ -506,13 +611,6 @@ void * TestASR(void * param)
     int iRet = BALLER_SUCCESS;
     baller_session_id session_id = BALLER_INVALID_SESSION_ID;
     s_thread_param* thread_param = (s_thread_param *)param;
-
-    iRet = BallerASRWorkingThread();
-    if (BALLER_SUCCESS != iRet)
-    {
-        printf("Call BallerASRWorkingThread failed. Return Code: %d\n", iRet);
-        return 0;
-    }
 
     // Call the BallerASRSessionBegin interface to get session
     std::string session_prams = std::string("res_dir=") + std::string(thread_param->dir) + std::string(",language=") + std::string(LANGUAGE)

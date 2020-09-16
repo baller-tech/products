@@ -11,7 +11,7 @@
 | 字符编码      | UTF-8                                                        |
 | WebSocket版本 | 13 ([RFC 6455](https://tools.ietf.org/html/rfc6455 "RFC 6455")) |
 | 响应格式      | 统一采用JSON格式                                             |
-| 图像格式      | jpg；jpeg；bmp；png；gif；tif；tiff                          |
+| 图像格式      | jpg；jpeg；bmp；png；gif；tif；tiff；pdf                     |
 | 图像大小      | 图像大小不超过4M                                             |
 
 ## 调用流程
@@ -99,6 +99,7 @@ host:api.baller-tech.com
 | ------------ | ------------ | ------------ | ------------ |
 | image_mode  | string  |  是 |   传入图片的文本模式 |
 |language | string| 否 | 识别语种参见[支持的图像识别语种](#support_language)|
+| file_format  | string  |  否 | 仅当识别PDF文件时需要填写，填写值为**pdf**。请参考[PDF识别注意事项](#support_pdf) |
 
 ##### image_mode 介绍
 
@@ -113,6 +114,7 @@ image_mode表明图像的模式，有以下几种可以设定的值
 | 参数名 | 类型   | 是否必须 | 描述                       |
 | ------ | ------ | -------- | -------------------------- |
 | image  | string | 是       | 经过base64编码后的图片数据 |
+| input_mode  | string | 否       | 仅当识别PDF文件时需要填写。请参考[PDF识别注意事项](#support_pdf) <br>once<br>continue<br/>end |
 
 
 ```
@@ -139,12 +141,13 @@ image_mode表明图像的模式，有以下几种可以设定的值
 | is_end  | int    | 结果返回是否结束（0-未结束; 1-结束），当为1时，请求方需关闭WebSocket |
 | data    | 数组   | 每一个子项的识别结果，[详见](#get_data)                      |
 
-##### <span id="get_data">data字段介绍
+##### <span id="get_data">data字段介绍</span>
 
 | 参数   | 类型   | 说明                                                         |
 | ------ | ------ | ------------------------------------------------------------ |
 | order  | int    | 当前响应报文中子句的顺序（是一次推送帧中多个子句的顺序，不是整个识别事务的） |
 | result | string | 该子句的识别结果                                             |
+| page   | int    | 仅识别PDF文件时有效，表示页数的索引（从0开始）               |
 
 
 ```
@@ -156,15 +159,21 @@ image_mode表明图像的模式，有以下几种可以设定的值
     "data": [
 		{
 			"order": 0,
-			"result": "谢谢惠顾"
+			"result": "谢谢惠顾",
+			"page": 0,
 		},
 		{
 			"order": 1,
-			"result": "期待下次再见"
+			"result": "期待下次再见",
+			"page": 0,
 		},
 	]
 }
 ```
+
+## <span id="support_pdf">PDF识别注意事项</span>
+
+ 	本接口支持对10M以内的PDF文件进行识别，识别PDF时业务参数中的file_format需设置为**pdf**。<br>	如果pdf文件较小（4M以内），可以一次将整个PDF文件发送到服务器，此时数据参数中的input_mode字段可以不设置，或设置为once；如果数据文件较大，不能一次将整个PDF文件发送到服务器，可以将PDF文件切分成多段，并分多次发送给服务器，在这种情况下如果不是最后一段需设置input_mode为continue，如果是最后一段需设置input_mode为end。
 
 ## <span id="support_language">支持的语种</span>
 

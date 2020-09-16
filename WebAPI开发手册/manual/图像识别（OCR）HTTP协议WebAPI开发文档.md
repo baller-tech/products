@@ -51,6 +51,8 @@ Content-Type | string | 传输数据的类型，此处使用固定值 | applicat
 request_id | string | 本次图像识别事务的请求ID；<br>获取该请求识别结果时需携带相同的请求ID；<br>调用者需保证请求ID的唯一性，建议使用UUID | 6497c282-9371-4c68-a9f1-522212b5ac1d
 image_mode | string | 传入图片的文本模式，可选值为：<br>multi_row | multi_row
 language | string| 识别语种参见[支持的图像识别语种](#support_language)| chs 
+file_format | string | 仅当识别PDF文件时需要填写，填写值为***\*pdf\****。请参考[PDF识别注意事项](#support_pdf) | pdf 
+input_mode | string | 仅当识别PDF文件时需要填写。请参考[PDF识别注意事项](#support_pdf) <br>once<br>continue<br/>end | once                                    
 callback_url | string | 识别结果推送的回调地址；<br>通过调用HTTP的GET方法获取识别结果时不需设置 | http://192.168.1.234:18888/ocr/callback
 
 #### 1.2 HTTP请求Body
@@ -104,8 +106,9 @@ data| json数组 | 本次获取到的子句的识别结果，[详见](#get_data)
 ##### 2.2.1 <span id="get_data">data字段介绍
 参数 | 类型 | 说明
 ---|---|---
-order|  int | 当前响应报文中子句的顺序（是一次GET响应报文的顺序，不是整个识别事务的） |
-result|  string | 该子句的识别结果 |
+order|  int | 当前响应报文中子句的顺序（是一次GET响应报文的顺序，不是整个识别事务的） 
+result|  string | 该子句的识别结果 
+page| int | 仅识别PDF文件时有效，表示页数的索引（从0开始） 
 
 
 ```
@@ -117,7 +120,8 @@ result|  string | 该子句的识别结果 |
     "data": [
         {
             "order": 0,
-            "result": "xxx"
+            "result": "xxx",
+            "page": 0
         }
     ]
 }
@@ -137,11 +141,16 @@ result|  string | 该子句的识别结果 |
     "data": [
         {
             "order": 0,
-            "result": "xxx"
+            "result": "xxx",
+            "page": 0
         }
     ]
 }
 ```
+
+## **<span id="support_pdf">PDF识别注意事项</span>**
+
+本接口支持对10M以内的PDF文件进行识别，识别PDF时业务参数中的file_format需设置为**pdf**。<br>如果pdf文件较小（4M以内），可以一次将整个PDF文件发送到服务器，此时数据参数中的input_mode字段可以不设置，或设置为once；如果数据文件较大，不能一次将整个PDF文件发送到服务器，可以将PDF文件切分成多段，并分多次发送给服务器，在这种情况下如果不是最后一段需设置input_mode为continue，如果是最后一段需设置input_mode为end。
 
 ## <span id="support_language">支持的语种</span>
 

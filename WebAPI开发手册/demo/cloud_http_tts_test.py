@@ -108,6 +108,8 @@ def get_result(request_id, pcm_file):
 
 def main():
     # 读取文本数据
+    # 一次语音合成任务需调用一次POST接口，和多次GET接口。
+    # 调用POST接口将文本数据发送给服务器，服务端会将传入的文本分为不同的子句，GET接口的响应报文中为一个子句的合成结果，当收到一个子句的合成结果时，应用就可以开始播放，下一个子句的合成结果会在当前子句播放完成前返回。
     with open(txt_file, "rb") as file:
         txt_data = file.read()
     if not txt_data:

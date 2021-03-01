@@ -36,6 +36,8 @@ def on_error(ws, error):
     print(f"ERROR: {error}")
 
 
+# 一次语音合成任务只需发送一次文本数据，但合成的结果会分多次返回。
+# 服务端会将传入的文本分为不同的子句，每次on_message触发时，返回的是一个子句的合成结果，当收到一个子句的合成结果时，应用就可以开始播放，下一个子句的合成结果会在当前子句播放完成前返回。
 def on_message(ws, message):
     try:
         message_values = json.loads(message)

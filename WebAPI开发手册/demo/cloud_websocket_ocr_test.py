@@ -80,6 +80,7 @@ def on_open(ws):
             image_data = fp.read()
             fp.close()
 
+        ws.out_file = None
         if save_to_file:
             out_file_name = image_file + ".txt"
             ws.out_file = open(out_file_name, "w", encoding='utf-8')

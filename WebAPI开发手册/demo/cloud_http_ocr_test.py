@@ -30,6 +30,8 @@ language = "chs"
 request_url = "http://api.baller-tech.com/v1/service/v1/ocr"
 # 测试使用的图像数据
 image_file = ""
+# 请查考《图像识别（OCR）HTTP协议WebAPI开发文档.pdf》中“PDF识别注意事项”章节
+file_format = ""
 # 推送结果的地址，该地址为调用者自己搭建的接收推送结果的Web服务地址
 callback_url = ""
 # 结果是否保存到文件中
@@ -46,6 +48,7 @@ def post_data(request_id, data):
     business_params = {
         'request_id': str(request_id),
         'image_mode': 'multi_row',
+        'file_format': file_format,
         "language": language,
     }
     if callback_url:

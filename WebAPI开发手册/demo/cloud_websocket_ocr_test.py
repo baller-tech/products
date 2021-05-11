@@ -32,6 +32,8 @@ host = "api.baller-tech.com"
 
 # 测试使用的图像数据
 image_file = ""
+# 请查考《图像识别（OCR）WebSocket协议WebAPI开发文档.pdf》中“PDF识别注意事项”章节
+file_format = ""
 # 是否将结果保存到文件
 save_to_file = True
 
@@ -88,6 +90,7 @@ def on_open(ws):
         # 业务参数
         business_params = {
             "image_mode": "multi_row",
+            "file_format": file_format,
             "language": language,
         }
         data_params = {

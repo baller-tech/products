@@ -25,7 +25,7 @@
 
 #include "baller_errors.h"
 #include "baller_common.h"
-#include "baller_mt.h"
+#include "baller_tts.h"
 
 // 由北京大牛儿科技发展有限公司统一分配
 #define BALLER_ORG_ID                              (0LL)
@@ -34,18 +34,24 @@
 
 // SDK参数设置
 // 语种
-#define BALLER_LANG                                 ("tib-chs")
+#define BALLER_LANG                                 ("mon")
 // 资源文件路径
-#define BALLER_RES_DIR                              ("./data")
+#define BALLER_RES_DIR                              ("./data/mon")
 // 授权文件路径
 #define BALLER_LICENSE_FILE                         ("./license/baller_sdk.license")
+// 采样率
+#define BALLER_SAMPLE_RATE                          (16000)
+// 采样点大小
+#define BALLER_SAMPLE_SIZE                          (16)
+// 音频编码；支持的音频编码请参考开发手册
+#define BALLER_AUDIO_ENCODE                         ("raw")
 
 // 测试参数设置
 // 测试使用的线程数
 #define BALLER_THREAD_COUNT                         (1)
 // 每个测试文件执行多少次
 #define BALLER_LOOP_COUNT                           (1)
-// 测试实时率时打开此宏
+// 测试实时率时打开此宏， 打开此宏时BALLER_AUDIO_ENCODE必须设置为“raw”
 // #define BALLER_TEST_RTF
 
 #ifdef _WIN32
@@ -63,22 +69,6 @@ typedef struct t_s_thread_param {
 } s_thread_param;
 
 #ifdef _WIN32
-static char * u8_to_gb(const char * u8_str)
-{
-    int u16_count = ::MultiByteToWideChar(CP_UTF8, 0, u8_str, -1, 0, 0);
-    unsigned short * u16_str = (unsigned short *)malloc(sizeof(unsigned short) * (u16_count + 1));
-    memset(u16_str, 0, sizeof(unsigned short) * (u16_count + 1));
-    ::MultiByteToWideChar(CP_UTF8, 0, u8_str, -1, (LPWSTR)u16_str, u16_count);
-
-    int gb_count = ::WideCharToMultiByte(CP_ACP, 0, (LPCWSTR)u16_str, -1, 0, 0, 0, 0);
-    char * gb_str = (char *)malloc(sizeof(char) * (gb_count + 1));
-    memset(gb_str, 0, sizeof(char) * (gb_count + 1));
-    ::WideCharToMultiByte(CP_ACP, 0, (LPCWSTR)u16_str, -1, gb_str, gb_count, 0, 0);
-
-    free(u16_str);
-    return gb_str;
-}
-
 static int GetFiles(const std::string& folder_name, std::vector<std::string>& vec_files)
 {
     intptr_t hFile = 0;
@@ -162,24 +152,18 @@ int ReadTestData(const char* pszTestFile, char** ppTestData, int* piTestDataLen)
 }
 
 
-void print_result(const char* result)
+void write_result(FILE* out_file, const char* result, const int result_len)
 {
-    if (result)
+    if (out_file)
     {
-#ifdef _WIN32
-        char * gb = u8_to_gb((const char *)result);
-        printf("%s", gb);
-        free(gb);
-#else
-        printf("%s", (char*)result);
-#endif
+        fwrite(result, 1, result_len, out_file);
     }
 }
 
 #ifdef _WIN32
-DWORD WINAPI test_mt(LPVOID param)
+DWORD WINAPI test_tts(LPVOID param)
 #else
-void * test_mt(void * param)
+void * test_tts(void * param)
 #endif
 {
     int ret = BALLER_SUCCESS;
@@ -187,50 +171,64 @@ void * test_mt(void * param)
     s_thread_param* thread_param = (s_thread_param *)param;
 
     // 调用SessionBegin接口
-    // 可通过修改hardware参数，控制使用GPU还是CPU，具体取值请参考开发手册。
     std::string session_prams = std::string("res_dir=") + BALLER_RES_DIR
         + std::string(",language=") + BALLER_LANG
-        + std::string(",engine_type=local,hardware=cpu_slow");
-    ret = BallerMTSessionBegin(session_prams.c_str(), &session_id);
+        + std::string(",sample_rate=") + std::to_string(BALLER_SAMPLE_RATE)
+        + std::string(",sample_size=") + std::to_string(BALLER_SAMPLE_SIZE);
+    ret = BallerTTSSessionBegin(session_prams.c_str(), &session_id);
     if (ret != BALLER_SUCCESS)
     {
-        printf("call BallerMTSessionBegin failed(%d)\n", ret);
+        printf("call BallerTTSSessionBegin failed(%d)\n", ret);
         return 0;
     }
-    printf("call BallerMTSessionBegin success\n");
+    printf("call BallerTTSSessionBegin success\n");
 
     int max_elapsed = INT_MIN;
     int min_elapsed = INT_MAX;
     int total_elapsed = 0;
-    int total_test_file_size = 0;
+    int total_synthesized_duration = 0;
     int test_count = 0;
-    std::string put_param = "input_mode=once";
+    std::string put_param = std::string("input_mode=once,audio_encode=") + BALLER_AUDIO_ENCODE;
+    FILE* out_file = 0;
     for (int loop_index = 0; loop_index < BALLER_LOOP_COUNT; ++loop_index)
     {
         for (int file_index = 0; file_index < thread_param->vec_test_file_name.size(); ++file_index)
         {
-            // 调用BallerMTPut接口
+#ifndef BALLER_TEST_RTF
+            if (out_file)
+            {
+                fclose(out_file);
+                out_file = 0;
+            }
+            std::string out_file_name = thread_param->vec_test_file_name[file_index] + "." + std::to_string(BALLER_THREAD_ID) + "." + BALLER_AUDIO_ENCODE;
+            out_file = fopen(out_file_name.c_str(), "wb");
+#endif /*BALLER_TEST_RTF*/
+
+            // 调用BallerTTSPut接口
             std::chrono::system_clock::time_point start = std::chrono::system_clock::now();
-            ret = BallerMTPut(session_id, put_param.c_str(), thread_param->vec_test_data[file_index]);
+            ret = BallerTTSPut(session_id, put_param.c_str(), thread_param->vec_test_data[file_index]);
             if (ret != BALLER_SUCCESS)
             {
-                printf("call BallerMTPut failed(%d)\n", ret);
+                printf("call BallerTTSPut failed(%d)\n", ret);
                 break;
             }
 #ifndef BALLER_TEST_RTF
-            printf("call BallerMTPut success\n");
+            printf("call BallerTTSPut success\n");
 #endif /*BALLER_TEST_RTF*/
 
-            // 循环调用BallerMTGet接口
+            // 循环调用BallerTTSGet接口
+            int synthesized_duration = 0;
             while (true)
             {
                 char *result = NULL;
-                ret = BallerMTGet(session_id, &result);
+                int result_len = 0;
+                ret = BallerTTSGet(session_id, &result, &result_len);
                 if (BALLER_MORE_RESULT == ret)
                 {
+                    synthesized_duration += result_len;
 #ifndef BALLER_TEST_RTF
-                    print_result(result);
-                    // 还有识别结果需要获取 需继续调用BallerMTGet
+                    write_result(out_file, result, result_len);
+                    // 还有识别结果需要获取 需继续调用BallerTTSGet
                     // 为了避免浪费CPU资源停10ms在继续获取，10ms为经验值，具体停留的时间需根据机器性能和业务需求综合考虑
                     BALLER_SLEEP_MS(10);
 #endif /*BALLER_TEST_RTF*/
@@ -238,50 +236,50 @@ void * test_mt(void * param)
                 }
                 else if (BALLER_SUCCESS == ret)
                 {
+                    synthesized_duration += result_len;
 #ifndef BALLER_TEST_RTF
-                    print_result(result);
-                    printf("\n");
-                    printf("BallerMTGet Finish\n");
+                    write_result(out_file, result, result_len);
+                    printf("BallerTTSGet Finish\n");
 #endif /*BALLER_TEST_RTF*/
                     break;
                 }
                 else
                 {
-                    printf("call BallerMTGet failed(%d)\n", ret);
+                    printf("call BallerTTSGet failed(%d)\n", ret);
                     break;
                 }
             }
             if (BALLER_SUCCESS == ret)
             {
-                test_count += 1;
                 int elapsed = int(std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - start).count());
-                printf("[%d] loop_index = %d file %s size: %d use %d ms rate %f\n",
-                    BALLER_THREAD_ID, loop_index,
-                    thread_param->vec_test_file_name[file_index].c_str(), thread_param->vec_test_data_len[file_index], elapsed,
-                    float(elapsed) / float(thread_param->vec_test_data_len[file_index]));
 
-                // 第一次耗时会比较长统计时不统计
-                if (test_count > 1)
-                {
-                    max_elapsed = std::max<int>(max_elapsed, elapsed);
-                    min_elapsed = std::min<int>(min_elapsed, elapsed);
-                    total_elapsed += elapsed;
-                    total_test_file_size += thread_param->vec_test_data_len[file_index];
-                    printf("[%d] statistics count %d min use: %d ms max use: %d ms avg use: %f ms rate %f \n",
-                        BALLER_THREAD_ID, test_count - 1,
-                        min_elapsed, max_elapsed, float(total_elapsed) / float(test_count - 1),
-                        float(total_elapsed) / float(total_test_file_size));
-                }
+                synthesized_duration = synthesized_duration / (BALLER_SAMPLE_SIZE / 8) / (BALLER_SAMPLE_RATE / 1000);
+                printf("[%d] loop_index = %d file %s " "synthesized %d ms use %d ms " "rate %f\n",
+                    BALLER_THREAD_ID, loop_index, thread_param->vec_test_file_name[file_index].c_str(), 
+                    synthesized_duration, elapsed, float(elapsed) / float(synthesized_duration));
+
+                max_elapsed = std::max<int>(max_elapsed, elapsed);
+                min_elapsed = std::min<int>(min_elapsed, elapsed);
+                total_elapsed += elapsed;
+                total_synthesized_duration += synthesized_duration;
+                printf("[%d] statistics min use: %d ms max use: %d ms total synthesized %d ms total use %d ms avg rate %f \n",
+                    BALLER_THREAD_ID, min_elapsed, max_elapsed, total_synthesized_duration, total_elapsed,
+                    float(total_elapsed) / float(total_synthesized_duration));
             }
         }
     }
 
-    ret = BallerMTSessionEnd(session_id);
+    if (out_file)
+    {
+        fclose(out_file);
+        out_file = 0;
+    }
+    ret = BallerTTSSessionEnd(session_id);
     if (ret != BALLER_SUCCESS)
     {
-        printf("call BallerMTSessionEnd failed. Return Code: %d\n", ret);
+        printf("call BallerTTSSessionEnd failed. Return Code: %d\n", ret);
     }
-    printf("call BallerMTSessionEnd success\n");
+    printf("call BallerTTSSessionEnd success\n");
 
     return 0;
 }
@@ -363,14 +361,14 @@ int main(int argc, char ** argv)
 #ifdef _WIN32
     std::vector<HANDLE> thread_handle;
     for (int thread_idx = 0; thread_idx < BALLER_THREAD_COUNT; ++thread_idx) {
-        thread_handle.push_back(::CreateThread(0, 0, test_mt, &thread_param, 0, 0));
+        thread_handle.push_back(::CreateThread(0, 0, test_tts, &thread_param, 0, 0));
     }
     ::WaitForMultipleObjects((DWORD)thread_handle.size(), &thread_handle[0], TRUE, INFINITE);
 #else
     std::vector<pthread_t> thread_handle;
     for (int thread_idx = 0; thread_idx < BALLER_THREAD_COUNT; ++thread_idx) {
         pthread_t sub_handle;
-        pthread_create(&sub_handle, 0, test_mt, &thread_param);
+        pthread_create(&sub_handle, 0, test_tts, &thread_param);
         thread_handle.push_back(sub_handle);
     }
     for (int thread_idx = 0; thread_idx < BALLER_THREAD_COUNT; ++thread_idx) {

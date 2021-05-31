@@ -26,8 +26,14 @@ app_key = ""
 request_url = "http://api.baller-tech.com/v1/service/v1/tts"
 # 测试使用的文本数据及参数
 txt_file = ""
+# 测试的语种
 language = ""
+# 合成的音频文件格式
+# 请查考《语音识别（TTS）HTTP协议WebAPI开发文档.pdf》中“支持的语种以及采样格式”章节
 sample_format = "audio/L16;rate=16000"
+# 合成的音频的压缩类型
+# 请查考《语音识别（TTS）HTTP协议WebAPI开发文档.pdf》中“支持的音频编码”章节
+audio_encode = "raw"
 # 推送结果的地址，该地址为调用者自己搭建的接收推送结果的Web服务地址
 callback_url = ""
 
@@ -43,6 +49,7 @@ def post_data(request_id, data):
         'request_id': str(request_id),
         'language': language,
         'sample_format': sample_format,
+        'audio_encode': audio_encode,
     }
     if callback_url:
         business_params["callback_url"] = callback_url
@@ -126,7 +133,7 @@ def main():
     # 获取合成结果
     if not callback_url:
         is_end = False
-        pcm_file = open(f"{request_id}.pcm", "wb")
+        pcm_file = open(f"{request_id}.{audio_encode}", "wb")
         while not is_end:
             is_end = get_result(request_id, pcm_file)
             time.sleep(0.150)

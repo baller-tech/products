@@ -77,20 +77,31 @@ host:api.baller-tech.com
 
 #### 业务参数(business)
 
-| 参数名   | 类型  | 是否必须  | 描述  |
-| ------------ | ------------ | ------------ | ------------ |
-| language  | string  |  是 |   音频的语种；参见[支持的语种和采样格式](#support_language) |
-| sample_format | string  | 是  | 音频采样格式；参见[支持的语种和采样格式](#support_language) |
+| 参数名   | 类型  | 是否必须  | 默认值 | 描述  |
+| ------------ | ------------ | ------------ | ------------ | ------------ |
+| language  | string  |  是 |  无 |   音频的语种；参见[支持的语种和采样格式](#support_language) |
+| sample_format | string  | 否 | audio/L16;rate=16000 | 音频采样格式；参见[支持的语种和采样格式](#support_language) |
+| audio_encode | string | 否 | raw | 音频编码格式；参见[支持的音频编码](#support_audio_encode) |
 
 ##### sample_format 介绍
 &#8195; &#8195;根据RFC对MIME格式的定义，使用audio/Lxx;rate=xxxxx 表明采样格式，audio/L后面的数字表示音频的采样点大小（单位bit）, rate=后面的数字表示音频 的采样率（单位hz）。<br>
 &#8195; &#8195;比如audio/L16;rate=16000表示音频数据为16000hz，16bit的pcm音频数据
+
+##### audio_encode 介绍
+
+​		语音合成的原始数据是未经过压缩的采样数据，播放器可以直接播放，它的数据量比较大，以audio/L16;rate=16000为例，一秒的音频需要32000字节的数据来表示。如果对带宽比较敏感，希望减少传输的数据量，可以指定编码格式，对原始采样数据进行编码（压缩），编码（压缩）后的数据需解码后才能正常播放。
+
+​		WebAPI返回的是编码后的裸流，不包含任何的封装信息。接口每次返回一帧或多帧完整的音频数据，不会将一帧音频数据分多次返回。
+
+​		为了方便解码，当该参数指定为speex或opus时，在每帧数据前会添加4个字节，用来表示当前帧的字节数。
 
 #### 数据流参数（data）
 
 | 参数名   | 类型  | 是否必须  | 描述  |
 | ------------ | ------------ | ------------ | ------------ |
 | txt  | string  | 是  | 经过base64编码后的文本数据   |
+
+
 
 
 ```
@@ -138,3 +149,14 @@ host:api.baller-tech.com
 藏语（康巴）|tib_kb|采样率：16000hz 采样点大小：16bits|audio/L16;rate=16000
 藏语（卫藏）|tib_wz|采样率：16000hz 采样点大小：16bits|audio/L16;rate=16000
 维语|uig|采样率：16000hz 采样点大小：16bits|audio/L16;rate=16000
+
+## <span id="support_audio_encode">支持的音频编码</span>
+
+| audio_encode | 编码说明                                                     |
+| ------------ | ------------------------------------------------------------ |
+| raw          | 未压缩的原始音频采样数据                                     |
+| alaw         | A-law编码，详细介绍请参考：https://github.com/dystopiancode/pcm-g711 |
+| ulaw         | µ-law编码，详细介绍请参考：https://github.com/dystopiancode/pcm-g711 |
+| mp3          | mp3编码，详细介绍请参考：https://lame.sourceforge.io/        |
+| speex        | speex编码（会在每帧数据前添加4个字节，表示当前帧的大小），详细介绍请参考：https://www.speex.org/ |
+| opus         | opus编码（会在每帧数据前添加4个字节，表示当前帧的大小），详细介绍请参考：https://opus-codec.org/ |

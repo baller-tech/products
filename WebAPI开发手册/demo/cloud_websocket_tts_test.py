@@ -26,10 +26,16 @@ app_key = ""
 request_url = "ws://api.baller-tech.com/v1/service/ws/v1/tts"
 host = "api.baller-tech.com"
 
-# 测试使用的音频数据
+# 测试使用的文本数据
 txt_file = ""
+# 测试的语种
 language = ""
+# 合成的音频文件格式
+# 请查考《语音识别（TTS）HTTP协议WebAPI开发文档.pdf》中“支持的语种以及采样格式”章节
 sample_format = "audio/L16;rate=16000"
+# 合成的音频的压缩类型
+# 请查考《语音识别（TTS）HTTP协议WebAPI开发文档.pdf》中“支持的音频编码”章节
+audio_encode = "raw"
 
 
 def on_error(ws, error):
@@ -47,7 +53,7 @@ def on_message(ws, message):
 
     # task_id只在服务器推送的第一帧中出现
     if "task_id" in message_values:
-        ws.result_file = open(f"{message_values['task_id']}.pcm", "wb")
+        ws.result_file = open(f"{message_values['task_id']}.{audio_encode}", "wb")
         print(f"task id {message_values['task_id']}")
 
     if 0 != message_values["code"]:
@@ -74,6 +80,7 @@ def on_open(ws):
         business_params = {
             "language": language,
             "sample_format": sample_format,
+            "audio_encode": audio_encode,
         }
         data_params = {
             "txt": base64.b64encode(txt_data).decode(encoding='utf-8'),

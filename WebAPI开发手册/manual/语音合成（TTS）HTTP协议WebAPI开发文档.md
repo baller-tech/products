@@ -49,11 +49,20 @@ Content-Type | string | 传输数据的类型，此处使用固定值 | applicat
 request_id | string | 本次语音合成事务的请求ID；<br>获取该请求合成结果时需携带相同的请求ID；<br>调用者需保证请求ID的唯一性，建议使用UUID | 6497c282-9371-4c68-a9f1-522212b5ac1d
 sample_format| string | 合成的采样格式，参见[支持的语种和采样格式](#support_language) | audio/L16;rate=16000
 language| string | 合成音频的语种，参见[支持的语种和采样格式](#support_language)| zho
+audio_encode| string | 音频编码格式；参见[支持的音频编码](#support_audio_encode) | raw 
 callback_url | string | 合成结果推送的回调地址；</br>通过调用HTTP的GET方法获取合成结果时不需设置 | http://192.168.1.234:18888/tts/callback
 
 ###### 1.1.1.1 sample_format 介绍
 &#8195; &#8195;根据RFC对MIME格式的定义，使用audio/Lxx;rate=xxxxx 表明采样格式，audio/L后面的数字表示音频的采样点大小（单位bit）, rate=后面的数字表示音频 的采样率（单位hz）。<br>
 &#8195; &#8195;比如audio/L16;rate=16000表示合成的音频数据为16000hz，16bit的pcm音频数据
+
+###### 1.1.1.2 audio_encode 介绍
+
+​		语音合成的原始数据是未经过压缩的采样数据，播放器可以直接播放，它的数据量比较大，以audio/L16;rate=16000为例，一秒的音频需要32000字节的数据来表示。如果对带宽比较敏感，希望减少传输的数据量，可以指定编码格式，对原始采样数据进行编码（压缩），编码（压缩）后的数据需解码后才能正常播放。
+
+​		WebAPI返回的是编码后的裸流，不包含任何的封装信息。接口每次返回一帧或多帧完整的音频数据，不会将一帧音频数据分多次返回。
+
+​		为了方便解码，当该参数指定为speex或opus时，在每帧数据前会添加4个字节，用来表示当前帧的字节数。
 
 #### 1.2 HTTP请求Body
 &#8195; &#8195;待合成的文本数据。
@@ -119,3 +128,14 @@ B-Is-End | string | 合成结果是否获取结束（"1"：结束；"0"：未结
 藏语（康巴）|tib_kb|采样率：16000hz 采样点大小：16bits|audio/L16;rate=16000
 藏语（卫藏）|tib_wz|采样率：16000hz 采样点大小：16bits|audio/L16;rate=16000
 维语|uig|采样率：16000hz 采样点大小：16bits|audio/L16;rate=16000
+
+## <span id="support_audio_encode">支持的音频编码</span>
+
+| audio_encode | 编码说明                                                     |
+| ------------ | ------------------------------------------------------------ |
+| raw          | 未压缩的原始音频采样数据                                     |
+| alaw         | A-law编码，详细介绍请参考：https://github.com/dystopiancode/pcm-g711 |
+| ulaw         | µ-law编码，详细介绍请参考：https://github.com/dystopiancode/pcm-g711 |
+| mp3          | mp3编码，详细介绍请参考：https://lame.sourceforge.io/        |
+| speex        | speex编码（会在每帧数据前添加4个字节，表示当前帧的大小），详细介绍请参考：https://www.speex.org/ |
+| opus         | opus编码（会在每帧数据前添加4个字节，表示当前帧的大小），详细介绍请参考：https://opus-codec.org/ |

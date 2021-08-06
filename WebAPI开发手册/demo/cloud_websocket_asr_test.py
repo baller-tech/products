@@ -151,7 +151,7 @@ def on_open(ws):
 
 
 def test_ws():
-    date = formatdate(timeval=None, localtime=True, usegmt=True)
+    date = formatdate(timeval=None, localtime=False, usegmt=True)
 
     # signature
     signature_org = ""

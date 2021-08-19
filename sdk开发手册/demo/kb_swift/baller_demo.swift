@@ -112,6 +112,11 @@ class NineKeyboardTool {
                 }
                 else
                 {
+                    let matchingMonosyllableLength = item.mSymbol.count + 1
+                    if (matchingMonosyllableLength <= mMatchingMonosyllable.count)
+                    {
+                        mMatchingMonosyllable.removeLast(matchingMonosyllableLength)
+                    }
                     mMonosyllable.remove(at: index)
                 }
             }
@@ -331,9 +336,9 @@ class BallerKBDemo {
     var mUserDataLen = 0
     
     let mTest9 = true
-    let mTest26 = true
-    let mTestWithoutUserData = false
-    let mTestWithUserData = true
+    let mTest26 = false
+    let mTestWithoutUserData = true
+    let mTestWithUserData = false
     
     /**
      开始测试的入口函数

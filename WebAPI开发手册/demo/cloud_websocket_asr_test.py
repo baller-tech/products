@@ -70,10 +70,6 @@ def on_message(ws, message):
     if 0 != message_values["code"]:
         print(f"asr failed {message_values['code']} {message_values['message']}")
 
-    # 最后一帧时关闭WebSocket连接
-    if 1 == message_values["is_end"]:
-        ws.close()
-
     # 语音识别时，会将传入的语音根据一定的规则分为不同的子句，每次GET请求返回的一个子句的识别结果
     # 一个子句的识别结果有两种状态完整的识别结果(is_complete等于1)和不完整的识别结果(is_complete等于0)；
     # 不完整的识别结果表示本次获取的识别结果并不是该子句的最终结果，下一次GET请求获取的识别结果还是该子句的；
@@ -90,6 +86,10 @@ def on_message(ws, message):
                 ws.out_file.write(message_values['data'])
             if show_offset:
                 print(f"begin = {message_values['begin']} ms end = {message_values['end']} ms")
+    
+    # 最后一帧时关闭WebSocket连接
+    if 1 == message_values["is_end"]:
+        ws.close()
 
 
 def on_open(ws):
@@ -100,6 +100,7 @@ def on_open(ws):
             pcm_data = fp.read()
             fp.close()
 
+        ws.out_file = None
         if save_to_file:
             out_file_name = audio_file + ".txt"
             ws.out_file = open(out_file_name, "w", encoding='utf-8')

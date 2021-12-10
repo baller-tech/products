@@ -31,10 +31,13 @@ txt_file = ""
 # 测试的语种
 language = ""
 # 合成的音频文件格式
-# 请查考《语音识别（TTS）HTTP协议WebAPI开发文档.pdf》中“支持的语种以及采样格式”章节
+# 请查考《语音识别（TTS）WebSocket协议WebAPI开发文档.pdf》中“支持的语种以及采样格式”章节
 sample_format = "audio/L16;rate=16000"
+# 合成语速
+# 请查考《语音识别（TTS）WebSocket协议WebAPI开发文档.pdf》中“语速的取值范围”章节
+speed = 0
 # 合成的音频的压缩类型
-# 请查考《语音识别（TTS）HTTP协议WebAPI开发文档.pdf》中“支持的音频编码”章节
+# 请查考《语音识别（TTS）WebSocket协议WebAPI开发文档.pdf》中“支持的音频编码”章节
 audio_encode = "raw"
 
 
@@ -81,6 +84,7 @@ def on_open(ws):
             "language": language,
             "sample_format": sample_format,
             "audio_encode": audio_encode,
+            "speed": speed,
         }
         data_params = {
             "txt": base64.b64encode(txt_data).decode(encoding='utf-8'),

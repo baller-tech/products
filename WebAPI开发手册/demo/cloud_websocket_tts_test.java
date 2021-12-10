@@ -48,6 +48,9 @@ class Common {
     // 合成的音频文件格式
     // 请查考《语音识别（TTS）WebSocket协议WebAPI开发文档.pdf》中“支持的语种以及采样格式”章节
     public static String mSampleFormat = "audio/L16;rate=16000";
+	// 合成语速
+	// 请查考《语音识别（TTS）WebSocket协议WebAPI开发文档.pdf》中“语速的取值范围”章节
+	public static String mSpeed = 0;
     // 合成的音频的压缩类型，
     // 请查考《语音识别（TTS）WebSocket协议WebAPI开发文档.pdf》中“支持的音频编码”章节
     public static String mAudioEncode = "raw";
@@ -105,6 +108,7 @@ class SendFrameThread extends Thread {
                 jsonBusiness.put("language", Common.mLanguage);
                 jsonBusiness.put("sample_format", Common.mSampleFormat);
                 jsonBusiness.put("audio_encode", Common.mAudioEncode);
+				jsonBusiness.put("audio_encode", Common.mSpeed);
                 jsonParams.put("business", jsonBusiness);
             } catch (JSONException e) {
                 e.printStackTrace();

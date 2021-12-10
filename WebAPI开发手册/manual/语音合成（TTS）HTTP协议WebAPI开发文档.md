@@ -50,6 +50,7 @@ request_id | string | 本次语音合成事务的请求ID；<br>获取该请求�
 sample_format| string | 合成的采样格式，参见[支持的语种和采样格式](#support_language) | audio/L16;rate=16000
 language| string | 合成音频的语种，参见[支持的语种和采样格式](#support_language)| zho
 audio_encode| string | 音频编码格式；参见[支持的音频编码](#support_audio_encode) | raw 
+speed| int | 音频输出的语速；参见[语速的取值范围](#support_speed_range) | 0 
 callback_url | string | 合成结果推送的回调地址；</br>通过调用HTTP的GET方法获取合成结果时不需设置 | http://192.168.1.234:18888/tts/callback
 
 ###### 1.1.1.1 sample_format 介绍
@@ -128,6 +129,8 @@ B-Is-End | string | 合成结果是否获取结束（"1"：结束；"0"：未结
 藏语（康巴）|tib_kb|采样率：16000hz 采样点大小：16bits|audio/L16;rate=16000
 藏语（卫藏）|tib_wz|采样率：16000hz 采样点大小：16bits|audio/L16;rate=16000
 维语|uig|采样率：16000hz 采样点大小：16bits|audio/L16;rate=16000
+中文|zho|采样率：16000hz 采样点大小：16bits|audio/L16;rate=16000
+英文|eng|采样率：16000hz 采样点大小：16bits|audio/L16;rate=16000
 
 ## <span id="support_audio_encode">支持的音频编码</span>
 
@@ -139,3 +142,9 @@ B-Is-End | string | 合成结果是否获取结束（"1"：结束；"0"：未结
 | mp3          | mp3编码，详细介绍请参考：https://lame.sourceforge.io/        |
 | speex        | speex编码（会在每帧数据前添加4个字节，表示当前帧的大小），详细介绍请参考：https://www.speex.org/ |
 | opus         | opus编码（会在每帧数据前添加4个字节，表示当前帧的大小），详细介绍请参考：https://opus-codec.org/ |
+
+## <span id="support_speed_range">语速的取值范围</span>
+
+1. 语速取值范围为-100到100，取值越大语速越慢。
+2. 目前仅有中文、英文两个语种支持调整语速。
+

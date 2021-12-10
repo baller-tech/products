@@ -82,6 +82,7 @@ host:api.baller-tech.com
 | language  | string  |  是 |  无 |   音频的语种；参见[支持的语种和采样格式](#support_language) |
 | sample_format | string  | 否 | audio/L16;rate=16000 | 音频采样格式；参见[支持的语种和采样格式](#support_language) |
 | audio_encode | string | 否 | raw | 音频编码格式；参见[支持的音频编码](#support_audio_encode) |
+| speed | int | 是 | 无 | 音频输出的语速；参见[语速的取值范围](#support_speed_range) |
 
 ##### sample_format 介绍
 &#8195; &#8195;根据RFC对MIME格式的定义，使用audio/Lxx;rate=xxxxx 表明采样格式，audio/L后面的数字表示音频的采样点大小（单位bit）, rate=后面的数字表示音频 的采样率（单位hz）。<br>
@@ -149,6 +150,8 @@ host:api.baller-tech.com
 藏语（康巴）|tib_kb|采样率：16000hz 采样点大小：16bits|audio/L16;rate=16000
 藏语（卫藏）|tib_wz|采样率：16000hz 采样点大小：16bits|audio/L16;rate=16000
 维语|uig|采样率：16000hz 采样点大小：16bits|audio/L16;rate=16000
+中文|zho|采样率：16000hz 采样点大小：16bits|audio/L16;rate=16000
+英文|eng|采样率：16000hz 采样点大小：16bits|audio/L16;rate=16000
 
 ## <span id="support_audio_encode">支持的音频编码</span>
 
@@ -160,3 +163,9 @@ host:api.baller-tech.com
 | mp3          | mp3编码，详细介绍请参考：https://lame.sourceforge.io/        |
 | speex        | speex编码（会在每帧数据前添加4个字节，表示当前帧的大小），详细介绍请参考：https://www.speex.org/ |
 | opus         | opus编码（会在每帧数据前添加4个字节，表示当前帧的大小），详细介绍请参考：https://opus-codec.org/ |
+
+## <span id="support_speed_range">语速的取值范围</span>
+
+1. 语速取值范围为-100到100，取值越大语速越慢。
+2. 目前仅有中文、英文两个语种支持调整语速。
+

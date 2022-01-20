@@ -50,7 +50,7 @@ class Common {
     public static String mSampleFormat = "audio/L16;rate=16000";
 	// 合成语速
 	// 请查考《语音识别（TTS）WebSocket协议WebAPI开发文档.pdf》中“语速的取值范围”章节
-	public static String mSpeed = 0;
+	public static String mSpeed = "0";
     // 合成的音频的压缩类型，
     // 请查考《语音识别（TTS）WebSocket协议WebAPI开发文档.pdf》中“支持的音频编码”章节
     public static String mAudioEncode = "raw";

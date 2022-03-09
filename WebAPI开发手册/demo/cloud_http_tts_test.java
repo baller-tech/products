@@ -47,7 +47,7 @@ public class cloud_http_tts_test {
     public static String mSampleFormat = "audio/L16;rate=16000";
 	// 合成语速
 	// 请查考《语音识别（TTS）HTTP协议WebAPI开发文档.pdf》中“语速的取值范围”章节
-	public static String mSpeed = "0";
+	public static float mSpeed = 1.0f;
     // 合成的音频的压缩类型
     // 请查考《语音识别（TTS）HTTP协议WebAPI开发文档.pdf》中“支持的音频编码”章节
     public static String mAudioEncode = "raw";
@@ -94,7 +94,7 @@ public class cloud_http_tts_test {
     @SuppressWarnings({ "unchecked", "rawtypes" })
     public static boolean postData(String requestId, byte[] testData) {
 
-        Map<String, String> businessParams = new HashMap<>();
+    	JSONObject businessParams = new JSONObject();
         businessParams.put("request_id", requestId);
         businessParams.put("language", mLanguage);
         businessParams.put("sample_format", mSampleFormat);

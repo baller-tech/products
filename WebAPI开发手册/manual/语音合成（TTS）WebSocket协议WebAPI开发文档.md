@@ -82,7 +82,7 @@ host:api.baller-tech.com
 | language  | string  |  是 |  无 |   音频的语种；参见[支持的语种和采样格式](#support_language) |
 | sample_format | string  | 否 | audio/L16;rate=16000 | 音频采样格式；参见[支持的语种和采样格式](#support_language) |
 | audio_encode | string | 否 | raw | 音频编码格式；参见[支持的音频编码](#support_audio_encode) |
-| speed | int | 是 | 无 | 音频输出的语速；参见[语速的取值范围](#support_speed_range) |
+| speed | float | 是 | 无 | 音频输出的语速；参见[语速的取值范围](#support_speed_range) |
 
 ##### sample_format 介绍
 &#8195; &#8195;根据RFC对MIME格式的定义，使用audio/Lxx;rate=xxxxx 表明采样格式，audio/L后面的数字表示音频的采样点大小（单位bit）, rate=后面的数字表示音频 的采样率（单位hz）。<br>
@@ -166,6 +166,6 @@ host:api.baller-tech.com
 
 ## <span id="support_speed_range">语速的取值范围</span>
 
-1. 语速取值范围为-100到100，取值越大语速越慢。
+1. 语速取值范围为0.5到2.0，0.5最慢，1.0为正常语速，2.0最快。
 2. 目前仅有中文、英文两个语种支持调整语速。
 

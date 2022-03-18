@@ -35,7 +35,7 @@ language = ""
 sample_format = "audio/L16;rate=16000"
 # 合成语速
 # 请查考《语音识别（TTS）WebSocket协议WebAPI开发文档.pdf》中“语速的取值范围”章节
-speed = 0
+speed = 1.0
 # 合成的音频的压缩类型
 # 请查考《语音识别（TTS）WebSocket协议WebAPI开发文档.pdf》中“支持的音频编码”章节
 audio_encode = "raw"

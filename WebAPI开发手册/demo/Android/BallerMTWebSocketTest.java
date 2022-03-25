@@ -1,8 +1,5 @@
 package com.baller.demo.asr_tts_websocket;
 
-import android.media.AudioFormat;
-import android.media.AudioManager;
-import android.media.AudioTrack;
 import android.os.Message;
 import android.util.Base64;
 import android.util.Log;
@@ -16,40 +13,38 @@ import org.json.JSONObject;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLEncoder;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.TimeZone;
-
+import java.util.concurrent.atomic.AtomicBoolean;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 
-public class BallerTTSTest extends Thread {
+// 添加依赖：org.java-websocket:Java-WebSocket:1.3.0
 
-    public static String mLogTag = "BallerTTSWebSocket";
-    public static String mUrl = "ws://api.baller-tech.com/v1/service/ws/v1/tts";
-    public static String mHost = "api.baller-tech.com";
-    public static long mOrgId = 0L;
-    public static long mAppId = 0L;
-    public static String mAppkey = "";
-    public static float speed = 1.0f;
+public class BallerMTWebSocketTest extends Thread {
 
-    WebSocketClient mWSClient = null;
-    String mLanguage = "";
-    String mTxt = "";
+    private static String mLogTag = "BallerMTWebSocketTest";
+    private static String mUrl = "ws://api.baller-tech.com/v1/service/ws/v1/mt";
+    private static String mHost = "api.baller-tech.com";
+    private static long mAppId = 0L;
+    private static String mAppkey = "";
 
-    public AudioTrack mAudioTrack = null;
+    private WebSocketClient mWSClient = null;
+    private String mLanguage = "";
+    private String mTxt = "";
+    private AtomicBoolean mFinish = new AtomicBoolean(false);
 
-    public BallerTTSTest(String strLanguage, String strTxt) {
+    public BallerMTWebSocketTest(String strLanguage, String strTxt) {
         this.mLanguage = strLanguage;
         this.mTxt = strTxt;
     }
 
-    void sendNetDisconnect() {
-        return;
+    private void sendNetDisconnect() {
+        Message msg = Message.obtain();
+        msg.what = 3002;
     }
 
     private static String HMACSHA256AndBase64(byte[] data, byte[] key)
@@ -59,9 +54,7 @@ public class BallerTTSTest extends Thread {
             Mac mac = Mac.getInstance("HmacSHA256");
             mac.init(signingKey);
             return Base64.encodeToString(mac.doFinal(data), Base64.NO_WRAP);
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        } catch (InvalidKeyException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
@@ -98,11 +91,8 @@ public class BallerTTSTest extends Thread {
         JSONObject jsonBusiness = new JSONObject();
         try {
             jsonBusiness.put("language", strLanguage);
-            jsonBusiness.put("sample_format", "audio/L16;rate=16000");
-            jsonBusiness.put("audio_encode", "raw");
-            jsonBusiness.put("speed",speed);
             jsonParams.put("business", jsonBusiness);
-        } catch (JSONException e) {
+        } catch (Exception e) {
             Log.e(mLogTag, e.toString());
             return "";
         }
@@ -111,7 +101,7 @@ public class BallerTTSTest extends Thread {
         try {
             jsonData.put("txt", Base64.encodeToString(strText.getBytes(), Base64.NO_WRAP));
             jsonParams.put("data", jsonData);
-        } catch (JSONException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
@@ -120,10 +110,6 @@ public class BallerTTSTest extends Thread {
 
     @Override
     public void run() {
-        int iAudioBuff = AudioTrack.getMinBufferSize(16000, AudioFormat.CHANNEL_OUT_MONO, AudioFormat.ENCODING_PCM_16BIT);
-        mAudioTrack = new AudioTrack(AudioManager.STREAM_MUSIC, 16000, AudioFormat.CHANNEL_OUT_MONO, AudioFormat.ENCODING_PCM_16BIT, iAudioBuff, AudioTrack.MODE_STREAM);
-        mAudioTrack.play();
-
         final String strLanguage = this.mLanguage;
         final String strText = this.mTxt;
         String strUrl = mUrl + "?" + URLEncoder.encode(makeAuthorization());
@@ -137,13 +123,13 @@ public class BallerTTSTest extends Thread {
                         public
                         void run() {
                             try {
-                                mWSClient.send(BallerTTSTest.makeFrame(strLanguage, strText));
+                                mWSClient.send(BallerMTWebSocketTest.makeFrame(strLanguage, strText));
                             } catch (Exception e) {
                                 sendNetDisconnect();
 
                                 try {
                                     closeBlocking();
-                                } catch ( InterruptedException ex ) {
+                                } catch (Exception ex ) {
                                     ex.printStackTrace();
                                 }
                             }
@@ -154,12 +140,10 @@ public class BallerTTSTest extends Thread {
 
                 @Override
                 public void onMessage(String message) {
-                    // Log.i(mLogTag, "on message: " + message);
-
                     JSONObject jsonResult;
                     try {
                         jsonResult = new JSONObject(message);
-                    } catch (JSONException e) {
+                    } catch (Exception e) {
                         Log.i(mLogTag, e.toString());
                         return;
                     }
@@ -167,30 +151,29 @@ public class BallerTTSTest extends Thread {
                     boolean isEnd = false;
                     String strData = "";
                     int error_code = 0 ;
+
                     try {
                         isEnd = 1 == jsonResult.getInt("is_end");
                         strData = jsonResult.getString("data");
                         error_code = jsonResult.getInt("code");
-                    } catch (JSONException e) {
+                    } catch (Exception e) {
                         e.printStackTrace();
                     }
-
                     if (error_code != 0)
                     {
-                        Log.i(mLogTag, "tts failed: " + error_code);
-                    }
-
-                    byte[] audio =  Base64.decode(strData, Base64.NO_WRAP);
-                    if (0 < audio.length)
-                    {
-                        int iWriteCode = mAudioTrack.write(audio, 0, audio.length);
+                        Log.i(mLogTag, "mt failed: " + error_code);
+                    } else {
+                        Log.i(mLogTag, "mt result: " + strData);
                     }
 
                     if (isEnd) {
                         try {
+                            mFinish.set(true);
                             Message msg = Message.obtain();
+                            msg.what = 12;
+
                             mWSClient.closeBlocking();
-                        } catch (InterruptedException e) {
+                        } catch (Exception e) {
                             Log.i(mLogTag, e.toString());
                         }
                     }
@@ -198,7 +181,6 @@ public class BallerTTSTest extends Thread {
 
                 @Override
                 public void onClose(int code, String reason, boolean remote) {
-                    // Log.i(mLogTag, "on close: " + reason);
                     mWSClient = null;
                 }
 
@@ -226,4 +208,3 @@ public class BallerTTSTest extends Thread {
         }
     }
 }
-

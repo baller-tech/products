@@ -116,7 +116,7 @@ class BallerASRHTTPTest extends Thread {
                 businessParams.put("language", mLanguage);
                 businessParams.put("sample_format", "audio/L16;rate=16000");
                 businessParams.put("audio_format", "raw");
-                businessParams.put("service_type", "realtime");
+                businessParams.put("service_type", "sentence");
                 businessParams.put("input_mode", inputMode);
                 businessParams.put("vad", "on");
             } catch (Exception e) {

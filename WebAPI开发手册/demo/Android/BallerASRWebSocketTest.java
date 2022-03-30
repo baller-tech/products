@@ -111,7 +111,7 @@ public class BallerASRWebSocketTest extends Thread {
                 try {
                     jsonBusiness.put("language", this.mLanguage);
                     jsonBusiness.put("audio_format", "audio/L16;rate=16000");
-                    jsonBusiness.put("service_type", "realtime");
+                    jsonBusiness.put("service_type", "sentence");
                     jsonParams.put("business", jsonBusiness);
                 } catch (Exception e) {
                     e.printStackTrace();

@@ -51,6 +51,9 @@ public class cloud_http_tts_test {
     // 合成的音频的压缩类型
     // 请查考《语音识别（TTS）HTTP协议WebAPI开发文档.pdf》中“支持的音频编码”章节
     public static String mAudioEncode = "raw";
+    // 合成的音频的发音人
+    // 请查考《语音识别（TTS）HTTP协议WebAPI开发文档.pdf》中“支持的发音人”章节
+    public static String mVoiceName = ""
     // 结果保存文件
     public static String mSaveResultFile = mTxtFile + "_out." + mAudioEncode;
     // 推送结果的地址，该地址为调用者自己搭建的接收推送结果的Web服务地址
@@ -100,6 +103,7 @@ public class cloud_http_tts_test {
         businessParams.put("sample_format", mSampleFormat);
         businessParams.put("audio_encode", mAudioEncode);
 		businessParams.put("speed", mSpeed);
+        businessParams.put("voice_name", mVoiceName);
         if (!mCallbackUrl.isEmpty()) {
             businessParams.put("callback_url", mCallbackUrl);
         }

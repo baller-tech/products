@@ -51,6 +51,7 @@ sample_format| string | 合成的采样格式，参见[支持的语种和采样�
 language| string | 合成音频的语种，参见[支持的语种和采样格式](#support_language)| zho
 audio_encode| string | 音频编码格式；参见[支持的音频编码](#support_audio_encode) | raw 
 speed| float | 音频输出的语速；参见[语速的取值范围](#support_speed_range) | 1.0 
+voice_name| string | 合成的发音人；参见[支持的发音人](#support_voice_name) | guli 
 callback_url | string | 合成结果推送的回调地址；</br>通过调用HTTP的GET方法获取合成结果时不需设置 | http://192.168.1.234:18888/tts/callback
 
 ###### 1.1.1.1 sample_format 介绍
@@ -148,3 +149,30 @@ B-Is-End | string | 合成结果是否获取结束（"1"：结束；"0"：未结
 1. 语速取值范围为0.5到2.0，0.5最慢，1.0为正常语速，2.0最快。
 2. 目前仅有中文、英文两个语种支持调整语速。
 
+## <span id="support_voice_name">支持的发音人</span>
+
+| 对外暴露标示 | 语种           | 备注     |
+| ------------ | -------------- | -------- |
+| yiyi         | 中文           | 暂不支持 |
+| xixi         | 中文           | 暂不支持 |
+| mary         | 英语（英音）   | 暂不支持 |
+| victoria     | 英语（英音）   | 暂不支持 |
+| bonnie       | 英语（英音）   | 暂不支持 |
+| elise        | 英语（美音）   | 暂不支持 |
+| regina       | 英语（美音）   | 暂不支持 |
+| aodeng       | 蒙语（传统）   | 支持     |
+| qimuge       | 蒙语（传统）   | 暂不支持 |
+| tana         | 蒙语（西里尔） | 暂不支持 |
+| suolangcuomu | 藏语（卫藏）   | 支持     |
+| gesangwangmu | 藏语（卫藏）   | 暂不支持 |
+| renyang      | 藏语（安多）   | 暂不支持 |
+| yangla       | 藏语（安多）   | 暂不支持 |
+| cangla       | 藏语（康巴）   | 暂不支持 |
+| guli         | 维语           | 支持     |
+| amina        | 维语           | 暂不支持 |
+| ailinna      | 哈萨克语       | 支持     |
+| mayila       | 哈萨克语       | 暂不支持 |
+| minzhen      | 朝鲜语         | 支持     |
+| hailaiyousuo | 彝语           | 暂不支持 |
+| dafei        | 壮语           | 暂不支持 |
+| yinan        | 壮语           | 支持     |

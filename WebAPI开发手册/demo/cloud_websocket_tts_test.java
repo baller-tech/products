@@ -51,6 +51,9 @@ class Common {
 	// 合成语速
 	// 请查考《语音识别（TTS）WebSocket协议WebAPI开发文档.pdf》中“语速的取值范围”章节
 	public static float mSpeed = 1.0f;
+    // 合成的音频的发音人
+    // 请查考《语音识别（TTS）WebSocket协议WebAPI开发文档.pdf》中“支持的发音人”章节
+    public static String mVoiceName = ""
     // 合成的音频的压缩类型，
     // 请查考《语音识别（TTS）WebSocket协议WebAPI开发文档.pdf》中“支持的音频编码”章节
     public static String mAudioEncode = "raw";
@@ -109,6 +112,7 @@ class SendFrameThread extends Thread {
                 jsonBusiness.put("sample_format", Common.mSampleFormat);
                 jsonBusiness.put("audio_encode", Common.mAudioEncode);
 				jsonBusiness.put("speed", Common.mSpeed);
+                jsonBusiness.put("voice_name", Common.mVoiceName);
                 jsonParams.put("business", jsonBusiness);
             } catch (JSONException e) {
                 e.printStackTrace();

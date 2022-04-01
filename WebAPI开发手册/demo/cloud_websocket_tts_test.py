@@ -39,6 +39,9 @@ speed = 1.0
 # 合成的音频的压缩类型
 # 请查考《语音识别（TTS）WebSocket协议WebAPI开发文档.pdf》中“支持的音频编码”章节
 audio_encode = "raw"
+# 合成的音频的发音人
+# 请查考《语音识别（TTS）WebSocket协议WebAPI开发文档.pdf》中“支持的发音人”章节
+voice_name = ""
 
 
 def on_error(ws, error):
@@ -85,6 +88,7 @@ def on_open(ws):
             "sample_format": sample_format,
             "audio_encode": audio_encode,
             "speed": speed,
+            "voice_name":voice_name,
         }
         data_params = {
             "txt": base64.b64encode(txt_data).decode(encoding='utf-8'),

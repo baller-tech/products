@@ -37,6 +37,9 @@ speed = 1.0
 # 合成的音频的压缩类型
 # 请查考《语音识别（TTS）HTTP协议WebAPI开发文档.pdf》中“支持的音频编码”章节
 audio_encode = "raw"
+# 合成的音频的发音人
+# 请查考《语音识别（TTS）HTTP协议WebAPI开发文档.pdf》中“支持的发音人”章节
+voice_name = ""
 # 推送结果的地址，该地址为调用者自己搭建的接收推送结果的Web服务地址
 callback_url = ""
 
@@ -53,7 +56,8 @@ def post_data(request_id, data):
         'language': language,
         'sample_format': sample_format,
         'audio_encode': audio_encode,
-        "speed": speed,
+        'speed': speed,
+        'voice_name':voice_name,
     }
     if callback_url:
         business_params["callback_url"] = callback_url

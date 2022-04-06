@@ -1,4 +1,4 @@
-package com.baller.demo.asr_tts_websocket;
+package com.baller.test;
 
 import android.os.Message;
 import android.util.Base64;
@@ -24,13 +24,11 @@ import javax.crypto.spec.SecretKeySpec;
 
 // 添加依赖：org.java-websocket:Java-WebSocket:1.3.0
 
-public class BallerMTWebSocketTest extends Thread {
+public class BallerMTWebSocketTest extends BallerBase {
 
     private static String mLogTag = "BallerMTWebSocketTest";
     private static String mUrl = "ws://api.baller-tech.com/v1/service/ws/v1/mt";
     private static String mHost = "api.baller-tech.com";
-    private static long mAppId = 0L;
-    private static String mAppkey = "";
 
     private WebSocketClient mWSClient = null;
     private String mLanguage = "";
@@ -133,6 +131,7 @@ public class BallerMTWebSocketTest extends Thread {
                                     ex.printStackTrace();
                                 }
                             }
+                            Log.i(mLogTag, "send data finish");
                         }
                     });
                     sendThread.start();
@@ -164,18 +163,17 @@ public class BallerMTWebSocketTest extends Thread {
                         Log.i(mLogTag, "mt failed: " + error_code);
                     } else {
                         Log.i(mLogTag, "mt result: " + strData);
+                        sendResult(strData);
                     }
 
                     if (isEnd) {
                         try {
                             mFinish.set(true);
-                            Message msg = Message.obtain();
-                            msg.what = 12;
-
-                            mWSClient.closeBlocking();
+                            mWSClient.close();
                         } catch (Exception e) {
                             Log.i(mLogTag, e.toString());
                         }
+                        Log.i(mLogTag, "mt get result finish");
                     }
                 }
 
@@ -186,7 +184,7 @@ public class BallerMTWebSocketTest extends Thread {
 
                 @Override
                 public void onError(Exception ex) {
-                    Log.i(mLogTag, "on error");
+                    Log.i(mLogTag, "on error: " + ex.getMessage());
                 }
             };
         } catch (URISyntaxException e)
@@ -206,5 +204,6 @@ public class BallerMTWebSocketTest extends Thread {
         if (!bConnectSucc) {
             sendNetDisconnect();
         }
+        Log.i(mLogTag, "thread 1 leave");
     }
 }

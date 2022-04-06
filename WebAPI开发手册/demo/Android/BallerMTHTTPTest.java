@@ -1,14 +1,9 @@
-package com.baller.demo.asr_tts_websocket;
+package com.baller.test;
 
 import android.util.Base64;
 import android.util.Log;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Locale;
-import java.util.TimeZone;
 import java.util.UUID;
-import java.security.MessageDigest;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -24,11 +19,9 @@ import org.json.JSONObject;
 // 添加依赖：commons-logging:commons-logging:1.2
 
 
-public class BallerMTHTTPTest extends Thread {
+public class BallerMTHTTPTest extends BallerBase {
     private static String mLogTag = "BallerMTHTTP";
     private static String mUrl = "http://api.baller-tech.com/v1/service/v1/mt";
-    private static long mAppId = 0L;
-    private static String mAppkey = "";
 
     private String mLanguage;
     private String mTxt;
@@ -36,34 +29,6 @@ public class BallerMTHTTPTest extends Thread {
     BallerMTHTTPTest(String strLanguage, String strTxt) {
         this.mLanguage = strLanguage;
         this.mTxt = strTxt;
-    }
-
-    private static String getGmtTime() {
-        SimpleDateFormat sdf3 = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss z", Locale.US);
-        sdf3.setTimeZone(TimeZone.getTimeZone("GMT"));
-        return sdf3.format(new Date());
-    }
-
-    private static String MD5(String sourceStr) {
-        try {
-            MessageDigest mdInst = MessageDigest.getInstance("MD5");
-            mdInst.update(sourceStr.getBytes());
-            byte[] md = mdInst.digest();
-            StringBuilder buf = new StringBuilder();
-            for (int i = 0; i < md.length; i++) {
-                int tmp = md[i];
-                if (tmp < 0)
-                    tmp += 256;
-                if (tmp < 16)
-                    buf.append("0");
-                buf.append(Integer.toHexString(tmp));
-            }
-            return buf.toString();
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
     }
 
     private boolean postData(String requestId, byte[] testData) {
@@ -116,7 +81,8 @@ public class BallerMTHTTPTest extends Thread {
                 }
 
             } else {
-                Log.i("HttpPost", "HttpPost方式请求失败");
+                Log.i(mLogTag, "mt post failed");
+                return false;
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -125,12 +91,13 @@ public class BallerMTHTTPTest extends Thread {
         return true;
     }
 
-    private static boolean getResult(String requestId) {
+    private boolean getResult(String requestId) {
         JSONObject paramMap = new JSONObject();
         try {
             paramMap.put("request_id", requestId);
         }catch (Exception e) {
             Log.i(mLogTag, "mt get failed. " + e.toString());
+            return true;
         }
 
         String businessParamBase64 = Base64.encodeToString(paramMap.toString().getBytes(), Base64.NO_WRAP);
@@ -165,10 +132,11 @@ public class BallerMTHTTPTest extends Thread {
                     Log.i(mLogTag, "mt failed: " + error_code);
                 } else if (!strData.isEmpty()) {
                     Log.i(mLogTag, "mt result: " + strData);
+                    sendResult(strData);
                 }
                 return isEnd;
             } else {
-                Log.i("HttpPost", "HttpPost方式请求失败");
+                Log.i(mLogTag, "mt get failed");
             }
         } catch (Exception e) {
             return true;
@@ -185,21 +153,19 @@ public class BallerMTHTTPTest extends Thread {
                 Log.e(mLogTag, "post failed");
                 return;
             }
+            Log.e(mLogTag, "post finish");
 
-            while (!isInterrupted()) {
-                if (getResult(requestId)) {
-                    break;
-                }
-
+            while (!getResult(requestId)) {
                 try {
-
                     Thread.sleep(40);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
             }
+            Log.e(mLogTag, "get result finish");
         } catch (Exception e) {
             e.printStackTrace();
         }
+        Log.e(mLogTag, "thread 1 leave");
     }
 }

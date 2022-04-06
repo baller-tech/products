@@ -1,4 +1,4 @@
-package com.baller.demo.asr_tts_websocket;
+package com.baller.test;
 
 import android.media.AudioFormat;
 import android.media.AudioRecord;
@@ -13,7 +13,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -27,21 +26,19 @@ import javax.crypto.spec.SecretKeySpec;
 
 // 添加依赖：org.java-websocket:Java-WebSocket:1.3.0
 
-public class BallerASRWebSocketTest extends Thread {
+public class BallerASRWebSocketTest extends BallerBase {
 
     private BallerASR mAsrWebSocket;
+    private String mLogTag = "BallerASRWebSocketTest";
 
-    public BallerASRWebSocketTest(String strLanguage) {
+    BallerASRWebSocketTest(String strLanguage) {
         mAsrWebSocket = new BallerASR(strLanguage);
     }
 
     public class BallerASR extends Thread {
 
-        private String mLogTag = "BallerASRWebSocketTest";
         private String mUrl = "ws://api.baller-tech.com/v1/service/ws/v1/asr";
         private String mHost = "api.baller-tech.com";
-        private long mAppId = 0L;
-        private String mAppkey = "";
 
         WebSocketClient mWSClient = null;
         LinkedList<byte[]> mRecordPCM = new LinkedList<>();
@@ -172,11 +169,12 @@ public class BallerASRWebSocketTest extends Thread {
                             Log.i(mLogTag, "asr failed. error code: " + String.valueOf(errorCode));
                         } else if (isComplete) {
                             Log.i(mLogTag, "asr result: " + strText);
+                            sendResult(strText);
                         }
 
                         if (isEnd) {
                             try {
-                                mWSClient.closeBlocking();
+                                mWSClient.close();
                             } catch (Exception e) {
                                 Log.i(mLogTag, e.toString());
                             }
@@ -304,6 +302,7 @@ public class BallerASRWebSocketTest extends Thread {
         mAsrWebSocket.setFinish();
         mWakeRecorder.stop();
         mWakeRecorder.release();
+        Log.e(mLogTag, "thread l leave");
     }
 }
 

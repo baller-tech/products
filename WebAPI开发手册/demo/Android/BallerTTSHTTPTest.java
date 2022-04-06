@@ -1,4 +1,4 @@
-package com.baller.demo.asr_tts_websocket;
+package com.baller.test;
 
 import android.media.AudioFormat;
 import android.media.AudioManager;
@@ -6,13 +6,7 @@ import android.media.AudioTrack;
 import android.util.Base64;
 import android.util.Log;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Locale;
-import java.util.TimeZone;
 import java.util.UUID;
-import java.security.MessageDigest;
-import java.io.InputStream;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -28,11 +22,9 @@ import org.apache.http.HttpEntity;
 // 添加依赖：org.jbundle.util.osgi.wrapped:org.jbundle.util.osgi.wrapped.org.apache.http.client:4.1.2
 // 添加依赖：commons-logging:commons-logging:1.2
 
-public class BallerTTSHTTPTest extends Thread {
+public class BallerTTSHTTPTest extends BallerBase {
     private static String mLogTag = "BallerTTSHTTPTest";
     private static String mUrl = "http://api.baller-tech.com/v1/service/v1/tts";
-    private static long mAppId = 0L;
-    private static String mAppkey = "";
 
     private String mLanguage = "";
     private String mTxt = "";
@@ -44,34 +36,6 @@ public class BallerTTSHTTPTest extends Thread {
     BallerTTSHTTPTest(String strLanguage, String strTxt) {
         this.mLanguage = strLanguage;
         this.mTxt = strTxt;
-    }
-
-    private static String getGmtTime() {
-        SimpleDateFormat sdf3 = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss z", Locale.US);
-        sdf3.setTimeZone(TimeZone.getTimeZone("GMT"));
-        return sdf3.format(new Date());
-    }
-
-    private static String MD5(String sourceStr) {
-        try {
-            MessageDigest mdInst = MessageDigest.getInstance("MD5");
-            mdInst.update(sourceStr.getBytes());
-            byte[] md = mdInst.digest();
-            StringBuilder buf = new StringBuilder();
-            for (int i = 0; i < md.length; i++) {
-                int tmp = md[i];
-                if (tmp < 0)
-                    tmp += 256;
-                if (tmp < 16)
-                    buf.append("0");
-                buf.append(Integer.toHexString(tmp));
-            }
-            return buf.toString();
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
     }
 
     private boolean postData(String requestId, byte[] testData) {
@@ -114,10 +78,12 @@ public class BallerTTSHTTPTest extends Thread {
                 int error_code = responseContent.getInt("code");
                 if (error_code != 0)
                 {
-                    Log.i(mLogTag, "mt failed: " + error_code);
+                    Log.i(mLogTag, "tts failed: " + error_code);
+                    return false;
                 }
             } else {
-                Log.i("HttpPost", "HttpPost方式请求失败");
+                Log.i(mLogTag, "tts post failed");
+                return false;
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -132,7 +98,7 @@ public class BallerTTSHTTPTest extends Thread {
             paramMap.put("request_id", requestId);
         }catch (Exception e) {
             e.printStackTrace();
-            return false;
+            return true;
         }
 
         String businessParamBase64 = Base64.encodeToString(paramMap.toString().getBytes(), Base64.NO_WRAP);
@@ -150,7 +116,6 @@ public class BallerTTSHTTPTest extends Thread {
         HttpClient httpClient = new DefaultHttpClient();
 
         boolean isEnd;
-        InputStream stream;
         int error_code;
 
         httpClient.getParams().setParameter(CoreConnectionPNames.CONNECTION_TIMEOUT, 30000);
@@ -163,6 +128,7 @@ public class BallerTTSHTTPTest extends Thread {
                 {
                     String message = httpResp.getFirstHeader("B-Message").getValue();
                     Log.i(mLogTag, "tts failed: " + error_code +  " " + message);
+                    return true;
                 } else {
                     HttpEntity entity = httpResp.getEntity();
                     byte[] audio = EntityUtils.toByteArray(entity);
@@ -170,10 +136,10 @@ public class BallerTTSHTTPTest extends Thread {
                         mAudioTrack.write(audio, 0, audio.length);
                     }
                 }
-                isEnd = Boolean.parseBoolean(httpResp.getFirstHeader("B-Is-End").getValue());
+                isEnd =  1== Integer.parseInt(httpResp.getFirstHeader("B-Is-End").getValue());
                 return isEnd;
             } else {
-                Log.i("HttpPost", "HttpPost方式请求失败");
+                Log.i(mLogTag, "tts get failed");
                 return true;
             }
         } catch (Exception e) {
@@ -184,18 +150,18 @@ public class BallerTTSHTTPTest extends Thread {
     @Override
     public void run() {
         String requestId = UUID.randomUUID().toString();
-        Log.e(mLogTag, requestId);
         mAudioTrack = new AudioTrack(AudioManager.STREAM_MUSIC, 16000,
-                AudioFormat.CHANNEL_OUT_MONO, AudioFormat.ENCODING_PCM_16BIT, iAudioBuff,
+                AudioFormat.CHANNEL_OUT_MONO, AudioFormat.ENCODING_PCM_16BIT, iAudioBuff * 4,
                 AudioTrack.MODE_STREAM);
         mAudioTrack.play();
 
         try {
             boolean putSuccess = postData(requestId, mTxt.getBytes("utf-8"));
             if (!putSuccess) {
-                System.out.println(requestId + " POST data failed");
+                Log.e(mLogTag, "post data failed");
                 return;
             }
+            Log.e(mLogTag, "post data finish");
 
             // 获取结果
             while (!isInterrupted()) {
@@ -208,8 +174,10 @@ public class BallerTTSHTTPTest extends Thread {
                     e.printStackTrace();
                 }
             }
+            Log.e(mLogTag, "get result finish");
         } catch (Exception e) {
             e.printStackTrace();
         }
+        Log.e(mLogTag, "thread 1 leave");
     }
 }

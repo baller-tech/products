@@ -1,4 +1,4 @@
-package com.baller.demo.asr_tts_websocket;
+package com.baller.test;
 
 import android.media.AudioFormat;
 import android.media.AudioManager;
@@ -7,6 +7,7 @@ import android.media.AudioTrack;
 import android.media.MediaRecorder;
 import android.util.Log;
 import android.util.Base64;
+import android.widget.TextView;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -18,22 +19,11 @@ import org.apache.http.params.CoreConnectionPNames;
 import org.apache.http.util.EntityUtils;
 import org.json.JSONObject;
 
-
-import java.security.MessageDigest;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.LinkedList;
-import java.util.Locale;
-import java.util.TimeZone;
 import java.util.UUID;
-import java.util.concurrent.atomic.AtomicBoolean;
 
-// 添加依赖：org.jbundle.util.osgi.wrapped:org.jbundle.util.osgi.wrapped.org.apache.http.client:4.1.2
-// 添加依赖：commons-logging:commons-logging:1.2
-
-
-class BallerASRHTTPTest extends Thread {
-
+class BallerASRHTTPTest extends BallerBase {
+    private String mLogTag = "BallerASRHTTP";
     private BallerASRHTTP mAsrhttp;
     private LinkedList<byte[]> mRecordPCM = new LinkedList<>();
     private static int iAudioBuff = AudioTrack.getMinBufferSize(16000,
@@ -44,69 +34,19 @@ class BallerASRHTTPTest extends Thread {
     }
 
     private class BallerASRHTTP extends Thread {
-        private String mLogTag = "BallerASRHTTP";
         private String mUrl = "http://api.baller-tech.com/v1/service/v1/asr";
-        private long mAppId = 0L;
-        private String mAppkey = "";
         private String mLanguage;
-
-        private String requestId;
         private AudioTrack mAudioTrack = new AudioTrack(AudioManager.STREAM_MUSIC,
                 16000, AudioFormat.CHANNEL_OUT_MONO, AudioFormat.ENCODING_PCM_16BIT,
                 iAudioBuff, AudioTrack.MODE_STREAM);
-        private AtomicBoolean has_start = new AtomicBoolean(false);
 
         BallerASRHTTP(String strLanguage) {
             this.mLanguage = strLanguage;
-            this.requestId = UUID.randomUUID().toString();
         }
+
 
         void addAudio(byte[] audio) {
-            if (mRecordPCM.size() > 0) {
-                byte [] audio_tmp = mRecordPCM.pop();
-                if (audio_tmp != null) {
-                    if (!postData(requestId, audio, "continue")) {
-                        Log.e(mLogTag, "post failed");
-                    }
-                    has_start.set(true);
-                }
-            }
             mRecordPCM.addLast(audio);
-        }
-
-        void setFinish() {
-            byte [] audio_tmp = mRecordPCM.pop();
-            if (audio_tmp != null) {
-                postData(requestId, audio_tmp, "end");
-            }
-        }
-
-        private String getGmtTime() {
-            SimpleDateFormat sdf3 = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss z", Locale.US);
-            sdf3.setTimeZone(TimeZone.getTimeZone("GMT"));
-            return sdf3.format(new Date());
-        }
-
-        private String MD5(String sourceStr) {
-            try {
-                MessageDigest mdInst = MessageDigest.getInstance("MD5");
-                mdInst.update(sourceStr.getBytes());
-                byte[] md = mdInst.digest();
-                StringBuilder buffer = new StringBuilder();
-                for (int i = 0; i < md.length; i++) {
-                    int tmp = md[i];
-                    if (tmp < 0)
-                        tmp += 256;
-                    if (tmp < 16)
-                        buffer.append("0");
-                    buffer.append(Integer.toHexString(tmp));
-                }
-                return buffer.toString();
-
-            } catch (Exception e) {
-                e.printStackTrace();
-                return null;
-            }
         }
 
         private boolean postData(String requestId_, byte[] testData, String inputMode) {
@@ -210,11 +150,12 @@ class BallerASRHTTPTest extends Thread {
                             Log.i(mLogTag, "asr get failed: " + error_code + " " + message + " " + requestId_);
                         } else if (isComplete == 1){
                             Log.i(mLogTag, "asr result: " + strData);
+                            sendResult(strData);
                         }
                     }
                 } else {
                     Log.i(mLogTag, "asr get failed");
-                    return false;
+                    return true;
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -226,22 +167,41 @@ class BallerASRHTTPTest extends Thread {
         @Override
         public void run() {
             mAudioTrack.play();
+            String requestId = UUID.randomUUID().toString();
             try {
-                while (true) {
-                    if (has_start.get())  {
-                        if (getResult(requestId)) {
-                            break;
-                        }
+                while (!finish.get()) {
+                    if (mRecordPCM.size() == 0) {
+                        continue;
                     }
+
+                    byte [] audio = mRecordPCM.pop();
+                    if (audio != null) {
+                        if (!postData(requestId, audio, "continue")) {
+                            Log.e(mLogTag, "post failed");
+                        }
+                        Log.e(mLogTag, "post continue");
+                    }
+                }
+
+                byte [] audio = mRecordPCM.pop();
+                if (!postData(requestId, audio, "end")) {
+                    Log.e(mLogTag, "post failed");
+                }
+                Log.e(mLogTag, "post end");
+
+                while (!getResult(requestId)) {
                     try {
                         Thread.sleep(40);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
                 }
+                Log.e(mLogTag, "get finish");
+
             } catch (Exception e) {
                 e.printStackTrace();
             }
+            Log.e(mLogTag, "thread 2 leave");
         }
     }
 
@@ -279,7 +239,7 @@ class BallerASRHTTPTest extends Thread {
 
         mAsrhttp.start();
 
-        while (!this.isInterrupted()) {
+        while (!this.finish.get()) {
             int iReadSize = mWakeRecorder.read(data, 0, data.length);
             if (0 < iReadSize)
             {
@@ -287,7 +247,6 @@ class BallerASRHTTPTest extends Thread {
             }
         }
 
-        mAsrhttp.setFinish();
         try {
             mAsrhttp.join();
         } catch (Exception e) {
@@ -296,6 +255,8 @@ class BallerASRHTTPTest extends Thread {
 
         mWakeRecorder.stop();
         mWakeRecorder.release();
+
+        Log.e(mLogTag, "thread 1 leave");
     }
 }
 

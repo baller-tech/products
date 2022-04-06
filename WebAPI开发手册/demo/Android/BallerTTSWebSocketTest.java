@@ -1,4 +1,4 @@
-package com.baller.demo.asr_tts_websocket;
+package com.baller.test;
 
 import android.media.AudioFormat;
 import android.media.AudioManager;
@@ -25,13 +25,11 @@ import javax.crypto.spec.SecretKeySpec;
 
 // 添加依赖：org.java-websocket:Java-WebSocket:1.3.0
 
-public class BallerTTSWebSocketTest extends Thread {
+public class BallerTTSWebSocketTest extends BallerBase {
 
     private static String mLogTag = "BallerTTSWebSocketTest";
     private static String mUrl = "ws://api.baller-tech.com/v1/service/ws/v1/tts";
     private static String mHost = "api.baller-tech.com";
-    private static long mAppId = 0L;
-    private static String mAppkey = "";
     private static float speed = 1.0f;
 
     private WebSocketClient mWSClient = null;
@@ -40,7 +38,7 @@ public class BallerTTSWebSocketTest extends Thread {
 
     private AudioTrack mAudioTrack = null;
 
-    public BallerTTSWebSocketTest(String strLanguage, String strTxt) {
+    BallerTTSWebSocketTest(String strLanguage, String strTxt) {
         this.mLanguage = strLanguage;
         this.mTxt = strTxt;
     }
@@ -118,7 +116,7 @@ public class BallerTTSWebSocketTest extends Thread {
                 AudioFormat.CHANNEL_OUT_MONO, AudioFormat.ENCODING_PCM_16BIT);
         mAudioTrack = new AudioTrack(AudioManager.STREAM_MUSIC, 16000,
                 AudioFormat.CHANNEL_OUT_MONO, AudioFormat.ENCODING_PCM_16BIT,
-                iAudioBuff, AudioTrack.MODE_STREAM);
+                iAudioBuff * 8, AudioTrack.MODE_STREAM);
         mAudioTrack.play();
 
         final String strLanguage = this.mLanguage;
@@ -146,6 +144,7 @@ public class BallerTTSWebSocketTest extends Thread {
                                     ex.printStackTrace();
                                 }
                             }
+                            Log.e(mLogTag, "send data finish");
                         }
                     });
                     sendThread.start();
@@ -182,16 +181,16 @@ public class BallerTTSWebSocketTest extends Thread {
 
                     if (0 < audio.length)
                     {
-                        Log.e(mLogTag, String.valueOf(audio.length));
                         mAudioTrack.write(audio, 0, audio.length);
                     }
 
                     if (isEnd) {
                         try {
-                            mWSClient.closeBlocking();
-                        } catch (InterruptedException e) {
+                            mWSClient.close();
+                        } catch (Exception e) {
                             Log.i(mLogTag, e.toString());
                         }
+                        Log.e(mLogTag, "get result finish");
                     }
                 }
 
@@ -222,6 +221,8 @@ public class BallerTTSWebSocketTest extends Thread {
         if (!bConnectSucc) {
             sendNetDisconnect();
         }
+
+        Log.e(mLogTag, "thread 1 leave");
     }
 }
 

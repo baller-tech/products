@@ -172,29 +172,29 @@ host:api.baller-tech.com
 
 ## <span id="support_voice_name">支持的发音人</span>
 
-| 对外暴露标示 | 语种           | 备注     |
-| ------------ | -------------- | -------- |
-| yiyi         | 中文           | 暂不支持 |
-| xixi         | 中文           | 暂不支持 |
-| mary         | 英语（英音）   | 暂不支持 |
-| victoria     | 英语（英音）   | 暂不支持 |
-| bonnie       | 英语（英音）   | 暂不支持 |
-| elise        | 英语（美音）   | 暂不支持 |
-| regina       | 英语（美音）   | 暂不支持 |
-| aodeng       | 蒙语（传统）   | 支持     |
-| qimuge       | 蒙语（传统）   | 暂不支持 |
-| tana         | 蒙语（西里尔） | 暂不支持 |
-| suolangcuomu | 藏语（卫藏）   | 支持     |
-| gesangwangmu | 藏语（卫藏）   | 暂不支持 |
-| renyang      | 藏语（安多）   | 暂不支持 |
-| yangla       | 藏语（安多）   | 暂不支持 |
-| cangla       | 藏语（康巴）   | 暂不支持 |
-| guli         | 维语           | 支持     |
-| amina        | 维语           | 暂不支持 |
-| ailinna      | 哈萨克语       | 支持     |
-| mayila       | 哈萨克语       | 暂不支持 |
-| minzhen      | 朝鲜语         | 支持     |
-| hailaiyousuo | 彝语           | 暂不支持 |
-| dafei        | 壮语           | 暂不支持 |
-| yinan        | 壮语           | 支持     |
+| 对外暴露标示 | 语种           | 备注 |
+| ------------ | -------------- | ---- |
+| yiyi         | 中文           | 支持 |
+| qianqian     | 中文           | 支持 |
+| mary         | 英语（英音）   | 支持 |
+| victoria     | 英语（英音）   | 支持 |
+| bonnie       | 英语（英音）   | 支持 |
+| elise        | 英语（美音）   | 支持 |
+| regina       | 英语（美音）   | 支持 |
+| aodeng       | 蒙语（传统）   | 支持 |
+| qimuge       | 蒙语（传统）   | 支持 |
+| tana         | 蒙语（西里尔） | 支持 |
+| suolangcuomu | 藏语（卫藏）   | 支持 |
+| gesangwangmu | 藏语（卫藏）   | 支持 |
+| renyang      | 藏语（安多）   | 支持 |
+| yangla       | 藏语（安多）   | 支持 |
+| cangla       | 藏语（康巴）   | 支持 |
+| guli         | 维语           | 支持 |
+| amina        | 维语           | 支持 |
+| ailinna      | 哈萨克语       | 支持 |
+| mayila       | 哈萨克语       | 支持 |
+| minzhen      | 朝鲜语         | 支持 |
+| hailaiyousuo | 彝语           | 支持 |
+| dafei        | 壮语           | 支持 |
+| yinan        | 壮语           | 支持 |
 

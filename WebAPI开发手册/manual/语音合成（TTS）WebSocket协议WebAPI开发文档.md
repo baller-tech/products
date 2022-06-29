@@ -151,6 +151,8 @@ host:api.baller-tech.com
 藏语（康巴）|tib_kb|采样率：16000hz 采样点大小：16bits|audio/L16;rate=16000
 藏语（卫藏）|tib_wz|采样率：16000hz 采样点大小：16bits|audio/L16;rate=16000
 维语|uig|采样率：16000hz 采样点大小：16bits|audio/L16;rate=16000
+壮语|zha|采样率：16000hz 采样点大小：16bits|audio/L16;rate=16000
+朝鲜语|kor|采样率：16000hz 采样点大小：16bits|audio/L16;rate=16000
 中文|zho|采样率：16000hz 采样点大小：16bits|audio/L16;rate=16000
 英文|eng|采样率：16000hz 采样点大小：16bits|audio/L16;rate=16000
 

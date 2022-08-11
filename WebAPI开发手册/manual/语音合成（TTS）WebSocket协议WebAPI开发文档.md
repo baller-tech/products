@@ -174,7 +174,7 @@ host:api.baller-tech.com
 
 ## <span id="support_voice_name">支持的发音人</span>
 
-| 对外暴露标示 | 语种           | 备注 |
+| 发音人       | 语种           | 备注 |
 | ------------ | -------------- | ---- |
 | yiyi         | 中文           | 支持 |
 | qianqian     | 中文           | 支持 |

@@ -84,6 +84,8 @@ host:api.baller-tech.com
 | audio_encode | string | 否 | raw | 音频编码格式；参见[支持的音频编码](#support_audio_encode) |
 | voice_name | string | 是 | 无 | 音频发言人；参见[支持的发音人](#support_voice_name)  |
 | speed | float | 是 | 无 | 音频输出的语速；参见[语速的取值范围](#support_speed_range) |
+| tempo         | float  | 否       | 0                    | 音频输出的节奏；参见[节奏的取值范围](#support_tempo_range)  |
+| pitch         | float  | 否       | 0                    | 音频输出的音调；参见[音调的取值范围](#support_pitch_range)  |
 
 ##### sample_format 介绍
 &#8195; &#8195;根据RFC对MIME格式的定义，使用audio/Lxx;rate=xxxxx 表明采样格式，audio/L后面的数字表示音频的采样点大小（单位bit）, rate=后面的数字表示音频 的采样率（单位hz）。<br>
@@ -103,7 +105,12 @@ host:api.baller-tech.com
 | ------------ | ------------ | ------------ | ------------ |
 | txt  | string  | 是  | 经过base64编码后的文本数据   |
 
+- **拼音处理**：文本中包含人名等的汉语拼音，希望按照拼音发音时，需要添加指定的标签`[rp1]`、`[rp0]`
 
+  - ~~~tex
+    My name is [rp1]xiǎo péng you[rp0].
+    你好啊，[rp1]xiǎo péng you[rp0]。
+    ~~~
 
 
 ```
@@ -172,12 +179,23 @@ host:api.baller-tech.com
 1. 语速取值范围为0.5到2.0，0.5最慢，1.0为正常语速，2.0最快。
 2. 目前仅有中文、英文两个语种支持调整语速。
 
+## <span id="support_tempo_range">节奏的取值范围</span>
+
+1. 节奏取值范围为-50到50，-50最慢，0为正常语速，50最快。
+2. 目前仅有中文、英文两个语种支持调整节奏。
+
+## <span id="support_pitch_range">音调的取值范围</span>
+
+1. 音调取值范围为-10到10，-10最慢，0为正常语速，10最快。
+2. 目前仅有中文、英文两个语种支持调整音调。
+
 ## <span id="support_voice_name">支持的发音人</span>
 
 | 发音人       | 语种           | 备注 |
 | ------------ | -------------- | ---- |
 | yiyi         | 中文           | 支持 |
 | qianqian     | 中文           | 支持 |
+| ruirui     | 中文           | 支持 |
 | mary         | 英语（英音）   | 支持 |
 | victoria     | 英语（英音）   | 支持 |
 | bonnie       | 英语（英音）   | 支持 |

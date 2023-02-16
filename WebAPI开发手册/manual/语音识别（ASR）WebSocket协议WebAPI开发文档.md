@@ -170,7 +170,8 @@ host:api.baller-tech.com
 语种 | 对应的language字段 | 支持的采样格式 | 对应的sample_format 
 ---|---|---|---
 哈语|kaz|采样率：16000hz 采样点大小：16bits|audio/L16;rate=16000
-蒙语|mon|采样率：16000hz 采样点大小：16bits|audio/L16;rate=16000
+蒙语（传统）|mon|采样率：16000hz 采样点大小：16bits|audio/L16;rate=16000
+蒙语（西里尔）|mon_o|采样率：16000hz 采样点大小：16bits|audio/L16;rate=16000
 藏语（安多）|tib_ad|采样率：16000hz 采样点大小：16bits|audio/L16;rate=16000
 藏语（康巴）|tib_kb|采样率：16000hz 采样点大小：16bits|audio/L16;rate=16000
 藏语（卫藏）|tib_wz|采样率：16000hz 采样点大小：16bits|audio/L16;rate=16000

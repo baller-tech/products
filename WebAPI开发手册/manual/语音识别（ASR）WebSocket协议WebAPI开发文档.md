@@ -42,8 +42,8 @@ ws://api.baller-tech.com/v1/service/ws/v1/asr?authorization=xxxx&host=xxxx&date=
 authorization使用base64编码前的格式如下json格式
 ```
 {
-	"app_id": "1172448516240310275",
-	"signature": "qaIpgE3Ecs78g6GRFxQBJKgdna28b7ronAcsDCsO+Zw="
+    "app_id": "1172448516240310275",
+    "signature": "qaIpgE3Ecs78g6GRFxQBJKgdna28b7ronAcsDCsO+Zw="
 }
 ```
 
@@ -114,7 +114,7 @@ host:api.baller-tech.com
         "audio": "AAAFAAoADwAXAB0AJgA0AEIATABPAE8AUQBRAEgAOwA0AC8AJwAcABUAEQAJAAIAAgADAAAA+P="
     },
     "business": {
-        "language": "mon",
+        "language": "mon_i",
         "service_type": "sentence",
         "sample_format": "audio/L16;rate=16000",
         "audio_format": "raw",
@@ -169,8 +169,8 @@ host:api.baller-tech.com
 
 语种 | 对应的language字段 | 支持的采样格式 | 对应的sample_format 
 ---|---|---|---
-哈语|kaz|采样率：16000hz 采样点大小：16bits|audio/L16;rate=16000
-蒙语（传统）|mon|采样率：16000hz 采样点大小：16bits|audio/L16;rate=16000
+哈语（传统）|kaz_i|采样率：16000hz 采样点大小：16bits|audio/L16;rate=16000
+蒙语（传统）|mon_i|采样率：16000hz 采样点大小：16bits|audio/L16;rate=16000
 蒙语（西里尔）|mon_o|采样率：16000hz 采样点大小：16bits|audio/L16;rate=16000
 藏语（安多）|tib_ad|采样率：16000hz 采样点大小：16bits|audio/L16;rate=16000
 藏语（康巴）|tib_kb|采样率：16000hz 采样点大小：16bits|audio/L16;rate=16000

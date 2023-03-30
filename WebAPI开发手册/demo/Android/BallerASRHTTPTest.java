@@ -7,161 +7,176 @@ import android.media.AudioTrack;
 import android.media.MediaRecorder;
 import android.util.Log;
 import android.util.Base64;
-import android.widget.TextView;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.ByteArrayEntity;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.params.CoreConnectionPNames;
-import org.apache.http.util.EntityUtils;
-import org.json.JSONObject;
-
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.LinkedList;
 import java.util.UUID;
 
-class BallerASRHTTPTest extends BallerBase {
-    private String mLogTag = "BallerASRHTTP";
+import org.json.JSONObject;
+
+public class BallerASRHTTPTest extends BallerBase {
+    private static String mLogTag = "BallerASRHTTP";
+    private static String mUrl = "http://" + mHost + "/v1/service/v1/asr";
+    private String mLanguage;
+
     private BallerASRHTTP mAsrhttp;
     private LinkedList<byte[]> mRecordPCM = new LinkedList<>();
-    private static int iAudioBuff = AudioTrack.getMinBufferSize(16000,
-            AudioFormat.CHANNEL_OUT_MONO, AudioFormat.ENCODING_PCM_16BIT);
+    private static int iAudioBuff = AudioTrack.getMinBufferSize(
+            16000,
+            AudioFormat.CHANNEL_OUT_MONO,
+            AudioFormat.ENCODING_PCM_16BIT);
 
     BallerASRHTTPTest(String strLanguage) {
-        mAsrhttp = new BallerASRHTTP(strLanguage);
+        this.mLanguage = strLanguage;
+        mAsrhttp = new BallerASRHTTP();
     }
 
+    private boolean postData(String requestId, byte[] testData, String inputMode) {
+        JSONObject businessParams = new JSONObject();
+        try {
+            businessParams.put("request_id", requestId);
+            businessParams.put("language", mLanguage);
+            businessParams.put("sample_format", "audio/L16;rate=16000");
+            businessParams.put("audio_format", "raw");
+            businessParams.put("service_type", "sentence");
+            businessParams.put("input_mode", inputMode);
+            businessParams.put("vad", "on");
+        } catch (Exception e) {
+            Log.i(mLogTag, "asr post failed. " + e.getMessage());
+            return false;
+        }
+        String businessParamsBase64 =
+                Base64.encodeToString(businessParams.toString().getBytes(), Base64.NO_WRAP);
+
+        String requestTime = getGmtTime();
+        String checkSum = mAppkey + requestTime + businessParamsBase64;
+        String md5 = MD5(checkSum);
+
+        try {
+
+            URL url = new URL(mUrl);
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            // 设置连接超时为5秒
+            connection.setConnectTimeout(5000);
+            // 设置请求类型为Get类型
+            connection.setRequestMethod("POST");
+            connection.setRequestProperty("B-AppId", String.valueOf(mAppId));
+            connection.setRequestProperty("B-CurTime", requestTime);
+            connection.setRequestProperty("B-Param", businessParamsBase64);
+            connection.setRequestProperty("B-CheckSum", md5);
+            connection.setRequestProperty("Content-Type", "application/octet-stream");
+
+            OutputStream out = connection.getOutputStream();
+            out.write(testData);
+            out.flush();
+            out.close();
+
+            int  status_code = connection.getResponseCode();
+
+            if (status_code == 200) {
+                InputStream inStream = connection.getInputStream();
+                byte[] bt = readStream(inStream);
+
+                String content = new String(bt, StandardCharsets.UTF_8);
+                com.alibaba.fastjson.JSONObject responseContent = com.alibaba.fastjson.JSONObject.parseObject(content);
+                int error_code = responseContent.getIntValue("code");
+                String message = responseContent.getString("message");
+                if (error_code != 0)
+                {
+                    Log.i(mLogTag, "asr failed: " + error_code + " " +message);
+                }
+                inStream.close();
+            } else {
+                Log.i(mLogTag, "asr post failed");
+                return false;
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+        return true;
+    }
+
+    private boolean getResult(String requestId) {
+        boolean isEnd;
+        JSONObject paramMap = new JSONObject();
+        try {
+            paramMap.put("request_id", requestId);
+        }catch (Exception e) {
+            e.printStackTrace();
+            return true;
+        }
+
+        String businessParamBase64 = Base64.encodeToString(paramMap.toString().getBytes(), Base64.NO_WRAP);
+
+        String requestTime = getGmtTime();
+        String checkSum = mAppkey + requestTime + businessParamBase64;
+        String md5 = MD5(checkSum);
+
+        try {
+
+            URL url = new URL(mUrl);
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            // 设置连接超时为5秒
+            connection.setConnectTimeout(5000);
+            // 设置请求类型为Get类型
+            connection.setRequestMethod("GET");
+            connection.setRequestProperty("B-AppId", String.valueOf(mAppId));
+            connection.setRequestProperty("B-CurTime", requestTime);
+            connection.setRequestProperty("B-Param", businessParamBase64);
+            connection.setRequestProperty("B-CheckSum", md5);
+
+            int  status_code = connection.getResponseCode();
+
+            if (status_code == 200) {
+                InputStream inStream = connection.getInputStream();
+                byte[] bt = readStream(inStream);
+
+                String content = new String(bt, StandardCharsets.UTF_8);
+                com.alibaba.fastjson.JSONObject responseContent = com.alibaba.fastjson.JSONObject.parseObject(content);
+                isEnd = 1 == responseContent.getIntValue("is_end");
+                int is_complete = responseContent.getIntValue("is_complete");
+                String strData = responseContent.getString("data");
+                int error_code = responseContent.getIntValue("code");
+                String message = responseContent.getString("message");
+                if (error_code != 0)
+                {
+                    Log.i(mLogTag, "asr failed: " + error_code + " " +message);
+                } else if (!strData.isEmpty() && is_complete == 1) {
+                    Log.i(mLogTag, "asr result: " + strData);
+                    sendResult(strData);
+                }
+            } else {
+                Log.i(mLogTag, "asr get failed");
+                return false;
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+
+        return isEnd;
+    }
+
+
     private class BallerASRHTTP extends Thread {
-        private String mUrl = "http://api.baller-tech.com/v1/service/v1/asr";
-        private String mLanguage;
-        private AudioTrack mAudioTrack = new AudioTrack(AudioManager.STREAM_MUSIC,
-                16000, AudioFormat.CHANNEL_OUT_MONO, AudioFormat.ENCODING_PCM_16BIT,
+        private AudioTrack mAudioTrack = new AudioTrack(
+                AudioManager.STREAM_MUSIC,
+                16000, AudioFormat.CHANNEL_OUT_MONO,
+                AudioFormat.ENCODING_PCM_16BIT,
                 iAudioBuff, AudioTrack.MODE_STREAM);
 
-        BallerASRHTTP(String strLanguage) {
-            this.mLanguage = strLanguage;
-        }
+        BallerASRHTTP() {}
 
 
         void addAudio(byte[] audio) {
             mRecordPCM.addLast(audio);
-        }
-
-        private boolean postData(String requestId_, byte[] testData, String inputMode) {
-            JSONObject businessParams = new JSONObject();
-            try {
-                businessParams.put("request_id", requestId_);
-                businessParams.put("language", mLanguage);
-                businessParams.put("sample_format", "audio/L16;rate=16000");
-                businessParams.put("audio_format", "raw");
-                businessParams.put("service_type", "sentence");
-                businessParams.put("input_mode", inputMode);
-                businessParams.put("vad", "on");
-            } catch (Exception e) {
-                Log.i(mLogTag, "asr post failed. " + e.getMessage());
-                return false;
-            }
-            String businessParamsBase64 =
-                    Base64.encodeToString(businessParams.toString().getBytes(), Base64.NO_WRAP);
-
-            String requestTime = getGmtTime();
-            String checkSum = mAppkey + requestTime + businessParamsBase64;
-            String md5 = MD5(checkSum);
-
-            HttpPost httpPost = new HttpPost(mUrl);
-            httpPost.setHeader("B-AppId", String.valueOf(mAppId));
-            httpPost.setHeader("B-CurTime", requestTime);
-            httpPost.setHeader("B-Param", businessParamsBase64);
-            httpPost.setHeader("B-CheckSum", md5);
-            httpPost.setHeader("Content-Type", "application/octet-stream");
-
-            httpPost.setEntity(new ByteArrayEntity(testData));
-
-            HttpClient httpClient = new DefaultHttpClient();
-
-            httpClient.getParams().setParameter(CoreConnectionPNames.CONNECTION_TIMEOUT, 30000);
-            httpClient.getParams().setParameter(CoreConnectionPNames.SO_TIMEOUT, 30000);
-            try {
-                HttpResponse httpResp = httpClient.execute(httpPost);
-                int  status_code = httpResp.getStatusLine().getStatusCode();
-                if (status_code == 200) {
-                    String result = EntityUtils.toString(httpResp.getEntity(), "UTF-8");
-                    JSONObject responseContent = new JSONObject(result);
-                    int error_code = responseContent.getInt("code");
-                    if (error_code != 0)
-                    {
-                        Log.i(mLogTag, "asr post failed: " + error_code);
-                        return false;
-                    }
-
-                } else {
-                    Log.i(mLogTag, "asr post failed. " + status_code);
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-                return false;
-            }
-            return true;
-        }
-
-        private boolean getResult(String requestId_) {
-            boolean isEnd = false;
-            JSONObject paramMap = new JSONObject();
-            try {
-                paramMap.put("request_id", requestId_);
-            }catch (Exception e) {
-                e.printStackTrace();
-                return true;
-            }
-
-            String businessParamBase64 = Base64.encodeToString(paramMap.toString().getBytes(), Base64.NO_WRAP);
-
-            String requestTime = getGmtTime();
-            String checkSum = mAppkey + requestTime + businessParamBase64;
-            String md5 = MD5(checkSum);
-
-            HttpGet httpGet = new HttpGet(mUrl);
-            httpGet.setHeader("B-AppId", String.valueOf(mAppId));
-            httpGet.setHeader("B-CurTime", requestTime);
-            httpGet.setHeader("B-Param", businessParamBase64);
-            httpGet.setHeader("B-CheckSum", md5);
-
-            HttpClient httpClient = new DefaultHttpClient();
-
-
-            httpClient.getParams().setParameter(CoreConnectionPNames.CONNECTION_TIMEOUT, 30000);
-            httpClient.getParams().setParameter(CoreConnectionPNames.SO_TIMEOUT, 30000);
-            try {
-                HttpResponse httpResp = httpClient.execute(httpGet);
-                if (httpResp.getStatusLine().getStatusCode() == 200) {
-                    String result = EntityUtils.toString(httpResp.getEntity(), "UTF-8");
-
-                    if (!result.isEmpty()) {
-                        JSONObject jsonResult = new JSONObject(result);
-                        isEnd = 1 == jsonResult.getInt("is_end");
-                        String strData = jsonResult.getString("data");
-                        int error_code = jsonResult.getInt("code");
-                        int isComplete = jsonResult.getInt("is_complete");
-                        if (error_code != 0)
-                        {
-                            String message = jsonResult.getString("message");
-                            Log.i(mLogTag, "asr get failed: " + error_code + " " + message + " " + requestId_);
-                        } else if (isComplete == 1){
-                            Log.i(mLogTag, "asr result: " + strData);
-                            sendResult(strData);
-                        }
-                    }
-                } else {
-                    Log.i(mLogTag, "asr get failed");
-                    return true;
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-                return true;
-            }
-            return isEnd;
         }
 
         @Override
@@ -176,18 +191,22 @@ class BallerASRHTTPTest extends BallerBase {
 
                     byte [] audio = mRecordPCM.pop();
                     if (audio != null) {
-                        if (!postData(requestId, audio, "continue")) {
+                        boolean putSuccess =postData(requestId, audio, "continue");
+                        if (!putSuccess) {
                             Log.e(mLogTag, "post failed");
                         }
-                        Log.e(mLogTag, "post continue");
                     }
                 }
+                byte [] audio;
+                if (mRecordPCM.size() > 0) {
+                    audio = mRecordPCM.pop();
+                } else {
+                    audio= new byte[32];
+                }
 
-                byte [] audio = mRecordPCM.pop();
                 if (!postData(requestId, audio, "end")) {
                     Log.e(mLogTag, "post failed");
                 }
-                Log.e(mLogTag, "post end");
 
                 while (!getResult(requestId)) {
                     try {
@@ -196,12 +215,9 @@ class BallerASRHTTPTest extends BallerBase {
                         e.printStackTrace();
                     }
                 }
-                Log.e(mLogTag, "get finish");
-
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            Log.e(mLogTag, "thread 2 leave");
         }
     }
 
@@ -255,8 +271,6 @@ class BallerASRHTTPTest extends BallerBase {
 
         mWakeRecorder.stop();
         mWakeRecorder.release();
-
-        Log.e(mLogTag, "thread 1 leave");
     }
 }
 

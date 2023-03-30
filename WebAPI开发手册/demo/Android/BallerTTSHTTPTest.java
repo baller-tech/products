@@ -6,28 +6,22 @@ import android.media.AudioTrack;
 import android.util.Base64;
 import android.util.Log;
 
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.params.CoreConnectionPNames;
-import org.apache.http.util.EntityUtils;
-import org.apache.http.entity.ByteArrayEntity;
 import org.json.JSONObject;
-import org.apache.http.HttpEntity;
 
-// 添加依赖：org.jbundle.util.osgi.wrapped:org.jbundle.util.osgi.wrapped.org.apache.http.client:4.1.2
-// 添加依赖：commons-logging:commons-logging:1.2
 
 public class BallerTTSHTTPTest extends BallerBase {
     private static String mLogTag = "BallerTTSHTTPTest";
-    private static String mUrl = "http://api.baller-tech.com/v1/service/v1/tts";
+    private static String mUrl = "http://" + mHost + "/v1/service/v1/tts";
 
-    private String mLanguage = "";
-    private String mTxt = "";
+    private String mLanguage;
+    private String mTxt;
     private AudioTrack mAudioTrack = null;
 
     private int iAudioBuff = AudioTrack.getMinBufferSize(16000,
@@ -57,34 +51,45 @@ public class BallerTTSHTTPTest extends BallerBase {
         String checkSum = mAppkey + requestTime + businessParamsBase64;
         String md5 = MD5(checkSum);
 
-        HttpPost httpPost = new HttpPost(mUrl);
-        httpPost.setHeader("B-AppId", String.valueOf(mAppId));
-        httpPost.setHeader("B-CurTime", requestTime);
-        httpPost.setHeader("B-Param", businessParamsBase64);
-        httpPost.setHeader("B-CheckSum", md5);
-        httpPost.setHeader("Content-Type", "application/octet-stream");
-
-        httpPost.setEntity(new ByteArrayEntity(testData));
-
-        HttpClient httpClient = new DefaultHttpClient();
-
-        httpClient.getParams().setParameter(CoreConnectionPNames.CONNECTION_TIMEOUT, 30000);
-        httpClient.getParams().setParameter(CoreConnectionPNames.SO_TIMEOUT, 30000);
         try {
-            HttpResponse httpResp = httpClient.execute(httpPost);
-            if (httpResp.getStatusLine().getStatusCode() == 200) {
-                String result = EntityUtils.toString(httpResp.getEntity(), "UTF-8");
-                JSONObject responseContent = new JSONObject(result);
-                int error_code = responseContent.getInt("code");
+
+            URL url = new URL(mUrl);
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            // 设置连接超时为5秒
+            connection.setConnectTimeout(5000);
+            // 设置请求类型为Get类型
+            connection.setRequestMethod("POST");
+            connection.setRequestProperty("B-AppId", String.valueOf(mAppId));
+            connection.setRequestProperty("B-CurTime", requestTime);
+            connection.setRequestProperty("B-Param", businessParamsBase64);
+            connection.setRequestProperty("B-CheckSum", md5);
+            connection.setRequestProperty("Content-Type", "application/octet-stream");
+
+            OutputStream out = connection.getOutputStream();
+            out.write(testData);
+            out.flush();
+            out.close();
+
+            int  status_code = connection.getResponseCode();
+
+            if (status_code == 200) {
+                InputStream inStream = connection.getInputStream();
+                byte[] bt = readStream(inStream);
+
+                String content = new String(bt, StandardCharsets.UTF_8);
+                com.alibaba.fastjson.JSONObject responseContent = com.alibaba.fastjson.JSONObject.parseObject(content);
+                int error_code = responseContent.getIntValue("code");
+                String message = responseContent.getString("message");
                 if (error_code != 0)
                 {
-                    Log.i(mLogTag, "tts failed: " + error_code);
-                    return false;
+                    Log.i(mLogTag, "tts failed: " + error_code + " " +message);
                 }
+                inStream.close();
             } else {
                 Log.i(mLogTag, "tts post failed");
                 return false;
             }
+
         } catch (Exception e) {
             e.printStackTrace();
             return false;
@@ -107,44 +112,45 @@ public class BallerTTSHTTPTest extends BallerBase {
         String checkSum = mAppkey + requestTime + businessParamBase64;
         String md5 = MD5(checkSum);
 
-        HttpGet httpGet = new HttpGet(mUrl);
-        httpGet.setHeader("B-AppId", String.valueOf(mAppId));
-        httpGet.setHeader("B-CurTime", requestTime);
-        httpGet.setHeader("B-Param", businessParamBase64);
-        httpGet.setHeader("B-CheckSum", md5);
 
-        HttpClient httpClient = new DefaultHttpClient();
-
-        boolean isEnd;
-        int error_code;
-
-        httpClient.getParams().setParameter(CoreConnectionPNames.CONNECTION_TIMEOUT, 30000);
-        httpClient.getParams().setParameter(CoreConnectionPNames.SO_TIMEOUT, 30000);
         try {
-            HttpResponse httpResp = httpClient.execute(httpGet);
-            if (httpResp.getStatusLine().getStatusCode() == 200) {
-                error_code = Integer.parseInt(httpResp.getFirstHeader("B-Code").getValue());
+            URL url = new URL(mUrl);
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            // 设置连接超时为5秒
+            connection.setConnectTimeout(5000);
+            // 设置请求类型为Get类型
+            connection.setRequestMethod("GET");
+            connection.setRequestProperty("B-AppId", String.valueOf(mAppId));
+            connection.setRequestProperty("B-CurTime", requestTime);
+            connection.setRequestProperty("B-Param", businessParamBase64);
+            connection.setRequestProperty("B-CheckSum", md5);
+
+            boolean isEnd;
+            int  status_code = connection.getResponseCode();
+
+            if (status_code == 200) {
+                InputStream inStream = connection.getInputStream();
+                byte[] audio = readStream(inStream);
+                if (audio.length > 0) {
+                    mAudioTrack.write(audio, 0, audio.length);
+                }
+
+                isEnd = 1 == Integer.parseInt(connection.getHeaderField("B-Is-End"));
+                int error_code = Integer.parseInt(connection.getHeaderField("B-Code"));
+                String message = connection.getHeaderField("B-Message");
                 if (error_code != 0)
                 {
-                    String message = httpResp.getFirstHeader("B-Message").getValue();
-                    Log.i(mLogTag, "tts failed: " + error_code +  " " + message);
-                    return true;
-                } else {
-                    HttpEntity entity = httpResp.getEntity();
-                    byte[] audio = EntityUtils.toByteArray(entity);
-                    if (audio.length > 0) {
-                        mAudioTrack.write(audio, 0, audio.length);
-                    }
+                    Log.i(mLogTag, "tts failed: " + error_code + " " +message);
                 }
-                isEnd =  1== Integer.parseInt(httpResp.getFirstHeader("B-Is-End").getValue());
                 return isEnd;
             } else {
                 Log.i(mLogTag, "tts get failed");
-                return true;
+                return false;
             }
+
         } catch (Exception e) {
             e.printStackTrace();
-            return true;
+            return false;
         }
     }
     @Override
@@ -156,12 +162,11 @@ public class BallerTTSHTTPTest extends BallerBase {
         mAudioTrack.play();
 
         try {
-            boolean putSuccess = postData(requestId, mTxt.getBytes("utf-8"));
+            boolean putSuccess = postData(requestId, mTxt.getBytes(StandardCharsets.UTF_8));
             if (!putSuccess) {
                 Log.e(mLogTag, "post data failed");
                 return;
             }
-            Log.e(mLogTag, "post data finish");
 
             // 获取结果
             while (!isInterrupted()) {
@@ -174,10 +179,8 @@ public class BallerTTSHTTPTest extends BallerBase {
                     e.printStackTrace();
                 }
             }
-            Log.e(mLogTag, "get result finish");
         } catch (Exception e) {
             e.printStackTrace();
         }
-        Log.e(mLogTag, "thread 1 leave");
     }
 }

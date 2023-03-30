@@ -26,27 +26,28 @@ import org.java_websocket.handshake.ServerHandshake;
 import com.alibaba.fastjson.JSONException;
 import com.alibaba.fastjson.JSONObject;
 
-/**
- * 
- * 信息配置类
- */
-class Common {
+
+public class cloud_websocket_mt_test {
+	
 	// 地址配置
 	public static String mUrl = "ws://api.baller-tech.com/v1/service/ws/v1/mt";
 	public static String mHost = "api.baller-tech.com";
 
 	// 账号信息 由北京市大牛儿科技发展有限公司统一分配
-	public static long mAppId = 0L;
-	public static String mAppkey = "";
+    public static long mOrgId = 0L;
+    public static long mAppId = 0L;
+    public static String mAppkey = "";
 
 	// 测试语种
 	// tib-chs: 藏文翻译为中文
-	public static String mLanguage = "tib-chs";
+	public static String mLanguage = "chs-eng";
 	// 测试使用的文件
-	public static String mTxtFile = "";
+	public static String mTxtFile = "chs.txt";
 	// 结果保存文件
-	public static String mOutFile = "";
-			
+	public static String mOutFile =  mTxtFile + "_out.txt";
+	// 是否将结果保存到文件
+	public static boolean mSaveToFile = false;
+	
 	// 读取文件
 	@SuppressWarnings("resource")
 	public static byte[] readFile(String strFile) {
@@ -76,70 +77,69 @@ class Common {
 
 		return fileData;
 	}
-}
+	
+	
+	/**
+	 * 
+	 * 发送数据的线程类
+	 */
+	public static class NMTSendFrameThread extends Thread {
+		private WebSocketClient mClient;
+		private boolean mIsFirstFrame = true;
 
-/**
- * 
- * 发送数据的线程类
- */
-class SendFrameThread extends Thread {
-	private WebSocketClient mClient;
-	private boolean mIsFirstFrame = true;
+		NMTSendFrameThread(WebSocketClient wsClient) {
+			this.mClient = wsClient;
+		}
 
-	SendFrameThread(WebSocketClient wsClient) {
-		this.mClient = wsClient;
-	}
+		public String makeFrame(byte[] data) {
+			JSONObject jsonParams = new JSONObject();
+			if (mIsFirstFrame) {
+				JSONObject jsonBusiness = new JSONObject();
+				try {
+					jsonBusiness.put("language", mLanguage);
+					jsonParams.put("business", jsonBusiness);
+				} catch (JSONException e) {
+					e.printStackTrace();
+					return null;
+				}
 
-	public String makeFrame(byte[] data) {
-		JSONObject jsonParams = new JSONObject();
-		if (mIsFirstFrame) {
-			JSONObject jsonBusiness = new JSONObject();
+				mIsFirstFrame = false;
+			}
+
+			JSONObject jsonData = new JSONObject();
 			try {
-				jsonBusiness.put("language", Common.mLanguage);
-				jsonParams.put("business", jsonBusiness);
+				jsonData.put("txt", Base64.getEncoder().encodeToString(data));
+				jsonParams.put("data", jsonData);
 			} catch (JSONException e) {
 				e.printStackTrace();
 				return null;
 			}
 
-			mIsFirstFrame = false;
+			return jsonParams.toString();
 		}
 
-		JSONObject jsonData = new JSONObject();
-		try {
-			jsonData.put("txt", Base64.getEncoder().encodeToString(data));
-			jsonParams.put("data", jsonData);
-		} catch (JSONException e) {
-			e.printStackTrace();
-			return null;
-		}
-
-		return jsonParams.toString();
-	}
-
-	public void run() {
-		// 读取测试文件
-		byte[] imageData = Common.readFile(Common.mTxtFile);
-		if (imageData == null || imageData.length == 0) {
-			System.out.println("读取测试文件出错");
-			return;
-		}
-
-		String strSendFrame = this.makeFrame(imageData);
-		if (strSendFrame != null) {
-			if (mClient.isClosed() || mClient.isClosing()) {
+		public void run() {
+			// 读取测试文件
+			byte[] imageData = readFile(mTxtFile);
+			if (imageData == null || imageData.length == 0) {
+				System.out.println("读取测试文件出错");
 				return;
 			}
-			mClient.send(strSendFrame);
-		} else {
-			return;
+
+			String strSendFrame = this.makeFrame(imageData);
+			if (strSendFrame != null) {
+				if (mClient.isClosed() || mClient.isClosing()) {
+					return;
+				}
+				mClient.send(strSendFrame);
+			} else {
+				return;
+			}
 		}
 	}
-}
+		
 
-public class cloud_websocket_mt_test {
-
-	private static DataOutputStream mOutFile = null;
+	private static DataOutputStream mOutStream = null;
 	
 	private static String HMACSHA256AndBase64(byte[] data, byte[] key) {
 		try {
@@ -162,14 +162,14 @@ public class cloud_websocket_mt_test {
 		sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
 		String strRequestDateTime = sdf.format(cd.getTime());
 
-		String strSignatureOrg = "app_id:" + Common.mAppId + "\n";
+		String strSignatureOrg = "app_id:" + mAppId + "\n";
 		strSignatureOrg += "date:" + strRequestDateTime + "\n";
-		strSignatureOrg += "host:" + Common.mHost;
-		String strSignatureFinal = HMACSHA256AndBase64(strSignatureOrg.getBytes(), Common.mAppkey.getBytes());
+		strSignatureOrg += "host:" + mHost;
+		String strSignatureFinal = HMACSHA256AndBase64(strSignatureOrg.getBytes(), mAppkey.getBytes());
 
 		JSONObject jsonAuthorization = new JSONObject();
 		try {
-			jsonAuthorization.put("app_id", Long.toString(Common.mAppId));
+			jsonAuthorization.put("app_id", Long.toString(mAppId));
 			jsonAuthorization.put("signature", strSignatureFinal);
 		} catch (JSONException e) {
 			e.printStackTrace();
@@ -180,7 +180,7 @@ public class cloud_websocket_mt_test {
 		String strAuthorizationFinal = "";
 		try {
 			strAuthorizationFinal = "authorization=" + URLEncoder.encode(strAuthorizationBase64, "UTF-8") + "&host="
-					+ URLEncoder.encode(Common.mHost, "UTF-8") + "&date="
+					+ URLEncoder.encode(mHost, "UTF-8") + "&date="
 					+ URLEncoder.encode(strRequestDateTime, "UTF-8");
 		} catch (UnsupportedEncodingException e) {
 			e.printStackTrace();
@@ -188,56 +188,58 @@ public class cloud_websocket_mt_test {
 
 		return strAuthorizationFinal;
 	}
-
-	public static void main(String[] args) {
-		// 检查运行条件
-		if (Common.mAppId == 0L || Common.mAppkey == "") {
-			System.out.println("请填写账号信息");
-			return;
-		}
-
-		try {
-			mOutFile = new DataOutputStream(new FileOutputStream(Common.mOutFile, false));
-		} catch (FileNotFoundException e1) {
-			System.out.println("打开结果文件" + Common.mOutFile + "失败");
-			e1.printStackTrace();
-			return;
-		}
+	
+	public static void TestOnce() {
 		
+		if (mSaveToFile) {
+			try {
+				mOutStream = new DataOutputStream(new FileOutputStream(mOutFile, false));
+			} catch (FileNotFoundException e1) {
+				System.out.println("打开结果文件" + mOutFile + "失败");
+				e1.printStackTrace();
+				return;
+			}
+		}
+
 		// 开始连接
 		WebSocketClient wsClient = null;
 		try {
-			String strUrl = Common.mUrl + "?" + makeAuthorization();
+			String strUrl = mUrl + "?" + makeAuthorization();
 			wsClient = new WebSocketClient(new URI(strUrl), new Draft_6455()) {
 				@Override
 				public void onOpen(ServerHandshake handshakedata) {
 					// 启动数据发送线程
-					SendFrameThread sendThread = new SendFrameThread(this);
+					NMTSendFrameThread sendThread = new NMTSendFrameThread(this);
 					sendThread.start();
 				}
 
 				@Override
 				public void onMessage(String message) {
 					JSONObject jsonObject = JSONObject.parseObject(message);
-					int iCode = jsonObject.getInteger("code");
+					
+					if (jsonObject.containsKey("task_id")) {
+						System.out.println("task id  " + jsonObject.getString("task_id"));
+					}
 
+					int iCode = jsonObject.getInteger("code");
 					if (0 == iCode) {
 						// 正常流程
 						boolean isEnd = jsonObject.getBoolean("is_end");
 						String strData = jsonObject.getString("data");
+						System.out.print(strData);
 						
-						try {
-							mOutFile.write(strData.getBytes());
-							System.out.print(strData);
-						} catch (IOException e) {
-							e.printStackTrace();
+						if (mSaveToFile) { 
+							try {
+								mOutStream.write(strData.getBytes());
+							} catch (IOException e) {
+								e.printStackTrace();
+							}
 						}
-						
+
 						if (isEnd) {
 							// 处理完毕主动关闭连接
 							this.close();
-							System.out.println();
-							System.out.println("翻译完毕");
+							System.out.println("task finish");
 						}
 					} else {
 						// 出错流程
@@ -269,5 +271,28 @@ public class cloud_websocket_mt_test {
 		if (wsClient != null) {
 			wsClient.connect();
 		}
+		
+		try {
+			wsClient.closeBlocking();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		
+	    if (mOutStream != null) {
+	        try {
+	        	mOutStream.close();
+	        } catch (IOException e) {
+	          e.printStackTrace();
+	        }
+	    }
 	}
+
+	public static void main(String[] args) {
+		// 检查运行条件
+		if (mAppId == 0L || mAppkey == "") {
+			System.out.println("请填写账号信息");
+			return;
+		}
+		TestOnce();
+	}	
 }

@@ -148,7 +148,6 @@ public class cloud_http_mt_test {
         try {
           outFile.write(dataArray.getBytes());
         } catch (IOException e) {
-          // TODO Auto-generated catch block
           e.printStackTrace();
         }
       }

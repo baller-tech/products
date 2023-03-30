@@ -24,7 +24,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 
-// 添加依赖：org.java-websocket:Java-WebSocket:1.3.0
 
 public class BallerASRWebSocketTest extends BallerBase {
 
@@ -37,8 +36,8 @@ public class BallerASRWebSocketTest extends BallerBase {
 
     public class BallerASR extends Thread {
 
-        private String mUrl = "ws://api.baller-tech.com/v1/service/ws/v1/asr";
-        private String mHost = "api.baller-tech.com";
+        private String mUrl = "ws://" + mHost + "/v1/service/ws/v1/asr";
+
 
         WebSocketClient mWSClient = null;
         LinkedList<byte[]> mRecordPCM = new LinkedList<>();
@@ -138,7 +137,7 @@ public class BallerASRWebSocketTest extends BallerBase {
             {
                 mWSClient = new WebSocketClient(new URI(strUrl), new Draft_17(), new HashMap<String, String>(), 3000) {
                     @Override
-                    public void onOpen(ServerHandshake handshakedata) {
+                    public void onOpen(ServerHandshake data) {
                     }
 
                     @Override
@@ -166,7 +165,7 @@ public class BallerASRWebSocketTest extends BallerBase {
 
                         if (errorCode != 0)
                         {
-                            Log.i(mLogTag, "asr failed. error code: " + String.valueOf(errorCode));
+                            Log.i(mLogTag, "asr failed. error code: " + errorCode);
                         } else if (isComplete) {
                             Log.i(mLogTag, "asr result: " + strText);
                             sendResult(strText);
@@ -198,15 +197,15 @@ public class BallerASRWebSocketTest extends BallerBase {
                 return;
             }
 
-            boolean bConnectSucc = true;
+            boolean bConnectSuccess;
             try {
-                bConnectSucc = mWSClient.connectBlocking();
+                bConnectSuccess = mWSClient.connectBlocking();
             } catch (InterruptedException e) {
-                bConnectSucc = false;
+                bConnectSuccess = false;
                 e.printStackTrace();
             }
 
-            if (!bConnectSucc) {
+            if (!bConnectSuccess) {
                 sendNetDisconnect();
                 return;
             }

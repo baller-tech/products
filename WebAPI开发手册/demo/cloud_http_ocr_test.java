@@ -11,6 +11,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Base64;
 import java.util.Date;
 import java.util.HashMap;
@@ -85,14 +86,14 @@ public class cloud_http_ocr_test {
   }
 
   @SuppressWarnings({ "unchecked", "rawtypes" })
-  public static boolean postData(String requestId, byte[] testData) {
+  public static boolean postData(String requestId, byte[] testData, String inputMode) {
 
     Map<String, String> businessParams = new HashMap<>();
     businessParams.put("request_id", requestId);
     businessParams.put("language", mLanguage);
     businessParams.put("image_mode", mImageMode);
     businessParams.put("file_format", mFileFormat);
-    businessParams.put("input_mode", "once");
+    businessParams.put("input_mode", inputMode);
     if (!mCallbackUrl.isEmpty()) {
       businessParams.put("callback_url", mCallbackUrl);
     }
@@ -175,7 +176,6 @@ public class cloud_http_ocr_test {
               String changeLine = "\n";
               outFile.write(changeLine.getBytes());
             } catch (IOException e) {
-              // TODO Auto-generated catch block
               e.printStackTrace();
             }
           }
@@ -202,7 +202,7 @@ public class cloud_http_ocr_test {
     }
 
     // 读取并发送图像数据
-    boolean putSuccess = postData(requestId, readFile(mTestFile));
+    boolean putSuccess = postData(requestId, readFile(mTestFile), "once");
     if (!putSuccess) {
       System.out.println(requestId + " POST data failed");
       return;
@@ -216,7 +216,6 @@ public class cloud_http_ocr_test {
           // 1. 避免线程一直被占用，导致CPU利用率高。40ms为经验值，使用时可根据实际的需求调大或调小。
           Thread.sleep(40);
         } catch (InterruptedException e) {
-          // TODO Auto-generated catch block
           e.printStackTrace();
         }
       }
@@ -231,8 +230,91 @@ public class cloud_http_ocr_test {
     }
     System.out.println(requestId + " GET result finished");
   }
+  
+
+  public static void testContinue() {
+
+    String requestId = UUID.randomUUID().toString();
+    // 读取音频数据
+    byte[] testData = readFile(mTestFile);
+
+    if (testData.length == 0) {
+      System.out.println("read audio file " + mTestFile + " failed");
+      return;
+    }
+    
+    FileOutputStream fileOut = null;
+    if (mSaveToFile) {
+      try {
+        File f = new File(mSaveResultFile);
+        fileOut = new FileOutputStream(f);
+      } catch (FileNotFoundException e1) {
+        e1.printStackTrace();
+      }
+    }
+
+    // 发送音频数据
+    int perSize = 32 * 200;
+    int sendSize = 0;
+    boolean putSuccess = true;
+    while (testData.length - sendSize > perSize) {
+      putSuccess = postData(requestId, Arrays.copyOfRange(testData, sendSize, sendSize + perSize), "continue");
+      sendSize += perSize;
+      if (!putSuccess) {
+        System.out.println(requestId + " POST data failed");
+        return;
+      }
+
+      // 获取一次音频数据
+      boolean isEnd = getResult(requestId, fileOut);
+      if (isEnd) {
+        System.out.println(requestId + " GET data finished");
+        return;
+      }
+
+      try {
+    	  // 停留40ms的作用：
+    	  // 1. 避免将音频数据瞬时全部发送到服务器而导致服务器任务缓存区满返回51024错误码的情况。
+    	  Thread.sleep(40);
+      } catch (InterruptedException e) {
+        e.printStackTrace();
+        return;
+      }
+    }
+
+    if (testData.length - sendSize  >= 0) {
+      putSuccess = postData(requestId, Arrays.copyOfRange(testData, sendSize, testData.length), "end");
+      if (!putSuccess) {
+        System.out.println(requestId + " POST data finished");
+        return;
+      }
+    }
+
+    if (mCallbackUrl.isEmpty()) {
+      while (!getResult(requestId, fileOut)) {
+        try {
+          // 停留40ms的作用：
+          // 1. 避免线程一直被占用，导致CPU利用率高。40ms为经验值，使用时可根据实际的需求调大或调小。
+          Thread.sleep(40);
+        } catch (InterruptedException e) {
+          e.printStackTrace();
+        }
+      }
+    }
+
+    if (fileOut != null) {
+      try {
+        fileOut.close();
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
+    }
+    System.out.println(requestId + " continue GET result finished ");
+  }
+
 
   public static void main(String[] args) {
     testOnce();
+    testContinue();
   }
 }

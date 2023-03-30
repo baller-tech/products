@@ -36,27 +36,26 @@ public class cloud_http_asr_test {
   
   // 测试语种
   // 请查考《语音识别（ASR）HTTP协议WebAPI开发文档.pdf》中“支持的语种以及采样格式”章节
-  public static String mLanguage = "tib_ad";
+  public static String mLanguage = "zho";
   // 测试使用的文件
-  public static String mTxtFile = "";
+  public static String mAudioFile = "zho_16000_16.wav";
   // 音频文件格式
   // 请查考《语音识别（ASR）HTTP协议WebAPI开发文档.pdf》中“支持的音频格式”章节
-  public static String mAudioFormat = "raw";
+  public static String mAudioFormat = "wav";
   // 音频采样率
-  // 请查考《语音识别（ASR）HTTP协议WebAPI开发文档.pdf》中“支持的语种以及采样格式”章节
   public static int mSampleRate = 16000;
+  // 请查考《语音识别（ASR）HTTP协议WebAPI开发文档.pdf》中“支持的语种以及采样格式”章节
   public static String mSampleFormat = "audio/L16;rate=" + String.valueOf(mSampleRate);
   // 结果保存文件
-  public static String mSaveResultFile = mTxtFile + "_out.txt";
+  public static String mSaveResultFile = mAudioFile + "_out.txt";
+  // 结果是否保存到文件中
+  public static boolean mSaveToFile = false;
   // 服务类型
   // sentence: 整句识别 结果实时返回 每个任务限制时长
   // realtime: 实时识别 结果实时返回 每个任务无时长限制
   public static String mServiceType = "sentence";
-
   // 推送结果的地址，该地址为调用者自己搭建的接收推送结果的Web服务地址
   public static String mCallbackUrl = "";
-  // 结果是否保存到文件中
-  public static boolean mSaveToFile = true;
   // 是否显示子句的位移信息
   public static boolean mShowOffset = false;
 
@@ -105,6 +104,7 @@ public class cloud_http_asr_test {
     businessParams.put("service_type", mServiceType);
     businessParams.put("input_mode", inputMode);
     businessParams.put("vad", "on");
+    businessParams.put("dynamic_correction", "off");
     if (!mCallbackUrl.isEmpty()) {
       businessParams.put("callback_url", mCallbackUrl);
     }
@@ -209,7 +209,7 @@ public class cloud_http_asr_test {
     }
 
     // 读取并发送音频数据
-    boolean putSuccess = postData(requestId, "once", readFile(mTxtFile));
+    boolean putSuccess = postData(requestId, "once", readFile(mAudioFile));
     if (!putSuccess) {
       System.out.println(requestId + " POST data failed");
       return;
@@ -238,15 +238,14 @@ public class cloud_http_asr_test {
     System.out.println(requestId + " once GET result finished");
   }   
 
-  @SuppressWarnings("static-access")
   public static void testContinue() {
 
     String requestId = UUID.randomUUID().toString();
     // 读取音频数据
-    byte[] testData = readFile(mTxtFile);
+    byte[] testData = readFile(mAudioFile);
 
     if (testData.length == 0) {
-      System.out.println("read audio file " + mTxtFile + " failed");
+      System.out.println("read audio file " + mAudioFile + " failed");
       return;
     }
     

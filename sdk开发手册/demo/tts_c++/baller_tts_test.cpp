@@ -1,401 +1,277 @@
-#ifdef _WIN32
-#include <windows.h>
-#include <conio.h>
-#include <locale.h>
-#include <io.h>
-#else
-#include <pthread.h>
-#include <limits.h>
-#include <unistd.h>
-#include <dirent.h>
-#include <sys/stat.h>
-#endif // _WIN32
-
-#include <stdio.h>
-#include <stdlib.h>
+#include <iostream>
+#include <sstream>
+#include <thread>
 #include <chrono>
-#include <string>
 #include <fstream>
 #include <vector>
-#include <sstream>
-#include <iomanip>
-#include <memory>
 #include <string.h>
-#include <algorithm>
+#include <chrono>
+#include <limits.h>
 
-#include "baller_errors.h"
 #include "baller_common.h"
+#include "baller_errors.h"
+#include "baller_types.h"
 #include "baller_tts.h"
 
-// 由北京大牛儿科技发展有限公司统一分配
-#define BALLER_ORG_ID                              (0LL)
-#define BALLER_APP_ID                              (0LL)
-#define BALLER_APP_KEY                             ("")
+/**
+* pcm 转 wav 方便测试播放
+*/
+typedef struct {
+    char            riffType[4];        //4byte,资源交换文件标志:RIFF   
+    unsigned int    riffSize;           //4byte,从下个地址到文件结尾的总字节数  
+    char            wavType[4];         //4byte,wav文件标志:WAVE    
+    char            formatType[4];      //4byte,波形文件标志:FMT(最后一位空格符)    
+    unsigned int    formatSize;         //4byte,音频属性(compressionCode,numChannels,sampleRate,bytesPerSecond,blockAlign,bitsPerSample)所占字节数
+    unsigned short  compressionCode;    //2byte,格式种类(1-线性pcm-WAVE_FORMAT_PCM,WAVEFORMAT_ADPCM)
+    unsigned short  numChannels;        //2byte,通道数
+    unsigned int    sampleRate;         //4byte,采样率
+    unsigned int    bytesPerSecond;     //4byte,传输速率
+    unsigned short  blockAlign;         //2byte,数据块的对齐，即DATA数据块长度
+    unsigned short  bitsPerSample;      //2byte,采样精度-PCM位宽
+    char            dataType[4];        //4byte,数据标志:data
+    unsigned int    dataSize;           //4byte,从下个地址到文件结尾的总字节数，即除了wav header以外的pcm data length
+} wav_head_data_t;
 
-// SDK参数设置
-// 语种
-#define BALLER_LANG                                 ("mon")
-// 资源文件路径
-#define BALLER_RES_DIR                              ("./data/mon")
-// 授权文件路径
-#define BALLER_LICENSE_FILE                         ("./license/baller_sdk.license")
-// 采样率
-#define BALLER_SAMPLE_RATE                          (16000)
-// 采样点大小
-#define BALLER_SAMPLE_SIZE                          (16)
-// 音频编码；支持的音频编码请参考开发手册
-#define BALLER_AUDIO_ENCODE                         ("raw")
-
-// 测试参数设置
-// 测试使用的线程数
-#define BALLER_THREAD_COUNT                         (1)
-// 每个测试文件执行多少次
-#define BALLER_LOOP_COUNT                           (1)
-// 测试实时率时打开此宏， 打开此宏时BALLER_AUDIO_ENCODE必须设置为“raw”
-// #define BALLER_TEST_RTF
-
-#ifdef _WIN32
-#define BALLER_THREAD_ID                            ::GetCurrentThreadId()
-#define BALLER_SLEEP_MS(_ms)                        do { Sleep(_ms); } while (false)
-#else
-#define BALLER_THREAD_ID                            pthread_self()
-#define BALLER_SLEEP_MS(_ms)                        do { usleep((_ms) * 1000); } while (false)
-#endif
-
-typedef struct t_s_thread_param {
-    std::vector<char*> vec_test_data;
-    std::vector<int> vec_test_data_len;
-    std::vector<std::string> vec_test_file_name;
-} s_thread_param;
-
-#ifdef _WIN32
-static int GetFiles(const std::string& folder_name, std::vector<std::string>& vec_files)
+static bool SaveWavFile(const std::string& file_name, const std::vector<char>& pcm_data)
 {
-    intptr_t hFile = 0;
-    struct _finddata_t fileInfo;
-    std::string filter_path_name = folder_name;
-    std::string root_path_name = folder_name;
-    if (folder_name[folder_name.length() - 1] != '/' && folder_name[folder_name.length() - 1] != '\\')
+    int pcm_byte_size = pcm_data.size();
+
+    // config wav head
+    wav_head_data_t wav_head;
+    memcpy(wav_head.riffType, "RIFF", strlen("RIFF"));
+    memcpy(wav_head.wavType, "WAVE", strlen("WAVE"));
+    wav_head.riffSize = 36 + pcm_byte_size;
+    wav_head.sampleRate = 16000;
+    wav_head.bitsPerSample = 16;
+    memcpy(wav_head.formatType, "fmt ", strlen("fmt "));
+    wav_head.formatSize = 16;
+    wav_head.numChannels = 1;
+    wav_head.blockAlign = wav_head.numChannels * wav_head.bitsPerSample / 8;
+    wav_head.compressionCode = 1;
+    wav_head.bytesPerSecond = wav_head.sampleRate * wav_head.blockAlign;
+    memcpy(wav_head.dataType, "data", strlen("data"));
+    wav_head.dataSize = pcm_byte_size;
+
+    // write wave
+    std::ofstream file_wav(file_name.c_str(), std::ofstream::binary);
+    if (!file_wav.is_open())
     {
-        filter_path_name += "\\*";
-        root_path_name += "\\";
+        std::cout << "save wave file " << file_name.c_str() << " failed" << std::endl;
+        return false;
+    }
+
+    file_wav.write((const char *)&wav_head, sizeof(wav_head));
+    if (pcm_data.size() > 0)
+    {
+        file_wav.write((const char *)&pcm_data[0], pcm_byte_size);
+    }
+
+    return true;
+}
+
+const static int64_t kOrgId = 0LL;
+const static int64_t kAppId = 0LL;
+const static std::string kAppKey = "";
+
+static std::string language;
+static std::string out_dir;
+static std::string text_file_name;
+static float speed = 1.0f;
+static std::string ability_server;
+
+struct BallerCallbackParam {
+    std::vector<char> pcm_data;
+    std::chrono::steady_clock::time_point begin_pt;
+    int first_elapsed;
+    int first_byte_size;
+
+    std::chrono::steady_clock::time_point first_frame_finish_pt;
+    int frame_idx;
+    int pcm_size;
+
+    std::chrono::steady_clock::time_point last_pt;
+};
+
+int BALLER_CALLBACK my_tts_callback(void* user_param, const void * wav, const int size)
+{
+    BallerCallbackParam* callback_param = (BallerCallbackParam*)(user_param);
+    callback_param->frame_idx += 1;
+    if (1 == callback_param->frame_idx)
+    {
+        callback_param->first_elapsed = int(std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - callback_param->begin_pt).count());
+        callback_param->first_byte_size = size;
+
+        callback_param->pcm_size = size;
+        callback_param->first_frame_finish_pt = std::chrono::steady_clock::now();
     }
     else
-    {
-        filter_path_name += "*";
-    }
-
-    if ((hFile = _findfirst(filter_path_name.c_str(), &fileInfo)) == -1) {
-        return 0;
-    }
-    do
-    {
-        if ((fileInfo.attrib & _A_SUBDIR) == 0)
+    {   
+        int temp_slow_elapsed = int(std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - callback_param->first_frame_finish_pt).count()) - (callback_param->pcm_size / 32);
+        if (temp_slow_elapsed > 0)
         {
-            vec_files.push_back(root_path_name + fileInfo.name);
+            printf("frame %d is slow %d ms\n", callback_param->frame_idx, temp_slow_elapsed);
+            callback_param->pcm_size = size;
+            callback_param->first_frame_finish_pt = std::chrono::steady_clock::now();
         }
-    } while (_findnext(hFile, &fileInfo) == 0);
-
-    _findclose(hFile);
-    return (int)vec_files.size();
-}
-
-#else
-static int GetFiles(const std::string& folder_name, std::vector<std::string>& vec_files)
-{
-    DIR *dir;
-    struct dirent *ptr;
-    if ((dir = opendir(folder_name.c_str())) == 0) {
-        return 0;
-    }
-    while ((ptr = readdir(dir)) != 0) {
-        if (strcmp(ptr->d_name, ".") == 0 || strcmp(ptr->d_name, "..") == 0) {
-            continue;
-        }
-        if (ptr->d_type == 8) {
-            // read image data
-            std::string image_file = folder_name;
-            if (folder_name[folder_name.length() - 1] != '/') {
-                image_file += '/';
-            }
-            image_file += ptr->d_name;
-            vec_files.push_back(image_file);
+        else
+        {
+            callback_param->pcm_size += size;            
         }
     }
-    return (int)vec_files.size();
-}
-#endif // _WIN32
 
-int ReadTestData(const char* pszTestFile, char** ppTestData, int* piTestDataLen)
-{
-    FILE* pFile = fopen(pszTestFile, "rb");
-    if (pFile == 0)
-    {
-        return 0;
-    }
-    fseek(pFile, 0, SEEK_END);
-    *piTestDataLen = (int)(ftell(pFile));
-    if (*piTestDataLen == 0)
-    {
-        fclose(pFile);
-        return 0;
-    }
-
-    // 预留结束位置的空字符
-    *ppTestData = (char *)malloc((*piTestDataLen) + 1);
-    memset(*ppTestData, '\0', (*piTestDataLen) + 1);
-    fseek(pFile, 0, SEEK_SET);
-    fread(*ppTestData, 1, *piTestDataLen, pFile);
-    fclose(pFile);
-
-    return *piTestDataLen;
+    callback_param->pcm_data.insert(callback_param->pcm_data.end(), (char*)wav, (char*)wav + size);
+    callback_param->last_pt = std::chrono::steady_clock::now();
+    return 1;
 }
 
-
-void write_result(FILE* out_file, const char* result, const int result_len)
+int DoTTS()
 {
-    if (out_file)
-    {
-        fwrite(result, 1, result_len, out_file);
-    }
-}
+    char version[256] = { 0 };
+    BallerTTSVersion(version, 255);
+    std::cout << version << std::endl; 
 
-#ifdef _WIN32
-DWORD WINAPI test_tts(LPVOID param)
-#else
-void * test_tts(void * param)
-#endif
-{
-    int ret = BALLER_SUCCESS;
     baller_session_id session_id = BALLER_INVALID_SESSION_ID;
-    s_thread_param* thread_param = (s_thread_param *)param;
 
-    // 调用SessionBegin接口
-    std::string session_prams = std::string("res_dir=") + BALLER_RES_DIR
-        + std::string(",language=") + BALLER_LANG
-        + std::string(",sample_rate=") + std::to_string(BALLER_SAMPLE_RATE)
-        + std::string(",sample_size=") + std::to_string(BALLER_SAMPLE_SIZE);
-    ret = BallerTTSSessionBegin(session_prams.c_str(), &session_id);
-    if (ret != BALLER_SUCCESS)
+    std::stringstream ss;
+    ss << "res_dir=./data/" << language;
+    ss << ",language=" << language;
+    if (!ability_server.empty())
     {
-        printf("call BallerTTSSessionBegin failed(%d)\n", ret);
-        return 0;
+        ss << ",engine_type=cloud";
     }
-    printf("call BallerTTSSessionBegin success\n");
-
-    int max_elapsed = INT_MIN;
-    int min_elapsed = INT_MAX;
-    int total_elapsed = 0;
-    int total_synthesized_duration = 0;
-    int test_count = 0;
-    std::string put_param = std::string("input_mode=once,audio_encode=") + BALLER_AUDIO_ENCODE;
-    FILE* out_file = 0;
-    for (int loop_index = 0; loop_index < BALLER_LOOP_COUNT; ++loop_index)
+    std::cout << "sesion param: " << ss.str().c_str() << std::endl;
+    int code = BallerTTSSessionBegin(ss.str().c_str(), &session_id);
+    if (BALLER_SUCCESS != code)
     {
-        for (int file_index = 0; file_index < thread_param->vec_test_file_name.size(); ++file_index)
+        std::cout << "session begin failed " << code << std::endl;
+        return code;
+    }
+    std::cout << "session begin success" << std::endl;
+
+    std::ifstream file_in(text_file_name);
+    if (!file_in.is_open())
+    {
+        std::cout << "打开文件" << text_file_name.c_str() << "失败，请检查文件是否存在。" << std::endl;
+        return -1;
+    }
+
+    int sentence_index = 0;
+    int total_elapsed = 0;
+    int total_wav_size = 0;
+    int total_first_elapsed = 0;
+    int total_first_point_count = 0;
+    char wav_file_name[64] = { 0 };
+
+    std::string txt;
+    while(getline(file_in, txt))
+    {
+        std::string put_param = "speed=" + std::to_string(speed);
+        sentence_index += 1;
+
+        BallerCallbackParam callback_param;
+        callback_param.first_elapsed = 0;
+        callback_param.first_byte_size = 0;
+        callback_param.frame_idx = 0;
+        callback_param.pcm_size = 0;
+        callback_param.begin_pt = std::chrono::steady_clock::now();
+
+        code = BallerTTSPut(session_id, put_param.c_str(), txt.c_str(), my_tts_callback, &callback_param);
+        int elapsed = int(std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - callback_param.begin_pt).count());
+        if (BALLER_SUCCESS != code)
         {
-#ifndef BALLER_TEST_RTF
-            if (out_file)
-            {
-                fclose(out_file);
-                out_file = 0;
-            }
-            std::string out_file_name = thread_param->vec_test_file_name[file_index] + "." + std::to_string(BALLER_THREAD_ID) + "." + BALLER_AUDIO_ENCODE;
-            out_file = fopen(out_file_name.c_str(), "wb");
-#endif /*BALLER_TEST_RTF*/
+            std::cout << "session put failed " << code << std::endl;
+            break;
+        }
 
-            // 调用BallerTTSPut接口
-            std::chrono::system_clock::time_point start = std::chrono::system_clock::now();
-            ret = BallerTTSPut(session_id, put_param.c_str(), thread_param->vec_test_data[file_index]);
-            if (ret != BALLER_SUCCESS)
-            {
-                printf("call BallerTTSPut failed(%d)\n", ret);
-                break;
-            }
-#ifndef BALLER_TEST_RTF
-            printf("call BallerTTSPut success\n");
-#endif /*BALLER_TEST_RTF*/
+        int wav_point_count = callback_param.pcm_data.size() / 2;
+        int first_point_count = callback_param.first_byte_size / 2;
 
-            // 循环调用BallerTTSGet接口
-            int synthesized_duration = 0;
-            while (true)
-            {
-                char *result = NULL;
-                int result_len = 0;
-                ret = BallerTTSGet(session_id, &result, &result_len);
-                if (BALLER_MORE_RESULT == ret)
-                {
-                    synthesized_duration += result_len;
-#ifndef BALLER_TEST_RTF
-                    write_result(out_file, result, result_len);
-                    // 还有识别结果需要获取 需继续调用BallerTTSGet
-                    // 为了避免浪费CPU资源停10ms在继续获取，10ms为经验值，具体停留的时间需根据机器性能和业务需求综合考虑
-                    BALLER_SLEEP_MS(10);
-#endif /*BALLER_TEST_RTF*/
-                    continue;
-                }
-                else if (BALLER_SUCCESS == ret)
-                {
-                    synthesized_duration += result_len;
-#ifndef BALLER_TEST_RTF
-                    write_result(out_file, result, result_len);
-                    printf("BallerTTSGet Finish\n");
-#endif /*BALLER_TEST_RTF*/
-                    break;
-                }
-                else
-                {
-                    printf("call BallerTTSGet failed(%d)\n", ret);
-                    break;
-                }
-            }
-            if (BALLER_SUCCESS == ret)
-            {
-                int elapsed = int(std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - start).count());
+        total_elapsed += elapsed;
+        total_wav_size += wav_point_count;
 
-                synthesized_duration = synthesized_duration / (BALLER_SAMPLE_SIZE / 8) / (BALLER_SAMPLE_RATE / 1000);
-                printf("[%d] loop_index = %d file %s " "synthesized %d ms use %d ms " "rate %f\n",
-                    BALLER_THREAD_ID, loop_index, thread_param->vec_test_file_name[file_index].c_str(), 
-                    synthesized_duration, elapsed, float(elapsed) / float(synthesized_duration));
+        total_first_elapsed += callback_param.first_elapsed;
+        total_first_point_count += first_point_count;
 
-                max_elapsed = std::max<int>(max_elapsed, elapsed);
-                min_elapsed = std::min<int>(min_elapsed, elapsed);
-                total_elapsed += elapsed;
-                total_synthesized_duration += synthesized_duration;
-                printf("[%d] statistics min use: %d ms max use: %d ms total synthesized %d ms total use %d ms avg rate %f \n",
-                    BALLER_THREAD_ID, min_elapsed, max_elapsed, total_synthesized_duration, total_elapsed,
-                    float(total_elapsed) / float(total_synthesized_duration));
-            }
+        float duration = float(wav_point_count) / float(16);
+        std::cout << "sentence: " << sentence_index << " voice duration: " << duration << "ms synthesis elapsed: " << elapsed << "ms rate: " << float(elapsed) / float(duration) << std::endl;
+        duration = float(first_point_count) / float(16);
+        std::cout << "sentence: " << sentence_index << " first pack duration: " << duration << "ms first pack synthesis elapsed: " << callback_param.first_elapsed << "ms" << std::endl;
+
+        std::cout << "[+] " << " first avg synthesis elapsed: " << float(total_first_elapsed) / float(sentence_index) << "ms";
+        std::cout << " total rate: " << float(total_elapsed) / (float(total_wav_size) / float(16));
+        std::cout << std::endl;
+
+        sprintf(wav_file_name, "%05d.wav", sentence_index);
+        if (!SaveWavFile(out_dir + "/" + wav_file_name, callback_param.pcm_data))
+        {
+            std::cout << "保存音频文件失败，请检查输出文件夹是否存在。" << std::endl;
+            break;
         }
     }
 
-    if (out_file)
+    code = BallerTTSSessionEnd(session_id);
+    if (BALLER_SUCCESS != code)
     {
-        fclose(out_file);
-        out_file = 0;
+        std::cout << "session end failed " << code << std::endl;
+        return code;
     }
-    ret = BallerTTSSessionEnd(session_id);
-    if (ret != BALLER_SUCCESS)
-    {
-        printf("call BallerTTSSessionEnd failed. Return Code: %d\n", ret);
-    }
-    printf("call BallerTTSSessionEnd success\n");
+    std::cout << "session end success" << std::endl;
 
-    return 0;
+    return BALLER_SUCCESS;
 }
 
-int main(int argc, char ** argv)
+int main(int argc, char** argv)
 {
-    // 检查命令行参数
-    if (argc != 3 || (atoi(argv[1]) != 0 && atoi(argv[1]) != 1) || argv[2][0] == 0)
+    BallerTTSSetWorkingThreadNumber(4);
+    BallerTTSWorkingThread();
+    
+    if (argc != 5 && argc != 6)
     {
-        printf("param 0 : test mode, (0) single file or (1) folder\n");
-        printf("param 1 : file name or folder name\n");
+        std::cout << "中文语音合成命令行参数: " << argv[0] << " zho 测试文本.txt out_dir speed [ability_server_addr]" << std::endl;
+        std::cout << "英文语音合成命令行参数: " << argv[0] << " eng 测试文本.txt out_dir speed [ability_server_addr]" << std::endl;
+
+        std::cout << "out_dir 位输出音频文件的文件夹，运行前需保证该文件夹已存在。" << std::endl;
+        std::cout << "ability_server_addr为可选项，表示能力服务器的地址，如果不填表示使用本地能力" << std::endl;
         return 0;
     }
 
-    // 读取测试数据
-    s_thread_param thread_param;
-    if (atoi(argv[1]) == 0)
+    language = argv[1];
+    if (language == "chs")
     {
-        thread_param.vec_test_file_name.push_back(argv[2]);
+        language = "zho";
     }
-    else
+    text_file_name = argv[2];
+    out_dir = argv[3];
+    speed = std::stof(argv[4]);
+    if (argc == 6)
     {
-        GetFiles(argv[2], thread_param.vec_test_file_name);
+        ability_server = argv[5];
     }
-    if (thread_param.vec_test_file_name.size() == 0)
+
+    std::stringstream ss;
+    ss << "org_id=" << kOrgId << ",app_id=" << kAppId << ",app_key=" << kAppKey;
+    ss << ",license=./license/baller_sdk.license";
+    ss << ",log_level=info,log_path=./logs";
+    if (!ability_server.empty())
     {
-        printf("test file count is 0\n");
+        ss << ",ability_server=" << ability_server;
+    }
+    printf("login param: %s\n", ss.str().c_str());
+    int code = BallerLogin(ss.str().c_str());
+    if (BALLER_SUCCESS != code)
+    {
+        std::cout << "login failed " << code << std::endl;
         return 0;
     }
-    for (int file_index = 0; file_index < (int)thread_param.vec_test_file_name.size(); ++file_index)
+    std::cout << "login success" << std::endl;
+
+    DoTTS();
+
+    code =BallerLogout();
+    if (BALLER_SUCCESS != code)
     {
-        int test_data_len = 0;
-        char* test_data = 0;
-        ReadTestData(thread_param.vec_test_file_name[file_index].c_str(), &test_data, &test_data_len);
-        if (test_data_len == 0 || !test_data)
-        {
-            printf("test file %s size is 0\n", thread_param.vec_test_file_name[file_index].c_str());
-
-            for (int data_index = 0; data_index < thread_param.vec_test_data.size(); ++data_index)
-            {
-                if (thread_param.vec_test_data[data_index])
-                {
-                    free(thread_param.vec_test_data[data_index]);
-                }
-            }
-            thread_param.vec_test_data.clear();
-            thread_param.vec_test_data_len.clear();
-            thread_param.vec_test_file_name.clear();
-            return 0;
-        }
-
-        thread_param.vec_test_data.push_back(test_data);
-        thread_param.vec_test_data_len.push_back(test_data_len);
-    }
-
-    // 参数检查
-    if (BALLER_ORG_ID == 0 || BALLER_APP_ID == 0 || std::string(BALLER_APP_KEY).empty())
-    {
-        printf("please fill in the account information");
+        std::cout << "logout failed " << code << std::endl;
         return 0;
     }
-
-    // 调用BallerLogin接口
-    std::string login_params = "org_id=" + std::to_string(BALLER_ORG_ID)
-        + ",app_id=" + std::to_string(BALLER_APP_ID)
-        + ",app_key=" + BALLER_APP_KEY
-        + ",license=" + BALLER_LICENSE_FILE
-        + ",log_level=warning,log_path=./baller_log";
-    int ret = BallerLogin(login_params.c_str());
-    if (ret != BALLER_SUCCESS)
-    {
-        printf("call BallerLogin failed(%d)\n", ret);
-        return 0;
-    }
-    printf("BallerLogin success\n");
-
-
-    // 启动测试线程
-#ifdef _WIN32
-    std::vector<HANDLE> thread_handle;
-    for (int thread_idx = 0; thread_idx < BALLER_THREAD_COUNT; ++thread_idx) {
-        thread_handle.push_back(::CreateThread(0, 0, test_tts, &thread_param, 0, 0));
-    }
-    ::WaitForMultipleObjects((DWORD)thread_handle.size(), &thread_handle[0], TRUE, INFINITE);
-#else
-    std::vector<pthread_t> thread_handle;
-    for (int thread_idx = 0; thread_idx < BALLER_THREAD_COUNT; ++thread_idx) {
-        pthread_t sub_handle;
-        pthread_create(&sub_handle, 0, test_tts, &thread_param);
-        thread_handle.push_back(sub_handle);
-    }
-    for (int thread_idx = 0; thread_idx < BALLER_THREAD_COUNT; ++thread_idx) {
-        pthread_join(thread_handle[thread_idx], 0);
-    }
-#endif
-
-    // 释放测试数据占用的内存
-    for (int data_index = 0; data_index < thread_param.vec_test_data.size(); ++data_index)
-    {
-        if (thread_param.vec_test_data[data_index])
-        {
-            free(thread_param.vec_test_data[data_index]);
-        }
-    }
-    thread_param.vec_test_data.clear();
-    thread_param.vec_test_data_len.clear();
-    thread_param.vec_test_file_name.clear();
-
-    // 调用BallerLogout接口
-    ret = BallerLogout();
-    if (ret != BALLER_SUCCESS)
-    {
-        printf("call BallerLogout failed(%d)\n", ret);
-        return 0;
-    }
-    printf("call BallerLogout success\n");
-
-    return 0;
+    std::cout << "logout success" << std::endl;
 }

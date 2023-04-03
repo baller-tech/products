@@ -36,8 +36,8 @@ ws://api.baller-tech.com/v1/service/ws/v1/tts?authorization=xxxx&host=xxxx&date=
 authorization使用base64编码前的格式如下json格式
 ```
 {
-	"app_id": "1172448516240310275",
-	"signature": "qaIpgE3Ecs78g6GRFxQBJKgdna28b7ronAcsDCsO+Zw="
+    "app_id": "1172448516240310275",
+    "signature": "qaIpgE3Ecs78g6GRFxQBJKgdna28b7ronAcsDCsO+Zw="
 }
 ```
 
@@ -93,11 +93,11 @@ host:api.baller-tech.com
 
 ##### audio_encode 介绍
 
-​		语音合成的原始数据是未经过压缩的采样数据，播放器可以直接播放，它的数据量比较大，以audio/L16;rate=16000为例，一秒的音频需要32000字节的数据来表示。如果对带宽比较敏感，希望减少传输的数据量，可以指定编码格式，对原始采样数据进行编码（压缩），编码（压缩）后的数据需解码后才能正常播放。
+​        语音合成的原始数据是未经过压缩的采样数据，播放器可以直接播放，它的数据量比较大，以audio/L16;rate=16000为例，一秒的音频需要32000字节的数据来表示。如果对带宽比较敏感，希望减少传输的数据量，可以指定编码格式，对原始采样数据进行编码（压缩），编码（压缩）后的数据需解码后才能正常播放。
 
-​		WebAPI返回的是编码后的裸流，不包含任何的封装信息。接口每次返回一帧或多帧完整的音频数据，不会将一帧音频数据分多次返回。
+​        WebAPI返回的是编码后的裸流，不包含任何的封装信息。接口每次返回一帧或多帧完整的音频数据，不会将一帧音频数据分多次返回。
 
-​		为了方便解码，当该参数指定为speex或opus时，在每帧数据前会添加4个字节，用来表示当前帧的字节数。
+​        为了方便解码，当该参数指定为speex或opus时，在每帧数据前会添加4个字节，用来表示当前帧的字节数。
 
 #### 数据流参数（data）
 
@@ -119,7 +119,7 @@ host:api.baller-tech.com
         "txt": "AAAFAAoADwAXAB0AJgA0AEIATABPAE8AUQBRAEgAOwA0AC8AJwAcABUAEQAJAAIAAgADAAAA+P="
     },
     "business": {
-        "language": "mon",
+        "language": "mon_i",
         "sample_format": "audio/L16;rate=16000",
     }
 }
@@ -152,8 +152,9 @@ host:api.baller-tech.com
 语种 | 对应的language字段 | 支持的采样格式 | 对应的sample_format 
 ---|---|---|---
 彝语|iii|采样率：16000hz 采样点大小：16bits|audio/L16;rate=16000
-哈语|kaz|采样率：16000hz 采样点大小：16bits|audio/L16;rate=16000
-蒙语|mon|采样率：16000hz 采样点大小：16bits|audio/L16;rate=16000
+哈语（传统）|kaz_i|采样率：16000hz 采样点大小：16bits|audio/L16;rate=16000
+蒙语（传统）|mon_i|采样率：16000hz 采样点大小：16bits|audio/L16;rate=16000
+蒙语（西里尔）|mon_o|采样率：16000hz 采样点大小：16bits|audio/L16;rate=16000
 藏语（安多）|tib_ad|采样率：16000hz 采样点大小：16bits|audio/L16;rate=16000
 藏语（康巴）|tib_kb|采样率：16000hz 采样点大小：16bits|audio/L16;rate=16000
 藏语（卫藏）|tib_wz|采样率：16000hz 采样点大小：16bits|audio/L16;rate=16000
@@ -195,7 +196,7 @@ host:api.baller-tech.com
 | ------------ | -------------- | ---- |
 | yiyi         | 中文           | 支持 |
 | qianqian     | 中文           | 支持 |
-| ruirui     | 中文           | 支持 |
+| ruirui       | 中文           | 支持 |
 | mary         | 英语（英音）   | 支持 |
 | victoria     | 英语（英音）   | 支持 |
 | bonnie       | 英语（英音）   | 支持 |
@@ -211,8 +212,8 @@ host:api.baller-tech.com
 | cangla       | 藏语（康巴）   | 支持 |
 | guli         | 维语           | 支持 |
 | amina        | 维语           | 支持 |
-| ailinna      | 哈萨克语       | 支持 |
-| mayila       | 哈萨克语       | 支持 |
+| ailinna      | 哈萨克语（传统）   | 支持 |
+| mayila       | 哈萨克语（传统）   | 支持 |
 | minzhen      | 朝鲜语         | 支持 |
 | hailaiyousuo | 彝语           | 支持 |
 | dafei        | 壮语           | 支持 |

@@ -13,11 +13,15 @@ import android.widget.TextView;
 
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
-    private Button start_asr, start_ocr, start_mt, start_tts;
+    private Button start_asr;
+    private Button start_ocr;
+    private Button start_nmt;
+    private Button start_tts;
     private TextView text_input, text_output;
     BallerBase baller_object = null;
     BallerPermission mBallerPermission;
     int checkPermission;
+    int type = 1;
 
     @SuppressLint("HandlerLeak")
     public Handler handler = new Handler() {
@@ -42,12 +46,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         start_asr = findViewById(R.id.start_asr);
         start_ocr = findViewById(R.id.start_ocr);
-        start_mt = findViewById(R.id.start_mt);
+        start_nmt = findViewById(R.id.start_nmt);
         start_tts = findViewById(R.id.start_tts);
 
         start_ocr.setOnClickListener(this);
         start_asr.setOnClickListener(this);
-        start_mt.setOnClickListener(this);
+        start_nmt.setOnClickListener(this);
         start_tts.setOnClickListener(this);
 
         mBallerPermission = new BallerPermission(this);
@@ -83,8 +87,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 if (start_asr.getText() == "开始录音") {
                     start_asr.setText("结束录音");
                     text_input.setText("");
-                    baller_object = new BallerASRHTTPTest("zho");
-//                  baller_object = new BallerASRWebSocketTest("tib_wz");
+                    if (type == 1) {
+                        baller_object = new BallerASRHTTPTest("zho");
+                    } else {
+                        baller_object = new BallerASRWebSocketTest("zho");
+                    }
+
                     baller_object.setmHandler(handler);
                     baller_object.start();
                 } else {
@@ -102,36 +110,42 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
                 break;
             case R.id.start_ocr:
-                baller_object = new BallerTTSHTTPTest("tib_wz", "");
-//                baller_object = new BallerTTSWebSocketTest("tib_wz", "");
+                if (type == 1) {
+                    baller_object = new BallerOCRHTTPTest("chs");
+                }
+
                 baller_object.setmHandler(handler);
                 baller_object.start();
                 break;
             case R.id.start_tts:
                 String input_text = text_input.getText().toString();
                 if (input_text.length() == 0) {
-                    input_text = "རྩོམ་རིག་ནི་སྐད་ཡིག་གི་སྒྱུ་རྩལ་ཞིག་ཡིན་ལ་སྤྱི་ཚོགས་རིག་གནས་ཀྱི་མཚོན་སྟངས་གལ་ཆེན་ཞིག་ཡིན།  \n" +
-                            "རྩོམ་རིག་བརྩམས་ཆོས་ནི་རྩོམ་པ་པོས་ཐུན་མོང་མ་ཡིན་པའི་སྐད་ཡིག་སྒྱུ་རྩལ་ལ་བརྟེན་ནས་དེའི་ཐུན་མོང་མ་ཡིན་པའི་སེམས་ཁམས་མཚོན་པའི་བརྩམས་ཆོས་ཤིག་ཡིན་པ་དང་རང་གཤིས་ཀྱི་ཁྱད་ཆོས་ཆེན་པོ་ལྡན་པའི་ཐུན་མོང་མ་ཡིན་པའི་རང་བཞིན་དེ་གཉིས་དང་ཁ་བྲལ་ཚེ་རྩོམ་རིག་བརྩམས་ཆོས་ངོ་མ་མེད།  \n" +
-                            "ཕུལ་དུ་བྱུང་བའི་རྩོམ་རིག་པ་ཞིག་ནི་མི་རིགས་ཤིག་གི་བསམ་པའི་འཇིག་རྟེན་གྱི་དཔའ་བོ་ཡིན།  \n" +
-                            "རྩོམ་རིག་གིས་མི་རིགས་ཤིག་གི་སྒྱུ་རྩལ་དང་བློ་གྲོས་མཚོན་ཡོད། ";
+                    input_text = "今天天气不错";
                     text_input.setText(input_text);
                 }
-                baller_object = new BallerTTSHTTPTest("tib_wz", input_text);
-//                baller_object = new BallerTTSWebSocketTest("tib_wz", input_text);
+
+                if (type == 1) {
+                    baller_object = new BallerTTSHTTPTest("zho", input_text);
+                } else {
+                    baller_object = new BallerTTSWebSocketTest("tib_wz", input_text);
+                }
+
                 baller_object.setmHandler(handler);
                 baller_object.start();
                 break;
-            case R.id.start_mt:
+            case R.id.start_nmt:
                 String content = text_input.getText().toString();
                 if (content.length() == 0) {
-                    content = "རྩོམ་རིག་ནི་སྐད་ཡིག་གི་སྒྱུ་རྩལ་ཞིག་ཡིན་ལ་སྤྱི་ཚོགས་རིག་གནས་ཀྱི་མཚོན་སྟངས་གལ་ཆེན་ཞིག་ཡིན།  \n" +
-                            "རྩོམ་རིག་བརྩམས་ཆོས་ནི་རྩོམ་པ་པོས་ཐུན་མོང་མ་ཡིན་པའི་སྐད་ཡིག་སྒྱུ་རྩལ་ལ་བརྟེན་ནས་དེའི་ཐུན་མོང་མ་ཡིན་པའི་སེམས་ཁམས་མཚོན་པའི་བརྩམས་ཆོས་ཤིག་ཡིན་པ་དང་རང་གཤིས་ཀྱི་ཁྱད་ཆོས་ཆེན་པོ་ལྡན་པའི་ཐུན་མོང་མ་ཡིན་པའི་རང་བཞིན་དེ་གཉིས་དང་ཁ་བྲལ་ཚེ་རྩོམ་རིག་བརྩམས་ཆོས་ངོ་མ་མེད།  \n" +
-                            "ཕུལ་དུ་བྱུང་བའི་རྩོམ་རིག་པ་ཞིག་ནི་མི་རིགས་ཤིག་གི་བསམ་པའི་འཇིག་རྟེན་གྱི་དཔའ་བོ་ཡིན།  \n" +
-                            "རྩོམ་རིག་གིས་མི་རིགས་ཤིག་གི་སྒྱུ་རྩལ་དང་བློ་གྲོས་མཚོན་ཡོད། ";
+                    content = "今天天气不错";
                     text_input.setText(content);
                 }
-//                baller_object = new BallerMTWebSocketTest("tib-chs", content);
-                baller_object = new BallerMTHTTPTest("tib-chs", content);
+
+                if (type == 1) {
+                    baller_object = new BallerMTHTTPTest("chs-eng", content);
+                } else {
+                    baller_object = new BallerMTWebSocketTest("tib-chs", content);
+                }
+
                 baller_object.setmHandler(handler);
                 baller_object.start();
                 break;

@@ -22,20 +22,18 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 
-// 添加依赖：org.java-websocket:Java-WebSocket:1.3.0
 
 public class BallerMTWebSocketTest extends BallerBase {
 
     private static String mLogTag = "BallerMTWebSocketTest";
-    private static String mUrl = "ws://api.baller-tech.com/v1/service/ws/v1/mt";
-    private static String mHost = "api.baller-tech.com";
+    private static String mUrl = "ws://" + mHost + "/v1/service/ws/v1/mt";
 
     private WebSocketClient mWSClient = null;
-    private String mLanguage = "";
-    private String mTxt = "";
+    private String mLanguage ;
+    private String mTxt;
     private AtomicBoolean mFinish = new AtomicBoolean(false);
 
-    public BallerMTWebSocketTest(String strLanguage, String strTxt) {
+    BallerMTWebSocketTest(String strLanguage, String strTxt) {
         this.mLanguage = strLanguage;
         this.mTxt = strTxt;
     }
@@ -115,7 +113,7 @@ public class BallerMTWebSocketTest extends BallerBase {
         {
             mWSClient = new WebSocketClient(new URI(strUrl), new Draft_17(), new HashMap<String, String>(), 3000) {
                 @Override
-                public void onOpen(ServerHandshake handshakedata) {
+                public void onOpen(ServerHandshake data) {
                     Thread sendThread = new Thread(new Runnable() {
                         @Override
                         public
@@ -193,15 +191,15 @@ public class BallerMTWebSocketTest extends BallerBase {
             return;
         }
 
-        boolean bConnectSucc = true;
+        boolean bConnectSuccess;
         try {
-            bConnectSucc = mWSClient.connectBlocking();
+            bConnectSuccess = mWSClient.connectBlocking();
         } catch (InterruptedException e) {
-            bConnectSucc = false;
+            bConnectSuccess = false;
             e.printStackTrace();
         }
 
-        if (!bConnectSucc) {
+        if (!bConnectSuccess) {
             sendNetDisconnect();
         }
         Log.i(mLogTag, "thread 1 leave");

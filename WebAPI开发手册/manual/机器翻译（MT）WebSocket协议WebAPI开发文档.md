@@ -36,8 +36,8 @@ ws://api.baller-tech.com/v1/service/ws/v1/mt?authorization=xxxx&host=xxxx&date=x
 authorization使用base64编码前的格式如下json格式
 ```
 {
-	"app_id": "1172448516240310275",
-	"signature": "qaIpgE3Ecs78g6GRFxQBJKgdna28b7ronAcsDCsO+Zw="
+    "app_id": "1172448516240310275",
+    "signature": "qaIpgE3Ecs78g6GRFxQBJKgdna28b7ronAcsDCsO+Zw="
 }
 ```
 
@@ -123,19 +123,19 @@ host:api.baller-tech.com
 
 | 翻译语种                       | 对应的language字段 |
 | :----------------------------- | ------------------ |
-| 藏文翻译为中文               | tib-chs            |
-| 维文翻译为中文     			| uig-chs            |
-| 哈萨克文翻译为中文 | kaz-chs            |
-| 蒙文(传统)翻译为中文     | mon-chs            |
-| 蒙文(西里尔)翻译为中文    | mon_o-chs            |
-| 彝文翻译为中文     | iii-chs            |
-| 壮文翻译为中文     | zha-chs            |
-| 朝鲜文翻译为中文 | kor-chs            |
-| 中文翻译为藏文     | chs-tib            |
-| 中文翻译为哈萨克文 | chs-kaz            |
-| 中文翻译为蒙文(传统)     	   | chs-mon            |
-| 中文翻译为蒙文(西里尔)    | chs-mon_o            |
-| 中文翻译为维文     | chs-uig            |
-| 中文翻译为彝文     | chs-iii            |
-| 中文翻译为壮文     | chs-zha            |
-| 中文翻译为朝鲜文  | chs-kor            |
+| 藏文翻译为中文                 | tib-chs            |
+| 维文翻译为中文                 | uig-chs            |
+| 哈萨克文(传统)翻译为中文       | kaz_i-chs          |
+| 蒙文(传统)翻译为中文           | mon_i-chs          |
+| 蒙文(西里尔)翻译为中文         | mon_o-chs          |
+| 彝文翻译为中文                 | iii-chs            |
+| 壮文翻译为中文                 | zha-chs            |
+| 朝鲜文翻译为中文               | kor-chs            |
+| 中文翻译为藏文                 | chs-tib            |
+| 中文翻译为哈萨克文(传统)       | chs-kaz_i          |
+| 中文翻译为蒙文(传统)           | chs-mon_i          |
+| 中文翻译为蒙文(西里尔)         | chs-mon_o          |
+| 中文翻译为维文                 | chs-uig            |
+| 中文翻译为彝文                 | chs-iii            |
+| 中文翻译为壮文                 | chs-zha            |
+| 中文翻译为朝鲜文               | chs-kor            |

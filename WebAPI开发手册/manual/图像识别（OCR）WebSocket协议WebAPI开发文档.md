@@ -47,8 +47,8 @@ authorization使用base64编码前的格式如下json格式
 
 ```
 {
-	"app_id": "1172448516240310275",
-	"signature": "qaIpgE3Ecs78g6GRFxQBJKgdna28b7ronAcsDCsO+Zw="
+    "app_id": "1172448516240310275",
+    "signature": "qaIpgE3Ecs78g6GRFxQBJKgdna28b7ronAcsDCsO+Zw="
 }
 ```
 
@@ -157,35 +157,35 @@ image_mode表明图像的模式，有以下几种可以设定的值
     "message": "success",
     "is_end": 1,
     "data": [
-		{
-			"order": 0,
-			"result": "谢谢惠顾",
-			"page": 0,
-		},
-		{
-			"order": 1,
-			"result": "期待下次再见",
-			"page": 0,
-		},
-	]
+        {
+            "order": 0,
+            "result": "谢谢惠顾",
+            "page": 0,
+        },
+        {
+            "order": 1,
+            "result": "期待下次再见",
+            "page": 0,
+        },
+    ]
 }
 ```
 
 ## <span id="support_pdf">PDF识别注意事项</span>
 
- 	本接口支持对10M以内的PDF文件进行识别，识别PDF时业务参数中的file_format需设置为**pdf**。<br>	如果pdf文件较小（4M以内），可以一次将整个PDF文件发送到服务器，此时数据参数中的input_mode字段可以不设置，或设置为once；如果数据文件较大，不能一次将整个PDF文件发送到服务器，可以将PDF文件切分成多段，并分多次发送给服务器，在这种情况下如果不是最后一段需设置input_mode为continue，如果是最后一段需设置input_mode为end。
+     本接口支持对10M以内的PDF文件进行识别，识别PDF时业务参数中的file_format需设置为**pdf**。<br>    如果pdf文件较小（4M以内），可以一次将整个PDF文件发送到服务器，此时数据参数中的input_mode字段可以不设置，或设置为once；如果数据文件较大，不能一次将整个PDF文件发送到服务器，可以将PDF文件切分成多段，并分多次发送给服务器，在这种情况下如果不是最后一段需设置input_mode为continue，如果是最后一段需设置input_mode为end。
 
 ## <span id="support_language">支持的语种</span>
 
 | 图像识别语种                       | 对应的language字段 |
 | :----------------------------- | ------------------ |
 | 简体中文               | chs            |
-| 繁体中文     			| cht            |
-| 藏文     	   | tib            |
-| 蒙文(传统) | mon            |
-| 蒙文(西里尔)  | mon_o            |
-| 维文     | uig            |
-| 彝文     | iii            |
-| 壮文     | zha            |
-| 韩文     | kor            |
-| 哈萨克文 | kaz            |
+| 繁体中文               | cht            |
+| 藏文                   | tib            |
+| 蒙文(传统)             | mon_i          |
+| 蒙文(西里尔)           | mon_o          |
+| 维文                   | uig            |
+| 彝文                   | iii            |
+| 壮文                   | zha            |
+| 韩文                   | kor            |
+| 哈萨克文(传统)         | kaz_i          |

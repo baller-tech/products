@@ -5,13 +5,11 @@ import android.media.AudioManager;
 import android.media.AudioTrack;
 import android.util.Base64;
 import android.util.Log;
-
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.drafts.Draft_17;
 import org.java_websocket.handshake.ServerHandshake;
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLEncoder;
@@ -23,14 +21,11 @@ import java.util.TimeZone;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 
-// 添加依赖：org.java-websocket:Java-WebSocket:1.3.0
 
 public class BallerTTSWebSocketTest extends BallerBase {
 
     private static String mLogTag = "BallerTTSWebSocketTest";
-    private static String mUrl = "ws://api.baller-tech.com/v1/service/ws/v1/tts";
-    private static String mHost = "api.baller-tech.com";
-    private static float speed = 1.0f;
+    private static String mUrl = "ws://" + mHost + "/v1/service/ws/v1/tts";
 
     private WebSocketClient mWSClient = null;
     private String mLanguage;
@@ -44,7 +39,6 @@ public class BallerTTSWebSocketTest extends BallerBase {
     }
 
     private void sendNetDisconnect() {
-        return;
     }
 
     private static String HMACSHA256AndBase64(byte[] data, byte[] key)
@@ -92,7 +86,7 @@ public class BallerTTSWebSocketTest extends BallerBase {
             jsonBusiness.put("language", strLanguage);
             jsonBusiness.put("sample_format", "audio/L16;rate=16000");
             jsonBusiness.put("audio_encode", "raw");
-            jsonBusiness.put("speed",speed);
+            jsonBusiness.put("speed",1.0f);
             jsonParams.put("business", jsonBusiness);
         } catch (JSONException e) {
             Log.e(mLogTag, e.toString());
@@ -128,7 +122,7 @@ public class BallerTTSWebSocketTest extends BallerBase {
                     new HashMap<String, String>(), 3000) {
 
                 @Override
-                public void onOpen(ServerHandshake handshakedata) {
+                public void onOpen(ServerHandshake data) {
                     Thread sendThread = new Thread(new Runnable() {
                         @Override
                         public
@@ -210,15 +204,15 @@ public class BallerTTSWebSocketTest extends BallerBase {
             return;
         }
 
-        boolean bConnectSucc;
+        boolean bConnectSuccess;
         try {
-            bConnectSucc = mWSClient.connectBlocking();
+            bConnectSuccess = mWSClient.connectBlocking();
         } catch (InterruptedException e) {
-            bConnectSucc = false;
+            bConnectSuccess = false;
             e.printStackTrace();
         }
 
-        if (!bConnectSucc) {
+        if (!bConnectSuccess) {
             sendNetDisconnect();
         }
 

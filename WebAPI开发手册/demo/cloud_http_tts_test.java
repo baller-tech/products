@@ -53,7 +53,7 @@ public class cloud_http_tts_test {
     public static String mAudioEncode = "raw";
     // 合成的音频的发音人
     // 请查考《语音识别（TTS）HTTP协议WebAPI开发文档.pdf》中“支持的发音人”章节
-    public static String mVoiceName = ""
+    public static String mVoiceName = "";
     // 结果保存文件
     public static String mSaveResultFile = mTxtFile + "_out." + mAudioEncode;
     // 推送结果的地址，该地址为调用者自己搭建的接收推送结果的Web服务地址
@@ -221,7 +221,6 @@ public class cloud_http_tts_test {
                     // 1. 避免线程一直被占用，导致CPU利用率高。40ms为经验值，使用时可根据实际的需求调大或调小。
                     Thread.sleep(40);
                 } catch (InterruptedException e) {
-                    // TODO Auto-generated catch block
                     e.printStackTrace();
                 }
            }

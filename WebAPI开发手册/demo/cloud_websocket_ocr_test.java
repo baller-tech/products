@@ -1,8 +1,10 @@
 package com.baller;
 
 import java.io.BufferedInputStream;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
@@ -29,32 +31,36 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONException;
 import com.alibaba.fastjson.JSONObject;
 
-/**
- * 
- * 信息配置类
- */
-class Common {
+public class cloud_websocket_ocr_test {
+	
 	// 地址配置
 	public static String mUrl = "ws://api.baller-tech.com/v1/service/ws/v1/ocr";
 	public static String mHost = "api.baller-tech.com";
 
 	// 账号信息 由北京市大牛儿科技发展有限公司统一分配
-	public static long mAppId = 0L;
-	public static String mAppkey = "";
+    public static long mOrgId = 0L;
+    public static long mAppId = 0L;
+    public static String mAppkey = "";
 
 	// 测试使用的文件
 	public static String mImageFile = "chs.png";
 	// 测试使用的语种 请查考《图像识别（OCR）WebSocket协议WebAPI开发文档.pdf》中“支持的语种”章节
 	public static String mLanguage = "chs";
+	// 请查考《图像识别（OCR）HTTP协议WebAPI开发文档.pdf》中“PDF识别注意事项”章节
+	public static String mFileFormat = "";
 	// 测试的图像模式
 	public static String mImageMode = "multi_row";
+	// 结果保存文件
+	public static String mSaveResultFile = mImageFile + "_out.txt";
+	// 结果是否保存到文件中
+	public static boolean mSaveToFile = false;
 
 	// 读取图片
 	@SuppressWarnings("resource")
 	public static byte[] readFile(String strFile) {
 		byte[] fileData = null;
 
-		BufferedInputStream inputStream;
+		BufferedInputStream inputStream; 
 		try {
 			inputStream = new BufferedInputStream(new FileInputStream(strFile));
 		} catch (FileNotFoundException e) {
@@ -78,69 +84,69 @@ class Common {
 
 		return fileData;
 	}
-}
+	
+	
+	/**
+	 * 
+	 * 发送数据的线程类
+	 */
+	public static class OCRSendFrameThread extends Thread {
+		private WebSocketClient mClient;
+		private boolean mIsFirstFrame = true;
 
-/**
- * 
- * 发送数据的线程类
- */
-class SendFrameThread extends Thread {
-	private WebSocketClient mClient;
-	private boolean mIsFirstFrame = true;
+		OCRSendFrameThread(WebSocketClient wsClient) {
+			this.mClient = wsClient;
+		}
 
-	SendFrameThread(WebSocketClient wsClient) {
-		this.mClient = wsClient;
-	}
+		public String makeFrame(byte[] data) {
+			JSONObject jsonParams = new JSONObject();
+			if (mIsFirstFrame) {
+				JSONObject jsonBusiness = new JSONObject();
+				try {
+					jsonBusiness.put("language", mLanguage);
+					jsonBusiness.put("image_mode", mImageMode);
+					jsonBusiness.put("file_format", mFileFormat);
+					jsonParams.put("business", jsonBusiness);
+				} catch (JSONException e) {
+					e.printStackTrace();
+					return null;
+				}
 
-	public String makeFrame(byte[] data) {
-		JSONObject jsonParams = new JSONObject();
-		if (mIsFirstFrame) {
-			JSONObject jsonBusiness = new JSONObject();
+				mIsFirstFrame = false;
+			}
+
+			JSONObject jsonData = new JSONObject();
 			try {
-				jsonBusiness.put("language", Common.mLanguage);
-				jsonBusiness.put("image_mode", Common.mImageMode);
-				jsonParams.put("business", jsonBusiness);
+				jsonData.put("image", Base64.getEncoder().encodeToString(data));
+				jsonParams.put("data", jsonData);
 			} catch (JSONException e) {
 				e.printStackTrace();
 				return null;
 			}
 
-			mIsFirstFrame = false;
+			return jsonParams.toString();
 		}
 
-		JSONObject jsonData = new JSONObject();
-		try {
-			jsonData.put("image", Base64.getEncoder().encodeToString(data));
-			jsonParams.put("data", jsonData);
-		} catch (JSONException e) {
-			e.printStackTrace();
-			return null;
-		}
-
-		return jsonParams.toString();
-	}
-
-	public void run() {
-		// 读取测试文件
-		byte[] imageData = Common.readFile(Common.mImageFile);
-		if (imageData == null || imageData.length == 0) {
-			System.out.println("读取图像文件出错");
-			return;
-		}
-
-		String strSendFrame = this.makeFrame(imageData);
-		if (strSendFrame != null) {
-			if (mClient.isClosed() || mClient.isClosing()) {
+		public void run() {
+			// 读取测试文件
+			byte[] imageData = readFile(mImageFile);
+			if (imageData == null || imageData.length == 0) {
+				System.out.println("读取图像文件出错");
 				return;
 			}
-			mClient.send(strSendFrame);
-		} else {
-			return;
+
+			String strSendFrame = this.makeFrame(imageData);
+			if (strSendFrame != null) {
+				if (mClient.isClosed() || mClient.isClosing()) {
+					return;
+				}
+				mClient.send(strSendFrame);
+			} else {
+				return;
+			}
 		}
 	}
-}
 
-public class cloud_websocket_ocr_test {
 
 	private static String HMACSHA256AndBase64(byte[] data, byte[] key) {
 		try {
@@ -163,14 +169,14 @@ public class cloud_websocket_ocr_test {
 		sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
 		String strRequestDateTime = sdf.format(cd.getTime());
 
-		String strSignatureOrg = "app_id:" + Common.mAppId + "\n";
+		String strSignatureOrg = "app_id:" + mAppId + "\n";
 		strSignatureOrg += "date:" + strRequestDateTime + "\n";
-		strSignatureOrg += "host:" + Common.mHost;
-		String strSignatureFinal = HMACSHA256AndBase64(strSignatureOrg.getBytes(), Common.mAppkey.getBytes());
+		strSignatureOrg += "host:" + mHost;
+		String strSignatureFinal = HMACSHA256AndBase64(strSignatureOrg.getBytes(), mAppkey.getBytes());
 
 		JSONObject jsonAuthorization = new JSONObject();
 		try {
-			jsonAuthorization.put("app_id", Long.toString(Common.mAppId));
+			jsonAuthorization.put("app_id", Long.toString(mAppId));
 			jsonAuthorization.put("signature", strSignatureFinal);
 		} catch (JSONException e) {
 			e.printStackTrace();
@@ -181,7 +187,7 @@ public class cloud_websocket_ocr_test {
 		String strAuthorizationFinal = "";
 		try {
 			strAuthorizationFinal = "authorization=" + URLEncoder.encode(strAuthorizationBase64, "UTF-8") + "&host="
-					+ URLEncoder.encode(Common.mHost, "UTF-8") + "&date="
+					+ URLEncoder.encode(mHost, "UTF-8") + "&date="
 					+ URLEncoder.encode(strRequestDateTime, "UTF-8");
 		} catch (UnsupportedEncodingException e) {
 			e.printStackTrace();
@@ -190,22 +196,26 @@ public class cloud_websocket_ocr_test {
 		return strAuthorizationFinal;
 	}
 
-	public static void main(String[] args) {
-		// 检查运行条件
-		if (Common.mAppId == 0L || Common.mAppkey == "") {
-			System.out.println("请填写账号信息");
-			return;
-		}
+	public static void TestOnce() {
+	    FileOutputStream [] fileOut = new FileOutputStream [1];
+	    if (mSaveToFile) {
+	      try {
+	        File f = new File(mSaveResultFile);
+	        fileOut[0] = new FileOutputStream(f);
+	      } catch (FileNotFoundException e1) {
+	        e1.printStackTrace();
+	      }
+	    }
 
 		// 开始连接
 		WebSocketClient wsClient = null;
 		try {
-			String strUrl = Common.mUrl + "?" + makeAuthorization();
+			String strUrl = mUrl + "?" + makeAuthorization();
 			wsClient = new WebSocketClient(new URI(strUrl), new Draft_6455()) {
 				@Override
 				public void onOpen(ServerHandshake handshakedata) {
 					// 启动数据发送线程
-					SendFrameThread sendThread = new SendFrameThread(this);
+					OCRSendFrameThread sendThread = new OCRSendFrameThread(this);
 					sendThread.start();
 				}
 
@@ -213,6 +223,10 @@ public class cloud_websocket_ocr_test {
 				public void onMessage(String message) {
 					JSONObject jsonObject = JSONObject.parseObject(message);
 					int iCode = jsonObject.getInteger("code");
+					
+					if (jsonObject.containsKey("task_id")) {
+						System.out.println("task id  " + jsonObject.getString("task_id"));
+					}
 
 					if (0 == iCode) {
 						// 正常流程
@@ -230,10 +244,21 @@ public class cloud_websocket_ocr_test {
 						Collections.sort(lsKeys);
 						for (int iIndex = 0; iIndex < lsKeys.size(); ++iIndex) {
 							System.out.println(mapOrderAndResult.get(lsKeys.get(iIndex)));
+							
+						    if (fileOut[0] != null) {
+							    try {
+							       fileOut[0].write(mapOrderAndResult.get(lsKeys.get(iIndex)).getBytes());
+						           String changeLine = "\n";
+						           fileOut[0].write(changeLine.getBytes());
+							    } catch (IOException e) {
+							      e.printStackTrace();
+							    }
+							}
 						}
 
 						if (isEnd) {
 							// 处理完毕主动关闭连接
+							System.out.println("task finish");
 							this.close();
 						}
 					} else {
@@ -266,5 +291,28 @@ public class cloud_websocket_ocr_test {
 		if (wsClient != null) {
 			wsClient.connect();
 		}
+		
+		try {
+			wsClient.closeBlocking();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		
+	    if (fileOut[0] != null) {
+	        try {
+	        	fileOut[0].close();
+	        } catch (IOException e) {
+	          e.printStackTrace();
+	        }
+	    }
 	}
+	
+	public static void main(String[] args) {
+		// 检查运行条件
+		if (mAppId == 0L || mAppkey == "") {
+			System.out.println("请填写账号信息");
+			return;
+		}
+		TestOnce();
+	}	
 }

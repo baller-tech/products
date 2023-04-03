@@ -26,11 +26,9 @@ import org.java_websocket.handshake.ServerHandshake;
 import com.alibaba.fastjson.JSONException;
 import com.alibaba.fastjson.JSONObject;
 
-/**
- * 
- * 信息配置类
- */
-class Common {
+
+public class cloud_websocket_tts_test {
+	
     // 地址配置
     public static String mUrl = "ws://api.baller-tech.com/v1/service/ws/v1/tts";
     public static String mHost = "api.baller-tech.com";
@@ -42,9 +40,9 @@ class Common {
 
     // 语种
     // 请查考《语音识别（TTS）WebSocket协议WebAPI开发文档.pdf》中“支持的语种以及采样格式”章节
-    public static String mLanguage = "";
+    public static String mLanguage = "zho";
     // 测试使用的文本文件
-    public static String mTxtFile = "";
+    public static String mTxtFile = "./data/txt/chs.txt";
     // 合成的音频文件格式
     // 请查考《语音识别（TTS）WebSocket协议WebAPI开发文档.pdf》中“支持的语种以及采样格式”章节
     public static String mSampleFormat = "audio/L16;rate=16000";
@@ -53,7 +51,7 @@ class Common {
     public static float mSpeed = 1.0f;
     // 合成的音频的发音人
     // 请查考《语音识别（TTS）WebSocket协议WebAPI开发文档.pdf》中“支持的发音人”章节
-    public static String mVoiceName = ""
+    public static String mVoiceName = "";
     // 合成的音频的压缩类型，
     // 请查考《语音识别（TTS）WebSocket协议WebAPI开发文档.pdf》中“支持的音频编码”章节
     public static String mAudioEncode = "raw";
@@ -89,72 +87,70 @@ class Common {
 
         return fileData;
     }
-}
+    
+    
+    /**
+     * 
+     * 发送数据的线程类
+     */
+    public static class TTSSendFrameThread extends Thread {
+        private WebSocketClient mClient;
+        private boolean mIsFirstFrame = true;
 
-/**
- * 
- * 发送数据的线程类
- */
-class SendFrameThread extends Thread {
-    private WebSocketClient mClient;
-    private boolean mIsFirstFrame = true;
+        TTSSendFrameThread(WebSocketClient wsClient) {
+            this.mClient = wsClient;
+        }
 
-    SendFrameThread(WebSocketClient wsClient) {
-        this.mClient = wsClient;
-    }
+        public String makeFrame(byte[] data) {
+            JSONObject jsonParams = new JSONObject();
+            if (mIsFirstFrame) {
+                JSONObject jsonBusiness = new JSONObject();
+                try {
+                    jsonBusiness.put("language", mLanguage);
+                    jsonBusiness.put("sample_format", mSampleFormat);
+                    jsonBusiness.put("audio_encode", mAudioEncode);
+                    jsonBusiness.put("speed", mSpeed);
+                    jsonBusiness.put("voice_name", mVoiceName);
+                    jsonParams.put("business", jsonBusiness);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                    return "";
+                }
 
-    public String makeFrame(byte[] data) {
-        JSONObject jsonParams = new JSONObject();
-        if (mIsFirstFrame) {
-            JSONObject jsonBusiness = new JSONObject();
+                mIsFirstFrame = false;
+            }
+
+            JSONObject jsonData = new JSONObject();
             try {
-                jsonBusiness.put("language", Common.mLanguage);
-                jsonBusiness.put("sample_format", Common.mSampleFormat);
-                jsonBusiness.put("audio_encode", Common.mAudioEncode);
-                jsonBusiness.put("speed", Common.mSpeed);
-                jsonBusiness.put("voice_name", Common.mVoiceName);
-                jsonParams.put("business", jsonBusiness);
+                jsonData.put("txt", Base64.getEncoder().encodeToString(data));
+                jsonParams.put("data", jsonData);
             } catch (JSONException e) {
                 e.printStackTrace();
-                return null;
+                return "";
             }
 
-            mIsFirstFrame = false;
+            return jsonParams.toString();
         }
 
-        JSONObject jsonData = new JSONObject();
-        try {
-            jsonData.put("txt", Base64.getEncoder().encodeToString(data));
-            jsonParams.put("data", jsonData);
-        } catch (JSONException e) {
-            e.printStackTrace();
-            return null;
-        }
-
-        return jsonParams.toString();
-    }
-
-    public void run() {
-        // 读取测试文件
-        byte[] imageData = Common.readFile(Common.mTxtFile);
-        if (imageData == null || imageData.length == 0) {
-            System.out.println("读取测试文件出错");
-            return;
-        }
-
-        String strSendFrame = this.makeFrame(imageData);
-        if (strSendFrame != null) {
-            if (mClient.isClosed() || mClient.isClosing()) {
+        public void run() {
+            // 读取测试文件
+            byte[] imageData = readFile(mTxtFile);
+            if (imageData == null || imageData.length == 0) {
+                System.out.println("读取测试文件出错");
                 return;
             }
-            mClient.send(strSendFrame);
-        } else {
-            return;
+
+            String strSendFrame = this.makeFrame(imageData);
+            if (strSendFrame != null) {
+                if (mClient.isClosed() || mClient.isClosing()) {
+                    return;
+                }
+                mClient.send(strSendFrame);
+            } else {
+                return;
+            }
         }
     }
-}
-
-public class cloud_websocket_tts_test {
 
     private static DataOutputStream mOutFile = null;
 
@@ -179,14 +175,14 @@ public class cloud_websocket_tts_test {
         sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
         String strRequestDateTime = sdf.format(cd.getTime());
 
-        String strSignatureOrg = "app_id:" + Common.mAppId + "\n";
+        String strSignatureOrg = "app_id:" + mAppId + "\n";
         strSignatureOrg += "date:" + strRequestDateTime + "\n";
-        strSignatureOrg += "host:" + Common.mHost;
-        String strSignatureFinal = HMACSHA256AndBase64(strSignatureOrg.getBytes(), Common.mAppkey.getBytes());
+        strSignatureOrg += "host:" + mHost;
+        String strSignatureFinal = HMACSHA256AndBase64(strSignatureOrg.getBytes(), mAppkey.getBytes());
 
         JSONObject jsonAuthorization = new JSONObject();
         try {
-            jsonAuthorization.put("app_id", Long.toString(Common.mAppId));
+            jsonAuthorization.put("app_id", Long.toString(mAppId));
             jsonAuthorization.put("signature", strSignatureFinal);
         } catch (JSONException e) {
             e.printStackTrace();
@@ -197,7 +193,7 @@ public class cloud_websocket_tts_test {
         String strAuthorizationFinal = "";
         try {
             strAuthorizationFinal = "authorization=" + URLEncoder.encode(strAuthorizationBase64, "UTF-8") + "&host="
-                    + URLEncoder.encode(Common.mHost, "UTF-8") + "&date="
+                    + URLEncoder.encode(mHost, "UTF-8") + "&date="
                     + URLEncoder.encode(strRequestDateTime, "UTF-8");
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
@@ -205,18 +201,12 @@ public class cloud_websocket_tts_test {
 
         return strAuthorizationFinal;
     }
-
-    public static void main(String[] args) {
-        // 检查运行条件
-        if (Common.mAppId == 0L || Common.mAppkey == "") {
-            System.out.println("请填写账号信息");
-            return;
-        }
-
+    
+    public static void TestOnce() {
         try {
-            mOutFile = new DataOutputStream(new FileOutputStream(Common.mSaveResultFile, true));
+            mOutFile = new DataOutputStream(new FileOutputStream(mSaveResultFile, true));
         } catch (FileNotFoundException e1) {
-            System.out.println("打开结果文件" + Common.mSaveResultFile + "失败");
+            System.out.println("打开结果文件" + mSaveResultFile + "失败");
             e1.printStackTrace();
             return;
         }
@@ -224,12 +214,12 @@ public class cloud_websocket_tts_test {
         // 开始连接
         WebSocketClient wsClient = null;
         try {
-            String strUrl = Common.mUrl + "?" + makeAuthorization();
+            String strUrl = mUrl + "?" + makeAuthorization();
             wsClient = new WebSocketClient(new URI(strUrl), new Draft_6455()) {
                 @Override
                 public void onOpen(ServerHandshake handshakedata) {
                     // 启动数据发送线程
-                    SendFrameThread sendThread = new SendFrameThread(this);
+                	TTSSendFrameThread sendThread = new TTSSendFrameThread(this);
                     sendThread.start();
                 }
 
@@ -239,6 +229,10 @@ public class cloud_websocket_tts_test {
                 public void onMessage(String message) {
                     JSONObject jsonObject = JSONObject.parseObject(message);
                     int iCode = jsonObject.getInteger("code");
+                    
+					if (jsonObject.containsKey("task_id")) {
+						System.out.println("task id  " + jsonObject.getString("task_id"));
+					}
 
                     if (0 == iCode) {
                         // 正常流程
@@ -255,7 +249,7 @@ public class cloud_websocket_tts_test {
                         if (isEnd) {
                             // 处理完毕主动关闭连接
                             this.close();
-                            System.out.println("语音合成完毕");
+							System.out.println("task finish");
                         }
                     } else {
                         // 出错流程
@@ -287,5 +281,27 @@ public class cloud_websocket_tts_test {
         if (wsClient != null) {
             wsClient.connect();
         }
+        
+		try {
+			wsClient.closeBlocking();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		
+		try {
+			mOutFile.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    }
+
+    public static void main(String[] args) {
+        // 检查运行条件
+        if (mAppId == 0L || mAppkey == "") {
+            System.out.println("请填写账号信息");
+            return;
+        }
+        TestOnce();
     }
 }

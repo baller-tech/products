@@ -3,8 +3,8 @@ package com.baller.test;
 import android.os.Handler;
 import android.os.Message;
 
-import java.io.File;
-import java.io.FileOutputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
 import java.security.MessageDigest;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -12,11 +12,12 @@ import java.util.Locale;
 import java.util.TimeZone;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public class BallerBase extends Thread {
+class BallerBase extends Thread {
     AtomicBoolean finish = new AtomicBoolean(false);
-    static long mAppId = 1187565976207491106L;
-    static String mAppkey = "165a8fdeb9ba57c3bc81547a275c6552";
-    Handler mHandler = null;
+    static String mHost = "api.baller-tech.com";
+    static long mAppId = 0L;
+    static String mAppkey = "";
+    private Handler mHandler = null;
 
     static String getGmtTime() {
         SimpleDateFormat sdf3 = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss z", Locale.US);
@@ -39,28 +40,16 @@ public class BallerBase extends Thread {
         mHandler.sendMessage(msg);
     }
 
-    private void saveFile(byte[] audio) {
-        getFile(audio, "/sdcard/baller/", "tmp.pcm");
-
-    }
-
-    private void getFile(byte[] bfile, String filePath, String fileName) {
-        try {
-            File file = new File(filePath);
-            if (!file.exists()) {
-                file.mkdirs();
-            }
-            File tempWav = new File(file, "temp.pcm");
-            if (!tempWav.exists())
-                tempWav.createNewFile();
-            FileOutputStream fos = new FileOutputStream(tempWav, true);
-            if (0 != bfile[0])
-                fos.write(bfile);
-            fos.flush();
-            fos.close();
-        } catch (Exception e) {
-            e.printStackTrace();
+    static byte[] readStream(InputStream inStream) throws Exception{
+        ByteArrayOutputStream outStream = new ByteArrayOutputStream();
+        byte[] buffer = new byte[1024];
+        int len;
+        while((len = inStream.read(buffer)) != -1)
+        {
+            outStream.write(buffer,0,len);
         }
+        inStream.close();
+        return outStream.toByteArray();
     }
 
     static String MD5(String sourceStr) {

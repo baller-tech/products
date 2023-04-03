@@ -34,13 +34,7 @@ class BallerPermission {
                     break;
                 }
             }
-            if(isAllGranted){
-                //已全部授权
-                return true;
-            }else{
-                //权限有缺失
-                return false;
-            }
+            return isAllGranted;
         } else {
             Log.i("permission", "requestCode: " + String.valueOf(requestCode));
             return false;
@@ -65,12 +59,6 @@ class BallerPermission {
         };
     }
 
-    /**
-     * 获取缺失的权限
-     * @param context
-     * @param permissions
-     * @return 返回缺少的权限，null 意味着没有缺少权限
-     */
     private static String[] getDeniedPermissions(Context context, String[] permissions){
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             ArrayList<String> deniedPermissionList = new ArrayList<>();
@@ -87,21 +75,12 @@ class BallerPermission {
         return null;
     }
 
-    /**
-     * 弹出对话框请求权限
-     * @param activity
-     * @param permissions
-     * @param requestCode
-     */
     private static void requestPermissions(Activity activity, String[] permissions, int requestCode){
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             activity.requestPermissions(permissions, requestCode);
         }
     }
 
-    /**
-     * 开始请求缺少的权限。
-     */
     int checkPermissions(){
         String[] deniedPermissions = getDeniedPermissions(mActivity, getPermissions());
         if(deniedPermissions != null && deniedPermissions.length > 0){

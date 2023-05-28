@@ -50,7 +50,7 @@ def on_message(ws, message):
         print(f"task id {message_values['task_id']}")
 
     if 0 != message_values["code"]:
-        print(f"mt failed {message_values['code']} {message_values['message']}")
+        print(f"nmt failed {message_values['code']} {message_values['message']}")
     else:
         # 获取结果
         if message_values["data"]:

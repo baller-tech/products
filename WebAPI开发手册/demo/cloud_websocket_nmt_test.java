@@ -27,7 +27,7 @@ import com.alibaba.fastjson.JSONException;
 import com.alibaba.fastjson.JSONObject;
 
 
-public class cloud_websocket_mt_test {
+public class cloud_websocket_nmt_test {
 	
 	// 地址配置
 	public static String mUrl = "ws://api.baller-tech.com/v1/service/ws/v1/mt";

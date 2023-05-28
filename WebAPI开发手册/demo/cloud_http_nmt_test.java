@@ -24,7 +24,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
-public class cloud_http_mt_test {
+public class cloud_http_nmt_test {
 
   // 请求地址
   public static String mUrl = "http://api.baller-tech.com/v1/service/v1/mt";
@@ -39,7 +39,7 @@ public class cloud_http_mt_test {
   public static String mSaveResultFile = mTxtFile + "_out.txt";
 
   // 测试语种
-  // 请查考《机器翻译（MT）HTTP协议WebAPI开发文档.pdf》中“支持的语种”章节
+  // 请查考《机器翻译（NMT）HTTP协议WebAPI开发文档.pdf》中“支持的语种”章节
   public static String mLanguage = "uig-chs";
   // 是否将结果保存到文件
   public static boolean mSaveToFile = true;

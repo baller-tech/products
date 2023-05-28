@@ -25,7 +25,7 @@
 
 #include "baller_errors.h"
 #include "baller_common.h"
-#include "baller_mt.h"
+#include "baller_nmt.h"
 
 // 由北京大牛儿科技发展有限公司统一分配
 #define BALLER_ORG_ID                              (0LL)
@@ -177,9 +177,9 @@ void print_result(const char* result)
 }
 
 #ifdef _WIN32
-DWORD WINAPI test_mt(LPVOID param)
+DWORD WINAPI test_nmt(LPVOID param)
 #else
-void * test_mt(void * param)
+void * test_nmt(void * param)
 #endif
 {
     int ret = BALLER_SUCCESS;
@@ -191,13 +191,13 @@ void * test_mt(void * param)
     std::string session_prams = std::string("res_dir=") + BALLER_RES_DIR
         + std::string(",language=") + BALLER_LANG
         + std::string(",engine_type=local,hardware=cpu_slow");
-    ret = BallerMTSessionBegin(session_prams.c_str(), &session_id);
+    ret = BallerNMTSessionBegin(session_prams.c_str(), &session_id);
     if (ret != BALLER_SUCCESS)
     {
-        printf("call BallerMTSessionBegin failed(%d)\n", ret);
+        printf("call BallerNMTSessionBegin failed(%d)\n", ret);
         return 0;
     }
-    printf("call BallerMTSessionBegin success\n");
+    printf("call BallerNMTSessionBegin success\n");
 
     int max_elapsed = INT_MIN;
     int min_elapsed = INT_MAX;
@@ -209,28 +209,28 @@ void * test_mt(void * param)
     {
         for (int file_index = 0; file_index < thread_param->vec_test_file_name.size(); ++file_index)
         {
-            // 调用BallerMTPut接口
+            // 调用BallerNMTPut接口
             std::chrono::system_clock::time_point start = std::chrono::system_clock::now();
-            ret = BallerMTPut(session_id, put_param.c_str(), thread_param->vec_test_data[file_index]);
+            ret = BallerNMTPut(session_id, put_param.c_str(), thread_param->vec_test_data[file_index]);
             if (ret != BALLER_SUCCESS)
             {
-                printf("call BallerMTPut failed(%d)\n", ret);
+                printf("call BallerNMTPut failed(%d)\n", ret);
                 break;
             }
 #ifndef BALLER_TEST_RTF
-            printf("call BallerMTPut success\n");
+            printf("call BallerNMTPut success\n");
 #endif /*BALLER_TEST_RTF*/
 
-            // 循环调用BallerMTGet接口
+            // 循环调用BallerNMTGet接口
             while (true)
             {
                 char *result = NULL;
-                ret = BallerMTGet(session_id, &result);
+                ret = BallerNMTGet(session_id, &result);
                 if (BALLER_MORE_RESULT == ret)
                 {
 #ifndef BALLER_TEST_RTF
                     print_result(result);
-                    // 还有识别结果需要获取 需继续调用BallerMTGet
+                    // 还有识别结果需要获取 需继续调用BallerNMTGet
                     // 为了避免浪费CPU资源停10ms在继续获取，10ms为经验值，具体停留的时间需根据机器性能和业务需求综合考虑
                     BALLER_SLEEP_MS(10);
 #endif /*BALLER_TEST_RTF*/
@@ -241,13 +241,13 @@ void * test_mt(void * param)
 #ifndef BALLER_TEST_RTF
                     print_result(result);
                     printf("\n");
-                    printf("BallerMTGet Finish\n");
+                    printf("BallerNMTGet Finish\n");
 #endif /*BALLER_TEST_RTF*/
                     break;
                 }
                 else
                 {
-                    printf("call BallerMTGet failed(%d)\n", ret);
+                    printf("call BallerNMTGet failed(%d)\n", ret);
                     break;
                 }
             }
@@ -276,12 +276,12 @@ void * test_mt(void * param)
         }
     }
 
-    ret = BallerMTSessionEnd(session_id);
+    ret = BallerNMTSessionEnd(session_id);
     if (ret != BALLER_SUCCESS)
     {
-        printf("call BallerMTSessionEnd failed. Return Code: %d\n", ret);
+        printf("call BallerNMTSessionEnd failed. Return Code: %d\n", ret);
     }
-    printf("call BallerMTSessionEnd success\n");
+    printf("call BallerNMTSessionEnd success\n");
 
     return 0;
 }
@@ -363,14 +363,14 @@ int main(int argc, char ** argv)
 #ifdef _WIN32
     std::vector<HANDLE> thread_handle;
     for (int thread_idx = 0; thread_idx < BALLER_THREAD_COUNT; ++thread_idx) {
-        thread_handle.push_back(::CreateThread(0, 0, test_mt, &thread_param, 0, 0));
+        thread_handle.push_back(::CreateThread(0, 0, test_nmt, &thread_param, 0, 0));
     }
     ::WaitForMultipleObjects((DWORD)thread_handle.size(), &thread_handle[0], TRUE, INFINITE);
 #else
     std::vector<pthread_t> thread_handle;
     for (int thread_idx = 0; thread_idx < BALLER_THREAD_COUNT; ++thread_idx) {
         pthread_t sub_handle;
-        pthread_create(&sub_handle, 0, test_mt, &thread_param);
+        pthread_create(&sub_handle, 0, test_nmt, &thread_param);
         thread_handle.push_back(sub_handle);
     }
     for (int thread_idx = 0; thread_idx < BALLER_THREAD_COUNT; ++thread_idx) {

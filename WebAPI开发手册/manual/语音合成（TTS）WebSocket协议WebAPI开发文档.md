@@ -195,8 +195,14 @@ host:api.baller-tech.com
 | 发音人       | 语种           | 备注 |
 | ------------ | -------------- | ---- |
 | yiyi         | 中文           | 支持 |
-| qianqian     | 中文           | 支持 |
+| runrun | 中文           | 支持 |
 | ruirui       | 中文           | 支持 |
+| nana | 中文 | 支持 |
+| lili | 中文 | 支持 |
+| mingxuan | 中文 | 支持 |
+| yueni | 中文 | 支持 |
+| muze | 中文 | 支持 |
+| tingyan | 中文 | 支持 |
 | mary         | 英语（英音）   | 支持 |
 | victoria     | 英语（英音）   | 支持 |
 | bonnie       | 英语（英音）   | 支持 |

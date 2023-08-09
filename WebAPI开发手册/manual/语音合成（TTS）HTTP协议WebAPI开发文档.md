@@ -53,6 +53,7 @@ audio_encode| string | 音频编码格式；参见[支持的音频编码](#suppo
 speed| float | 音频输出的语速；参见[语速的取值范围](#support_speed_range) | 1.0 
 tempo| float | 音频输出的节奏；参见[节奏的取值范围](#support_tempo_range) | 0 
 pitch| float | 音频输出的音调；参见[音调的取值范围](#support_pitch_range) | 0 
+volume| float | 音频输出的音量；参见[音量的取值范围](#support_volume) | 1.0 
 voice_name| string | 合成的发音人；参见[支持的发音人](#support_voice_name) | guli 
 callback_url | string | 合成结果推送的回调地址；</br>通过调用HTTP的GET方法获取合成结果时不需设置 | http://192.168.1.234:18888/tts/callback
 
@@ -158,18 +159,20 @@ B-Is-End | string | 合成结果是否获取结束（"1"：结束；"0"：未结
 
 ## <span id="support_speed_range">语速的取值范围</span>
 
-1. 语速取值范围为0.5到2.0，0.5最慢，1.0为正常语速，2.0最快。
-2. 目前仅有中文、英文两个语种支持调整语速。
+1. 语速取值范围为0.5到2.0，0.5最慢，1.0为正常，2.0最快。
 
 ## <span id="support_tempo_range">节奏的取值范围</span>
 
-1. 节奏取值范围为-50到50，-50最慢，0为正常语速，50最快。
-2. 目前仅有中文、英文两个语种支持调整节奏。
+1. 节奏取值范围为-50到50，-50最慢，0为正常，50最快。
 
 ## <span id="support_pitch_range">音调的取值范围</span>
 
-1. 音调取值范围为-10到10，-10最慢，0为正常语速，10最快。
-2. 目前仅有中文、英文两个语种支持调整音调。
+1. 节奏取值范围为-50到50，-50最慢，0为正常，50最快。
+
+## <span id="support_volume">音量的取值范围</span>
+
+1. 音量的取值范围为0.0到1.0，0.0音量最低，1.0音量最高，默认1.0。 
+2. 目前仅中文、英文支持音量设置，其他语种仅支持音量为1.0的值。
 
 ## <span id="support_voice_name">支持的发音人</span>
 
@@ -185,8 +188,6 @@ B-Is-End | string | 合成结果是否获取结束（"1"：结束；"0"：未结
 | muze | 中文 | 支持 |
 | tingyan | 中文 | 支持 |
 | mary         | 英语（英音）   | 支持 |
-| victoria     | 英语（英音）   | 支持 |
-| bonnie       | 英语（英音）   | 支持 |
 | elise        | 英语（美音）   | 支持 |
 | regina       | 英语（美音）   | 支持 |
 | aodeng       | 蒙语（传统）   | 支持 |

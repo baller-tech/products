@@ -86,6 +86,7 @@ host:api.baller-tech.com
 | speed | float | 是 | 无 | 音频输出的语速；参见[语速的取值范围](#support_speed_range) |
 | tempo         | float  | 否       | 0                    | 音频输出的节奏；参见[节奏的取值范围](#support_tempo_range)  |
 | pitch         | float  | 否       | 0                    | 音频输出的音调；参见[音调的取值范围](#support_pitch_range)  |
+| volume | float | 是 | 1.0 | 音频输出的音量；参见[音量的取值范围](#support_volume) |
 
 ##### sample_format 介绍
 &#8195; &#8195;根据RFC对MIME格式的定义，使用audio/Lxx;rate=xxxxx 表明采样格式，audio/L后面的数字表示音频的采样点大小（单位bit）, rate=后面的数字表示音频 的采样率（单位hz）。<br>
@@ -177,18 +178,20 @@ host:api.baller-tech.com
 
 ## <span id="support_speed_range">语速的取值范围</span>
 
-1. 语速取值范围为0.5到2.0，0.5最慢，1.0为正常语速，2.0最快。
-2. 目前仅有中文、英文两个语种支持调整语速。
+1. 语速取值范围为0.5到2.0，0.5最慢，1.0为正常，2.0最快。
 
 ## <span id="support_tempo_range">节奏的取值范围</span>
 
-1. 节奏取值范围为-50到50，-50最慢，0为正常语速，50最快。
-2. 目前仅有中文、英文两个语种支持调整节奏。
+1. 节奏取值范围为-50到50，-50最慢，0为正常，50最快。
 
 ## <span id="support_pitch_range">音调的取值范围</span>
 
-1. 音调取值范围为-10到10，-10最慢，0为正常语速，10最快。
-2. 目前仅有中文、英文两个语种支持调整音调。
+1. 音调取值范围为-10到10，-10最低，0为正常，10最高。
+
+## <span id="support_volume">音量的取值范围</span>
+
+1. 音量的取值范围为0.0到1.0，0.0音量最低，1.0音量最高，默认1.0。
+2. 目前仅中文、英文支持音量设置，其他语种仅支持音量为1.0的值。
 
 ## <span id="support_voice_name">支持的发音人</span>
 
@@ -204,8 +207,6 @@ host:api.baller-tech.com
 | muze | 中文 | 支持 |
 | tingyan | 中文 | 支持 |
 | mary         | 英语（英音）   | 支持 |
-| victoria     | 英语（英音）   | 支持 |
-| bonnie       | 英语（英音）   | 支持 |
 | elise        | 英语（美音）   | 支持 |
 | regina       | 英语（美音）   | 支持 |
 | aodeng       | 蒙语（传统）   | 支持 |

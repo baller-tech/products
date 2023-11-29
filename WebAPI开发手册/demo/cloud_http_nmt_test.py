@@ -107,6 +107,7 @@ def get_result(request_id, out_file):
         print(f"{response_content['data']}")
         if out_file:
             out_file.write(response_content['data'])
+            out_file.flush()
 
     return 1 == int(response_content["is_end"])
 

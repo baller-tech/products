@@ -84,6 +84,7 @@ def on_message(ws, message):
             print(f"{message_values['data']}")
             if ws.out_file:
                 ws.out_file.write(message_values['data'])
+                ws.out_file.flush()
             if show_offset:
                 print(f"begin = {message_values['begin']} ms end = {message_values['end']} ms")
     

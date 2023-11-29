@@ -57,6 +57,7 @@ def on_message(ws, message):
             result = message_values['data']
             if ws.out_file:
                 ws.out_file.write(result)
+                ws.out_file.flush()
             print(result)
 
     # 最后一帧时关闭WebSocket连接

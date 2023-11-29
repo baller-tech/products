@@ -116,6 +116,7 @@ def get_result(request_id, pcm_file):
     code = response.headers["B-Code"]
     if 0 == int(code):
         pcm_file.write(response.content)
+        pcm_file.flush()
     else:
         print(f"{request_id} GET failed {response.headers['B-Code']} {response.headers['B-Message']}")
     return 1 == int(response.headers["B-Is-End"])

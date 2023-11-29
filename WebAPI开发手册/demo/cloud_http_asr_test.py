@@ -143,6 +143,7 @@ def get_result(request_id, out_file):
             print(f"{response_content['data']}")
             if out_file:
                 out_file.write(response_content['data'])
+                out_file.flush()
             if show_offset:
                 print(f"begin = {response_content['begin']} ms end = {response_content['end']} ms")
 

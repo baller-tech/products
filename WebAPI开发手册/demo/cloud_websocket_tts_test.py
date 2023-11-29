@@ -70,6 +70,7 @@ def on_message(ws, message):
     if message_values["data"]:
         if ws.result_file:
             ws.result_file.write(base64.b64decode(message_values['data']))
+            ws.result_file.flush()
 
     # 最后一帧时关闭WebSocket连接
     if 1 == message_values["is_end"]:

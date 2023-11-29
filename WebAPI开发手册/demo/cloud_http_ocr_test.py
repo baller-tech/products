@@ -124,6 +124,7 @@ def get_result(request_id, out_file):
                 print(value)
                 if out_file:
                     out_file.write(value + "\n")
+                    out_file.flush()
 
     else:
         print(f"{request_id} GET failed {response_content['code']} {response_content['message']}")

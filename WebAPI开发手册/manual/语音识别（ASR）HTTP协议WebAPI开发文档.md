@@ -57,7 +57,7 @@ sample_format| string | 采样格式，参见[支持的语种和采样格式](#s
 language| string | 语种，参见[支持的语种和采样格式](#support_language)| zho
 input_mode| string | 音频数据的发送模式，支持以下字段:<br>  &#8195;once<br>  &#8195;continue<br>  &#8195;end | once
 service_type  | string  | 服务类型，支持以下字段:<br> &#8195;sentence: 句子识别（默认值，任务有时长限制）<br> &#8195;realtime: 实时识别（任务无时长限制） | sentence
-dynamic_correction| string | 是否启用动态纠正:<br>&#8195; on : 启用（暂不支持） <br>&#8195;off: 不启用（默认值） | off
+dynamic_correction| string | 是否启用动态纠正:<br>&#8195; on : 启用 <br>&#8195;off: 不启用（默认值） | off
 vad| string | 是否启用端点检测，支持以下字段:<br>  &#8195;on: 启用（默认值）<br>  &#8195;off: 不启用 | on
 callback_url | string | 识别结果推送的回调地址；<br>通过调用HTTP的GET方法获取识别结果时不需设置 | http://192.168.1.234:18888/ocr/callback
 

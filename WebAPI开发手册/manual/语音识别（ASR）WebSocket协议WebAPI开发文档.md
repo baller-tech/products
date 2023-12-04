@@ -89,7 +89,7 @@ host:api.baller-tech.com
 | audio_format | string | 是 | 音频格式；参见 参见[支持的音频格式](#support_audio_format)  |
 | service_type  | string  | 否  | 服务类型:<br> sentence: 句子识别（默认值，任务有时长限制）<br/> realtime: 实时识别（任务无时长限制） |
 | vad  | string  | 否  | 是否启用端点检测:<br> on : 启用（默认值）<br> off: 不启用 |
-| dynamic_correction | string | 否 | 是否启用动态纠正:<br> on : 启用（暂不支持）<br> off: 不启用（默认值） |
+| dynamic_correction | string | 否 | 是否启用动态纠正:<br> on : 启用<br> off: 不启用（默认值） |
 
 
 ##### sample_format 介绍

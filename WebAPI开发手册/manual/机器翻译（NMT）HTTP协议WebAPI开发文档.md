@@ -109,3 +109,5 @@ request_id | string | 本次机器翻译事务的请求ID；<br/>需与POST时�
 | 中文翻译为彝文                  | chs-iii            |
 | 中文翻译为壮文                  | chs-zha            |
 | 中文翻译为韩文                  | chs-kor            |
+| 中文翻译为英文 | zho-eng |
+| 英文翻译为中文 | eng-zho |

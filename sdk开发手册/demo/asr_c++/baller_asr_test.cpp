@@ -1,721 +1,246 @@
 #ifdef _WIN32
 #include <windows.h>
-#include <conio.h>
-#include <locale.h>
-#else
-#include <pthread.h>
-#include <limits.h>
-#include <unistd.h>
-#include <dirent.h>
-#include <sys/stat.h>
-#endif // _WIN32
+#endif 
 
-#include <stdio.h>
-#include <stdlib.h>
+#include <iostream>
 #include <chrono>
+#include <thread>
 #include <string>
-#include <fstream>
-#include <vector>
 #include <sstream>
-#include <iomanip>
-#include <memory>
-#include <string.h>
+#include <vector>
+#include <fstream>
 
 #include "baller_errors.h"
 #include "baller_common.h"
 #include "baller_asr.h"
 
-/**
- * ¸ù¾İ¿ª·¢ÊÖ²á»òballer_asr.hÖĞµÄÃèÊö£¬baller asr sdkÖ§³ÖËÄÖÖ³£ÓÃµÄÊ¹ÓÃ³¡¾°£¬µ÷ÓÃÕß¸ù¾İ×Ô¼ºµÄĞèÇóÈ·¶¨ÊôÓÚÄÄÒ»Àà³¡¾°¡£
- * 1. ÒôÆµÊı¾İÒ»´ÎĞÔÊäÈëÇÒ²»ĞèÒª¶¯Ì¬ĞŞÕı
- * 2. ÒôÆµÊı¾İÒ»´ÎĞÔÊäÈëÇÒĞèÒª¶¯Ì¬ĞŞÕı
- * 3. ÒôÆµÊı¾İÁ¬ĞøÊäÈëÇÒ²»ĞèÒª¶¯Ì¬ĞŞÕı
- * 4. ÒôÆµÊı¾İÁ¬ĞøÊäÈëÇÒĞèÒª¶¯Ì¬ĞŞÕı
- * 
- * ±¾Ê¾ÀıÖĞ·Ö±ğÏÔÊ¾ÁËËÄÖÖ³¡¾°µ÷ÓÃµÄºËĞÄ´úÂëµÄÂß¼­£¬³¡¾°ÓëºËĞÄ´úÂëÂß¼­µÄ¶ÔÓ¦¹ØÏµÎª£º
- * 1. ÒôÆµÊı¾İÒ»´ÎĞÔÊäÈëÇÒ²»ĞèÒª¶¯Ì¬ĞŞÕı ÇëÖØµã²Î¿¼ test_once_whitout_dynamic_correction ·½·¨
- * 2. ÒôÆµÊı¾İÒ»´ÎĞÔÊäÈëÇÒĞèÒª¶¯Ì¬ĞŞÕı ÇëÖØµã²Î¿¼ test_once_with_dynamic_correction ·½·¨
- * 3. ÒôÆµÊı¾İÁ¬ĞøÊäÈëÇÒ²»ĞèÒª¶¯Ì¬ĞŞÕı ÇëÖØµã²Î¿¼ test_continue_whitout_dynamic_correction ·½·¨
- * 4. ÒôÆµÊı¾İÁ¬ĞøÊäÈëÇÒĞèÒª¶¯Ì¬ĞŞÕı  ÇëÖØµã²Î¿¼ test_continue_with_dynamic_correction ·½·¨
- */
 
- // ÓÉ±±¾©ÊĞ´óÅ£¶ù¿Æ¼¼·¢Õ¹ÓĞÏŞ¹«Ë¾Í³Ò»·ÖÅä
-#define ORG_ID                            (0LL)
-#define APP_ID                            (0LL)
-#define APP_KEY                           ("")
+// ç”±åŒ—äº¬å¸‚å¤§ç‰›å„¿ç§‘æŠ€å‘å±•æœ‰é™å…¬å¸ç»Ÿä¸€åˆ†é…
+#define ORG_ID                            (0)
+#define APP_ID                            (0)
+#define APP_KEY                           ("0")
 
-// ×ÊÔ´ÎÄ¼ş´æ·ÅµÄÂ·¾¶
-#define DATA_PATH                       ("data")
-// ÒôÆµ²ÉÑù¸ñÊ½
-#define SAMPLE_RATE                     (16000)
-#define SAMPLE_SIZE                     (16)
-// ¿ÉÓÃÓïÖÖÇë²Î¿¼SDK¶ÔÓ¦µÄ¿ª·¢ÊÖ²á
-#define LANGUAGE                        ("tib_ad")
-// Ö§³ÖµÄÒôÆµ¸ñÊ½Çë²Î¿¼SDK¶ÔÓ¦µÄ¿ª·¢ÊÖ²á
-#define AUDIO_FROMAT                    ("raw")
-// ²âÊÔÒôÆµ
-#define PCM_FILE                        ("tib_ad.pcm")
-// ÊÇ·ñ´òÓ¡×Ó¾äµÄÆ«ÒÆĞÅÏ¢
-#define PRINT_OFFSET                    (0)
+static std::string g_language = "";
+static std::string g_pcm_file_name = "";
+static int g_loop_count = 1;
+static std::vector<char> g_pcm_data;
 
-#ifdef _WIN32
-#define get_thread_id   ::GetCurrentThreadId()
-#else  // unix-like
-#define get_thread_id   pthread_self()
-#endif // _WIN32 / unix-like
-
-typedef struct t_s_thread_param {
-    const char * dir;
-    const char * language;
-    char * pcm_data;
-    int pcm_data_len;
-    int loop_cnt;
-
-    int sample_rate;
-    int sample_size;
-} s_thread_param;
-
-typedef struct tag_sentence_info {
-    std::string strResult;
-    int iStatus;
-    unsigned int uStartTime;
-    unsigned int uEndTime;
-} s_sentence_info;
-
-#ifdef _WIN32
-static char *
-u8_to_gb(
-    const char * u8_str
-)
+template <typename T>
+static bool ReadFile(const std::string& name, std::vector<T>& buf)
 {
-    int u16_count = ::MultiByteToWideChar(CP_UTF8, 0, u8_str, -1, 0, 0);
-    unsigned short * u16_str = (unsigned short *)malloc(sizeof(unsigned short) * (u16_count + 1));
-    memset(u16_str, 0, sizeof(unsigned short) * (u16_count + 1));
-    ::MultiByteToWideChar(CP_UTF8, 0, u8_str, -1, (LPWSTR)u16_str, u16_count);
-
-    int gb_count = ::WideCharToMultiByte(CP_ACP, 0, (LPCWSTR)u16_str, -1, 0, 0, 0, 0);
-    char * gb_str = (char *)malloc(sizeof(char) * (gb_count + 1));
-    memset(gb_str, 0, sizeof(char) * (gb_count + 1));
-    ::WideCharToMultiByte(CP_ACP, 0, (LPCWSTR)u16_str, -1, gb_str, gb_count, 0, 0);
-
-    free(u16_str);
-
-    return gb_str;
-}
-#endif // _WIN32
-
-void BallerSleepMSec(int iMSec)
-{
-#ifdef _WIN32
-    Sleep(iMSec);
-#else
-    usleep(iMSec * 1000);
-#endif
-}
-
-int ReadPCMData(const char* pszFile, char** ppPCMData, int* piPCMDataLen)
-{
-    FILE* pFile = fopen(pszFile, "rb");
-    if (pFile == 0)
+    std::ifstream file(name.c_str(), std::ifstream::binary | std::ifstream::ate);
+    if (file.is_open())
     {
-        return 0;
-    }
-    fseek(pFile, 0, SEEK_END);
-    *piPCMDataLen = (int)(ftell(pFile));
-    if (*piPCMDataLen == 0)
-    {
-        fclose(pFile);
-        return 0;
-    }
-
-    *ppPCMData = (char *)malloc(*piPCMDataLen);
-    memset(*ppPCMData, 0, *piPCMDataLen);
-
-    fseek(pFile, 0, SEEK_SET);
-    fread(*ppPCMData, 1, *piPCMDataLen, pFile);
-
-    fclose(pFile);
-    return *piPCMDataLen;
-}
-
-void show_full_result(const std::vector<s_sentence_info>& vecResult)
-{
-    for (std::size_t iIndex = 0; iIndex < vecResult.size(); ++iIndex)
-    {
-#ifdef _WIN32
-        char * gb = u8_to_gb(vecResult[iIndex].strResult.c_str());
-        printf("%s\n", gb);
-        free(gb);
-#else
-        printf("%s\n", vecResult[iIndex].strResult.c_str());
-#endif
-
-#if PRINT_OFFSET
-        if (BALLER_ASR_STATUS_COMPLETE  == vecResult[iIndex].iStatus && vecResult[iIndex].uEndTime != 0)
+        buf.resize(file.tellg() / sizeof(T));
+        file.seekg(0, file.beg);
+        if (buf.size() > 0)
         {
-            printf("start: %u ms end: %u\n", vecResult[iIndex].uStartTime, vecResult[iIndex].uEndTime);
+            file.read((char*)&buf[0], buf.size() * sizeof(T));
         }
-#endif /*PRINT_OFFSET*/
+        return true;
     }
 
-    printf("\n");
+    return false;
 }
 
-void test_once_whitout_dynamic_correction(baller_session_id session_id, char* pPCMData, int iPCMDataLen)
+int DoTask(baller_session_id& session_id)
 {
-    std::string strOnceParams = std::string("input_mode=once, vad=on, audio_format=") + std::string(AUDIO_FROMAT);
-    int iRet = BallerASRPut(session_id, strOnceParams.c_str(), pPCMData, iPCMDataLen);
-    if (BALLER_SUCCESS != iRet)
+    // æ¨¡æ‹Ÿå½•éŸ³è®¾å¤‡é‡‡é›†å£°éŸ³ï¼Œæ¯éš”40msåå‡ºä¸€æ¬¡40msçš„éŸ³é¢‘
+    const int pre_byte_size = 16 * 2 * 40;
+    int used_size = 0;
+    int ret = BALLER_SUCCESS;
+
+    char *result = nullptr;
+    int result_len = 0;
+    int curr_status = BALLER_ASR_STATUS_INCOMPLETE;
+    unsigned int start_time = 0;
+    unsigned int end_time = 0;
+
+    while (g_pcm_data.size() - used_size > pre_byte_size)
     {
-        printf("Call BallerASRPut failed. Return Code: %d\n", iRet);
-        return;
+        std::stringstream put_param;
+        put_param << "dynamic_correction=on" << ",input_mode=continue";
+        ret = BallerASRPut(session_id, put_param.str().c_str(), g_pcm_data.data() + used_size, pre_byte_size);
+        used_size += pre_byte_size;
+        if (BALLER_SUCCESS != ret)
+        {
+            std::cout << "call BallerASRPut failed(" << ret << ")" << std::endl;
+            return ret;
+        }
+
+        result = nullptr;
+        result_len = 0;
+        curr_status = BALLER_ASR_STATUS_INCOMPLETE;
+        start_time = 0;
+        end_time = 0;
+        ret = BallerASRGet(session_id, &result, &result_len, &curr_status, &start_time, &end_time);
+        if (BALLER_SUCCESS == ret)
+        {
+            // ä»»åŠ¡è®¡ç®—ç»“æŸ
+            if (result && result_len > 0)
+            {
+                std::cout << "status=" << curr_status << " result=" << result << std::endl;
+            }
+            return ret;
+        }
+        else if (BALLER_MORE_RESULT == ret)
+        {
+            // è¿˜æœ‰è®¡ç®—ç»“æœæ²¡æœ‰å–å‡º
+            if (result && result_len > 0)
+            {
+                std::cout << "status=" << curr_status << " result=" << result << std::endl;
+            }
+        }
+        else
+        {
+            // ä»»åŠ¡å‡ºé”™
+            std::cout << "call BallerASRGet failed(" << ret << ")" << std::endl;
+            return ret;
+        }
     }
 
-    std::vector<s_sentence_info> vecResult;
-    while (1)
+    int left_size = g_pcm_data.size() - used_size;
+    std::stringstream put_param;
+    put_param << "dynamic_correction=on" << ",input_mode=end";
+    ret = BallerASRPut(session_id, put_param.str().c_str(), g_pcm_data.data() + used_size, left_size);
+    if (BALLER_SUCCESS != ret)
     {
-        char *pResult = NULL;
-        int iResultLen = 0;
-        int iStatus = 0;
-        unsigned int uStartTime = 0;
-        unsigned int uEndTime = 0;
+        std::cout << "call BallerASRPut failed(" << ret << ")" << std::endl;
+        return ret;
+    }
 
-        iRet = BallerASRGet(session_id, &pResult, &iResultLen, &iStatus, &uStartTime, &uEndTime);
-        if (BALLER_SUCCESS == iRet)
+    while (true)
+    {
+        result = nullptr;
+        result_len = 0;
+        curr_status = BALLER_ASR_STATUS_INCOMPLETE;
+        start_time = 0;
+        end_time = 0;
+
+        ret = BallerASRGet(session_id, &result, &result_len, &curr_status, &start_time, &end_time);
+        if (BALLER_SUCCESS == ret)
         {
-            // µ±·µ»ØÖµÎªBALLER_SUCCESSÊ±Èç¹ûÓĞÊ¶±ğ½á¹û£¬ÔòÊ¶±ğ½á¹ûµÄ×´Ì¬Ò»¶¨ÎªBALLER_ASR_STATUS_COMPLETE¡£
-            if (iResultLen > 0 && pResult)
+            // ä»»åŠ¡è®¡ç®—ç»“æŸ ä¸éœ€è¦ç»§ç»­è°ƒç”¨BallerASRGet
+            if (result && result_len > 0)
             {
-                s_sentence_info sSentenceInfo;
-                sSentenceInfo.strResult = std::string(pResult);
-                sSentenceInfo.uStartTime = uStartTime;
-                sSentenceInfo.uEndTime = uEndTime;
-                sSentenceInfo.iStatus = iStatus;
-                vecResult.push_back(sSentenceInfo);
-                show_full_result(vecResult);
+                std::cout << "status=" << curr_status << " result=" << result << std::endl;
             }
-            // Ê¶±ğ½á¹ûÒÑ»ñÈ¡Íê±Ï£¬²»ĞèÒª¼ÌĞøµ÷ÓÃBallerASRGet
-            break;
+            return ret;
         }
-        else if (BALLER_MORE_RESULT == iRet)
+        else if (BALLER_MORE_RESULT == ret)
         {
-            // ²»Ê¹ÓÃ¶¯Ì¬ĞŞÕıÊ±Ö»Ğè¹ØĞÄ×Ó¾äÍêÕûµÄÊ¶±ğ½á¹û£»iStatus==BALLER_ASR_STATUS_COMPLETEÊ±µÄÊ¶±ğ½á¹û
-            if (iResultLen > 0 && pResult && BALLER_ASR_STATUS_COMPLETE == iStatus)
+            // è¿˜æœ‰è®¡ç®—ç»“æœæœªå–å‡º éœ€è¦ç»§ç»­è°ƒç”¨BallerASRGet
+            if (result && result_len > 0)
             {
-                s_sentence_info sSentenceInfo;
-                sSentenceInfo.strResult = std::string(pResult);
-                sSentenceInfo.uStartTime = uStartTime;
-                sSentenceInfo.uEndTime = uEndTime;
-                sSentenceInfo.iStatus = iStatus;
-                vecResult.push_back(sSentenceInfo);
-                show_full_result(vecResult);
+                std::cout << "status=" << curr_status << " result=" << result << std::endl;
             }
-
-            // »¹ÓĞÊ¶±ğ½á¹ûĞèÒª»ñÈ¡ Ğè¼ÌĞøµ÷ÓÃBallerASRGet
-            // ÎªÁË±ÜÃâÀË·ÑCPU×ÊÔ´Í£10msÔÚ¼ÌĞø»ñÈ¡£¬10msÎª¾­ÑéÖµ£¬¾ßÌåÍ£ÁôµÄÊ±¼äĞè¸ù¾İ»úÆ÷ĞÔÄÜºÍÒµÎñĞèÇó×ÛºÏ¿¼ÂÇ
-            BallerSleepMSec(10);
+            // è¿˜æœ‰è¯†åˆ«ç»“æœéœ€è¦è·å– éœ€ç»§ç»­è°ƒç”¨BallerASRGet
+            // ä¸ºäº†é¿å…æµªè´¹CPUèµ„æºåœ5msåœ¨ç»§ç»­è·å–ï¼Œ5msä¸ºç»éªŒå€¼ï¼Œå…·ä½“åœç•™çš„æ—¶é—´éœ€æ ¹æ®æœºå™¨æ€§èƒ½å’Œä¸šåŠ¡éœ€æ±‚ç»¼åˆè€ƒè™‘
+            std::this_thread::sleep_for(std::chrono::milliseconds(5));
             continue;
         }
         else
         {
-            // »ñÈ¡½á¹û³ö´í ²»ĞèÒª¼ÌĞøµ÷ÓÃBallerASRGet
-            printf("Call BallerASRGet failed. Return Code: %d\n", iRet);
-            break;
+            // ä»»åŠ¡å‡ºé”™ ä¸éœ€è¦ç»§ç»­è°ƒç”¨BallerASRGet
+            std::cout << "call BallerASRGet failed(" << ret << ")" << std::endl;
+            return ret;
         }
     }
-} 
 
-void test_once_with_dynamic_correction(baller_session_id session_id, char* pPCMData, int iPCMDataLen)
-{
-    std::string strOnceParams = std::string("input_mode=once, vad=on, audio_format=") + std::string(AUDIO_FROMAT);
-    int iRet = BallerASRPut(session_id, strOnceParams.c_str(), pPCMData, iPCMDataLen);
-    if (BALLER_SUCCESS != iRet)
-    {
-        printf("Call BallerASRPut failed. Return Code: %d\n", iRet);
-        return;
-    }
-
-    std::vector<s_sentence_info> vecResult;
-    int iLastStatus = BALLER_ASR_STATUS_COMPLETE;
-
-    while (1)
-    {
-        char *pResult = NULL;
-        int iResultLen = 0;
-        int iStatus = 0;
-        unsigned int uStartTime = 0;
-        unsigned int uEndTime = 0;
-
-        iRet = BallerASRGet(session_id, &pResult, &iResultLen, &iStatus, &uStartTime, &uEndTime);
-        if (BALLER_SUCCESS == iRet)
-        {
-            if (iResultLen > 0 && pResult)
-            {
-                if (BALLER_ASR_STATUS_INCOMPLETE == iLastStatus)
-                {
-                    // Èç¹ûÉÏÒ»´Î»ñÈ¡½á¹ûµÄ×´Ì¬ÎªBALLER_ASR_STATUS_INCOMPLETE£¬±íÊ¾ÉÏÒ»´Î»ñÈ¡µÄ½á¹ûÊÇ²»ÍêÕûµÄ£¬±¾´Î»ñÈ¡µÄ½á¹ûÊÇ¶ÔÉÏÒ»´Î»ñÈ¡½á¹ûµÄĞŞÕı
-                    // ÕâÀïÊ¹ÓÃ±¾´Î»ñÈ¡µÄ½á¹ûÌæ»»ÉÏ´Î»ñÈ¡µÄ½á¹û
-                    vecResult.pop_back();
-                    s_sentence_info sSentenceInfo;
-                    sSentenceInfo.strResult = std::string(pResult);
-                    sSentenceInfo.uStartTime = uStartTime;
-                    sSentenceInfo.uEndTime = uEndTime;
-                    sSentenceInfo.iStatus = iStatus;
-                    vecResult.push_back(sSentenceInfo);
-                }
-                else
-                {
-                    // Èç¹ûÉÏÒ»´Î»ñÈ¡½á¹ûµÄ×´Ì¬ÎªBALLER_ASR_STATUS_COMPLETE£¬±íÊ¾ÉÏÒ»´Î»ñÈ¡µÄ½á¹ûÊÇÒ»¸ö×Ó¾äÍêÕûµÄ½á¹û£¬±¾´Î»ñÈ¡µÄ½á¹ûÊÇÒ»¸öĞÂ×Ó¾äµÄ½á¹û
-                    // ÕâÀïÊ¹ÓÃ±¾´Î»ñÈ¡µÄ½á¹ûÌæ»»ÉÏ´Î»ñÈ¡µÄ½á¹û
-                    s_sentence_info sSentenceInfo;
-                    sSentenceInfo.strResult = std::string(pResult);
-                    sSentenceInfo.uStartTime = uStartTime;
-                    sSentenceInfo.uEndTime = uEndTime;
-                    sSentenceInfo.iStatus = iStatus;
-                    vecResult.push_back(sSentenceInfo);
-                }
-                show_full_result(vecResult);
-            }
-
-            // Ê¶±ğ½á¹ûÒÑ»ñÈ¡Íê±Ï£¬²»ĞèÒª¼ÌĞøµ÷ÓÃBallerASRGet
-            break;
-        }
-        else if (BALLER_MORE_RESULT == iRet)
-        {
-            // Ê¹ÓÃ¶¯Ì¬ĞŞÕıÊ±¼ÈĞè¹ØĞÄ×Ó¾äÍêÕûµÄÊ¶±ğ½á¹û£»Ò²Ğè¹ØĞÄ×Ó¾äÖĞ¼ä×´Ì¬µÄ½á¹û
-            if (iResultLen > 0 && pResult)
-            {
-                if (BALLER_ASR_STATUS_INCOMPLETE == iLastStatus)
-                {
-                    // Èç¹ûÉÏÒ»´Î»ñÈ¡½á¹ûµÄ×´Ì¬ÎªBALLER_ASR_STATUS_INCOMPLETE£¬±íÊ¾ÉÏÒ»´Î»ñÈ¡µÄ½á¹ûÊÇ²»ÍêÕûµÄ£¬±¾´Î»ñÈ¡µÄ½á¹ûÊÇ¶ÔÉÏÒ»´Î»ñÈ¡½á¹ûµÄĞŞÕı
-                    // ÕâÀïÊ¹ÓÃ±¾´Î»ñÈ¡µÄ½á¹ûÌæ»»ÉÏ´Î»ñÈ¡µÄ½á¹û
-                    vecResult.pop_back();
-                    s_sentence_info sSentenceInfo;
-                    sSentenceInfo.strResult = std::string(pResult);
-                    sSentenceInfo.uStartTime = uStartTime;
-                    sSentenceInfo.uEndTime = uEndTime;
-                    sSentenceInfo.iStatus = iStatus;
-                    vecResult.push_back(sSentenceInfo);
-                }
-                else
-                {
-                    // Èç¹ûÉÏÒ»´Î»ñÈ¡½á¹ûµÄ×´Ì¬ÎªBALLER_ASR_STATUS_COMPLETE£¬±íÊ¾ÉÏÒ»´Î»ñÈ¡µÄ½á¹ûÊÇÒ»¸ö×Ó¾äÍêÕûµÄ½á¹û£¬±¾´Î»ñÈ¡µÄ½á¹ûÊÇÒ»¸öĞÂ×Ó¾äµÄ½á¹û
-                    // ÕâÀïÊ¹ÓÃ±¾´Î»ñÈ¡µÄ½á¹ûÌæ»»ÉÏ´Î»ñÈ¡µÄ½á¹û
-                    s_sentence_info sSentenceInfo;
-                    sSentenceInfo.strResult = std::string(pResult);
-                    sSentenceInfo.uStartTime = uStartTime;
-                    sSentenceInfo.uEndTime = uEndTime;
-                    sSentenceInfo.iStatus = iStatus;
-                    vecResult.push_back(sSentenceInfo);
-                }
-
-                iLastStatus = iStatus;
-                show_full_result(vecResult);
-            }
-
-            // »¹ÓĞÊ¶±ğ½á¹ûĞèÒª»ñÈ¡ Ğè¼ÌĞøµ÷ÓÃBallerASRGet
-            // ÎªÁË±ÜÃâÀË·ÑCPU×ÊÔ´Í£10msÔÚ¼ÌĞø»ñÈ¡£¬10msÎª¾­ÑéÖµ£¬¾ßÌåÍ£ÁôµÄÊ±¼äĞè¸ù¾İ»úÆ÷ĞÔÄÜºÍÒµÎñĞèÇó×ÛºÏ¿¼ÂÇ
-            BallerSleepMSec(10);
-            continue;
-        }
-        else
-        {
-            // »ñÈ¡½á¹û³ö´í ²»ĞèÒª¼ÌĞøµ÷ÓÃBallerASRGet
-            printf("Call BallerASRGet failed. Return Code: %d\n", iRet);
-            break;
-        }
-    }
+    return ret;
 }
 
-void test_continue_whitout_dynamic_correction(baller_session_id session_id, char* pPCMData, int iPCMDataLen)
+int DoWork()
 {
-    // Ä£ÄâÂ¼ÒôÉè±¸²É¼¯µ½ÒôÆµÊı¾İºóÊµÊ±µÄ½«ÒôÆµÊı¾İ·¢ËÍ¸øsdk£»Ã¿´ÎÏòsdk·¢ËÍ40msµÄ8k16bitµÄÒôÆµÊı¾İ
-    int iPackageSize = 16 * 40;
-    int iUsedSize = 0;
-    int iRet = BALLER_SUCCESS;
-    std::vector<s_sentence_info> vecResult;
-
-    char *pResult = NULL;
-    int iResultLen = 0;
-    int iStatus = 0;
-    unsigned int uStartTime = 0;
-    unsigned int uEndTime = 0;
-
-    for (; iPCMDataLen - iUsedSize > iPackageSize; iUsedSize += iPackageSize)
-    {
-        std::string strContinueParams = std::string("input_mode=continue, vad=on, audio_format=") + std::string(AUDIO_FROMAT);
-        iRet = BallerASRPut(session_id, strContinueParams.c_str(), pPCMData + iUsedSize, iPackageSize);
-        if (BALLER_SUCCESS != iRet)
-        {
-            printf("Call BallerASRPut failed. Return Code: %d\n", iRet);
-            return;
-        }
-
-        iRet = BallerASRGet(session_id, &pResult, &iResultLen, &iStatus, &uStartTime, &uEndTime);
-        // continueÄ£Ê½ÏÂBallerASRPutµÄinput_modeÃ»ÓĞ´«ÈëendÊ±£¬BallerASRGet²»»á·µ»ØBALLER_SUCCESS¡£
-        if (BALLER_MORE_RESULT == iRet)
-        {
-            // ²»Ê¹ÓÃ¶¯Ì¬ĞŞÕıÊ±Ö»Ğè¹ØĞÄ×Ó¾äÍêÕûµÄÊ¶±ğ½á¹û£»iStatus==BALLER_ASR_STATUS_COMPLETEÊ±µÄÊ¶±ğ½á¹û
-            if (iResultLen > 0 && pResult && BALLER_ASR_STATUS_COMPLETE == iStatus)
-            {
-                s_sentence_info sSentenceInfo;
-                sSentenceInfo.strResult = std::string(pResult);
-                sSentenceInfo.uStartTime = uStartTime;
-                sSentenceInfo.uEndTime = uEndTime;
-                sSentenceInfo.iStatus = iStatus;
-                vecResult.push_back(sSentenceInfo);
-                show_full_result(vecResult);
-            }
-        }
-        else
-        {
-            // »ñÈ¡½á¹û³ö´í ²»ĞèÒª¼ÌĞøµ÷ÓÃBallerASRGet
-            printf("Call BallerASRGet failed. Return Code: %d\n", iRet);
-            return;
-        }
-    }
-
-    std::string strEndParams = std::string("input_mode=end, vad=on, audio_format=") + std::string(AUDIO_FROMAT);
-    iRet = BallerASRPut(session_id, strEndParams.c_str(), pPCMData + iUsedSize, iPCMDataLen - iUsedSize);
-    if (BALLER_SUCCESS != iRet)
-    {
-        printf("Call BallerASRPut failed. Return Code: %d\n", iRet);
-        return;
-    }
-
-    while (1)
-    {
-        char *pResult = NULL;
-        int iResultLen = 0;
-        int iStatus = 0;
-        unsigned int uStartTime = 0;
-        unsigned int uEndTime = 0;
-
-        iRet = BallerASRGet(session_id, &pResult, &iResultLen, &iStatus, &uStartTime, &uEndTime);
-        if (BALLER_SUCCESS == iRet)
-        {
-            // µ±·µ»ØÖµÎªBALLER_SUCCESSÊ±Èç¹ûÓĞÊ¶±ğ½á¹û£¬ÔòÊ¶±ğ½á¹ûµÄ×´Ì¬Ò»¶¨ÎªBALLER_ASR_STATUS_COMPLETE¡£
-            if (iResultLen > 0 && pResult)
-            {
-                s_sentence_info sSentenceInfo;
-                sSentenceInfo.strResult = std::string(pResult);
-                sSentenceInfo.uStartTime = uStartTime;
-                sSentenceInfo.uEndTime = uEndTime;
-                sSentenceInfo.iStatus = iStatus;
-                vecResult.push_back(sSentenceInfo);
-                show_full_result(vecResult);
-            }
-
-            // Ê¶±ğ½á¹ûÒÑ»ñÈ¡Íê±Ï£¬²»ĞèÒª¼ÌĞøµ÷ÓÃBallerASRGet
-            break;
-        }
-        else if (BALLER_MORE_RESULT == iRet)
-        {
-            // ²»Ê¹ÓÃ¶¯Ì¬ĞŞÕıÊ±Ö»Ğè¹ØĞÄ×Ó¾äÍêÕûµÄÊ¶±ğ½á¹û£»iStatus==BALLER_ASR_STATUS_COMPLETEÊ±µÄÊ¶±ğ½á¹û
-            if (iResultLen > 0 && pResult && BALLER_ASR_STATUS_COMPLETE == iStatus)
-            {
-                s_sentence_info sSentenceInfo;
-                sSentenceInfo.strResult = std::string(pResult);
-                sSentenceInfo.uStartTime = uStartTime;
-                sSentenceInfo.uEndTime = uEndTime;
-                sSentenceInfo.iStatus = iStatus;
-                vecResult.push_back(sSentenceInfo);
-                show_full_result(vecResult);
-            }
-
-            // »¹ÓĞÊ¶±ğ½á¹ûĞèÒª»ñÈ¡ Ğè¼ÌĞøµ÷ÓÃBallerASRGet
-            // ÎªÁË±ÜÃâÀË·ÑCPU×ÊÔ´Í£10msÔÚ¼ÌĞø»ñÈ¡£¬10msÎª¾­ÑéÖµ£¬¾ßÌåÍ£ÁôµÄÊ±¼äĞè¸ù¾İ»úÆ÷ĞÔÄÜºÍÒµÎñĞèÇó×ÛºÏ¿¼ÂÇ
-            BallerSleepMSec(10);
-            continue;
-        }
-        else
-        {
-            // »ñÈ¡½á¹û³ö´í ²»ĞèÒª¼ÌĞøµ÷ÓÃBallerASRGet
-            printf("Call BallerASRGet failed. Return Code: %d\n", iRet);
-            break;
-        }
-    }
-}
-
-void test_continue_with_dynamic_correction(baller_session_id session_id, char* pPCMData, int iPCMDataLen)
-{
-    // Ä£ÄâÂ¼ÒôÉè±¸²É¼¯µ½ÒôÆµÊı¾İºóÊµÊ±µÄ½«ÒôÆµÊı¾İ·¢ËÍ¸øsdk£»Ã¿´ÎÏòsdk·¢ËÍ40msµÄ8k16bitµÄÒôÆµÊı¾İ
-    int iPackageSize = 16 * 40;
-    int iUsedSize = 0;
-    int iRet = BALLER_SUCCESS;
-    int iLastStatus = BALLER_ASR_STATUS_COMPLETE;
-    std::vector<s_sentence_info> vecResult;
-
-    char *pResult = NULL;
-    int iResultLen = 0;
-    int iStatus = 0;
-    unsigned int uStartTime = 0;
-    unsigned int uEndTime = 0;
-
-    for (; iPCMDataLen - iUsedSize > iPackageSize; iUsedSize += iPackageSize)
-    {
-        std::string strContinueParams = std::string("input_mode=continue, vad=on, audio_format=") + std::string(AUDIO_FROMAT);
-        iRet = BallerASRPut(session_id, strContinueParams.c_str(), pPCMData + iUsedSize, iPackageSize);
-        if (BALLER_SUCCESS != iRet)
-        {
-            printf("Call BallerASRPut failed. Return Code: %d\n", iRet);
-            return;
-        }
-
-        iRet = BallerASRGet(session_id, &pResult, &iResultLen, &iStatus, &uStartTime, &uEndTime);
-        // continueÄ£Ê½ÏÂBallerASRPutµÄinput_modeÃ»ÓĞ´«ÈëendÊ±£¬BallerASRGet²»»á·µ»ØBALLER_SUCCESS¡£
-        if (BALLER_MORE_RESULT == iRet)
-        {
-            if (iResultLen > 0 && pResult)
-            {
-                if (BALLER_ASR_STATUS_INCOMPLETE == iLastStatus)
-                {
-                    // Èç¹ûÉÏÒ»´Î»ñÈ¡½á¹ûµÄ×´Ì¬ÎªBALLER_ASR_STATUS_INCOMPLETE£¬±íÊ¾ÉÏÒ»´Î»ñÈ¡µÄ½á¹ûÊÇ²»ÍêÕûµÄ£¬±¾´Î»ñÈ¡µÄ½á¹ûÊÇ¶ÔÉÏÒ»´Î»ñÈ¡½á¹ûµÄĞŞÕı
-                    // ÕâÀïÊ¹ÓÃ±¾´Î»ñÈ¡µÄ½á¹ûÌæ»»ÉÏ´Î»ñÈ¡µÄ½á¹û
-                    vecResult.pop_back();
-                    s_sentence_info sSentenceInfo;
-                    sSentenceInfo.strResult = std::string(pResult);
-                    sSentenceInfo.uStartTime = uStartTime;
-                    sSentenceInfo.uEndTime = uEndTime;
-                    sSentenceInfo.iStatus = iStatus;
-                    vecResult.push_back(sSentenceInfo);
-                }
-                else
-                {
-                    // Èç¹ûÉÏÒ»´Î»ñÈ¡½á¹ûµÄ×´Ì¬ÎªBALLER_ASR_STATUS_COMPLETE£¬±íÊ¾ÉÏÒ»´Î»ñÈ¡µÄ½á¹ûÊÇÒ»¸ö×Ó¾äÍêÕûµÄ½á¹û£¬±¾´Î»ñÈ¡µÄ½á¹ûÊÇÒ»¸öĞÂ×Ó¾äµÄ½á¹û
-                    // ÕâÀïÊ¹ÓÃ±¾´Î»ñÈ¡µÄ½á¹ûÌæ»»ÉÏ´Î»ñÈ¡µÄ½á¹û
-                    s_sentence_info sSentenceInfo;
-                    sSentenceInfo.strResult = std::string(pResult);
-                    sSentenceInfo.uStartTime = uStartTime;
-                    sSentenceInfo.uEndTime = uEndTime;
-                    sSentenceInfo.iStatus = iStatus;
-                    vecResult.push_back(sSentenceInfo);
-                }
-
-                iLastStatus = iStatus;
-                show_full_result(vecResult);
-            }
-        }
-        else
-        {
-            // »ñÈ¡½á¹û³ö´í ²»ĞèÒª¼ÌĞøµ÷ÓÃBallerASRGet
-            printf("Call BallerASRGet failed. Return Code: %d\n", iRet);
-            return;
-        }
-    }
-
-    std::string strEndParams = std::string("input_mode=end, vad=on, audio_format=") + std::string(AUDIO_FROMAT);
-    iRet = BallerASRPut(session_id, strEndParams.c_str(), pPCMData + iUsedSize, iPCMDataLen - iUsedSize);
-    if (BALLER_SUCCESS != iRet)
-    {
-        printf("Call BallerASRPut failed. Return Code: %d\n", iRet);
-        return;
-    }
-
-    while (1)
-    {
-        char *pResult = NULL;
-        int iResultLen = 0;
-        int iStatus = 0;
-        unsigned int uStartTime = 0;
-        unsigned int uEndTime = 0;
-
-        iRet = BallerASRGet(session_id, &pResult, &iResultLen, &iStatus, &uStartTime, &uEndTime);
-        if (BALLER_SUCCESS == iRet)
-        {
-            if (iResultLen > 0 && pResult)
-            {
-
-                if (BALLER_ASR_STATUS_INCOMPLETE == iLastStatus)
-                {
-                    // Èç¹ûÉÏÒ»´Î»ñÈ¡½á¹ûµÄ×´Ì¬ÎªBALLER_ASR_STATUS_INCOMPLETE£¬±íÊ¾ÉÏÒ»´Î»ñÈ¡µÄ½á¹ûÊÇ²»ÍêÕûµÄ£¬±¾´Î»ñÈ¡µÄ½á¹ûÊÇ¶ÔÉÏÒ»´Î»ñÈ¡½á¹ûµÄĞŞÕı
-                    // ÕâÀïÊ¹ÓÃ±¾´Î»ñÈ¡µÄ½á¹ûÌæ»»ÉÏ´Î»ñÈ¡µÄ½á¹û
-                    vecResult.pop_back();
-                    s_sentence_info sSentenceInfo;
-                    sSentenceInfo.strResult = std::string(pResult);
-                    sSentenceInfo.uStartTime = uStartTime;
-                    sSentenceInfo.uEndTime = uEndTime;
-                    sSentenceInfo.iStatus = iStatus;
-                    vecResult.push_back(sSentenceInfo);
-                }
-                else
-                {
-                    // Èç¹ûÉÏÒ»´Î»ñÈ¡½á¹ûµÄ×´Ì¬ÎªBALLER_ASR_STATUS_COMPLETE£¬±íÊ¾ÉÏÒ»´Î»ñÈ¡µÄ½á¹ûÊÇÒ»¸ö×Ó¾äÍêÕûµÄ½á¹û£¬±¾´Î»ñÈ¡µÄ½á¹ûÊÇÒ»¸öĞÂ×Ó¾äµÄ½á¹û
-                    // ÕâÀïÊ¹ÓÃ±¾´Î»ñÈ¡µÄ½á¹ûÌæ»»ÉÏ´Î»ñÈ¡µÄ½á¹û
-                    s_sentence_info sSentenceInfo;
-                    sSentenceInfo.strResult = std::string(pResult);
-                    sSentenceInfo.uStartTime = uStartTime;
-                    sSentenceInfo.uEndTime = uEndTime;
-                    sSentenceInfo.iStatus = iStatus;
-                    vecResult.push_back(sSentenceInfo);
-                }
-                show_full_result(vecResult);
-            }
-
-            // Ê¶±ğ½á¹ûÒÑ»ñÈ¡Íê±Ï£¬²»ĞèÒª¼ÌĞøµ÷ÓÃBallerASRGet
-            break;
-        }
-        else if (BALLER_MORE_RESULT == iRet)
-        {
-            if (iResultLen > 0 && pResult)
-            {
-
-                if (BALLER_ASR_STATUS_INCOMPLETE == iLastStatus)
-                {
-                    // Èç¹ûÉÏÒ»´Î»ñÈ¡½á¹ûµÄ×´Ì¬ÎªBALLER_ASR_STATUS_INCOMPLETE£¬±íÊ¾ÉÏÒ»´Î»ñÈ¡µÄ½á¹ûÊÇ²»ÍêÕûµÄ£¬±¾´Î»ñÈ¡µÄ½á¹ûÊÇ¶ÔÉÏÒ»´Î»ñÈ¡½á¹ûµÄĞŞÕı
-                    // ÕâÀïÊ¹ÓÃ±¾´Î»ñÈ¡µÄ½á¹ûÌæ»»ÉÏ´Î»ñÈ¡µÄ½á¹û
-                    vecResult.pop_back();
-                    s_sentence_info sSentenceInfo;
-                    sSentenceInfo.strResult = std::string(pResult);
-                    sSentenceInfo.uStartTime = uStartTime;
-                    sSentenceInfo.uEndTime = uEndTime;
-                    sSentenceInfo.iStatus = iStatus;
-                    vecResult.push_back(sSentenceInfo);
-                }
-                else
-                {
-                    // Èç¹ûÉÏÒ»´Î»ñÈ¡½á¹ûµÄ×´Ì¬ÎªBALLER_ASR_STATUS_COMPLETE£¬±íÊ¾ÉÏÒ»´Î»ñÈ¡µÄ½á¹ûÊÇÒ»¸ö×Ó¾äÍêÕûµÄ½á¹û£¬±¾´Î»ñÈ¡µÄ½á¹ûÊÇÒ»¸öĞÂ×Ó¾äµÄ½á¹û
-                    // ÕâÀïÊ¹ÓÃ±¾´Î»ñÈ¡µÄ½á¹ûÌæ»»ÉÏ´Î»ñÈ¡µÄ½á¹û
-                    s_sentence_info sSentenceInfo;
-                    sSentenceInfo.strResult = std::string(pResult);
-                    sSentenceInfo.uStartTime = uStartTime;
-                    sSentenceInfo.uEndTime = uEndTime;
-                    sSentenceInfo.iStatus = iStatus;
-                    vecResult.push_back(sSentenceInfo);
-                }
-
-                iLastStatus = iStatus;
-                show_full_result(vecResult);
-            }
-
-            // »¹ÓĞÊ¶±ğ½á¹ûĞèÒª»ñÈ¡ Ğè¼ÌĞøµ÷ÓÃBallerASRGet
-            // ÎªÁË±ÜÃâÀË·ÑCPU×ÊÔ´Í£10msÔÚ¼ÌĞø»ñÈ¡£¬10msÎª¾­ÑéÖµ£¬¾ßÌåÍ£ÁôµÄÊ±¼äĞè¸ù¾İ»úÆ÷ĞÔÄÜºÍÒµÎñĞèÇó×ÛºÏ¿¼ÂÇ
-            BallerSleepMSec(10);
-            continue;
-        }
-        else
-        {
-            // »ñÈ¡½á¹û³ö´í ²»ĞèÒª¼ÌĞøµ÷ÓÃBallerASRGet
-            printf("Call BallerASRGet failed. Return Code: %d\n", iRet);
-            break;
-        }
-    }
-} 
-
-#ifdef _WIN32
-DWORD WINAPI TestASR(LPVOID param)
-#else  // unix-like
-void * TestASR(void * param)
-#endif // _WIN32 / unix-like
-{
-    int iRet = BALLER_SUCCESS;
     baller_session_id session_id = BALLER_INVALID_SESSION_ID;
-    s_thread_param* thread_param = (s_thread_param *)param;
-
-    // Call the BallerASRSessionBegin interface to get session
-    std::string session_prams = std::string("res_dir=") + std::string(thread_param->dir) + std::string(",language=") + std::string(LANGUAGE)
-        + std::string(",sample_size=") + std::to_string(thread_param->sample_size) + std::string(",sample_rate=") + std::to_string(thread_param->sample_rate)
-        + std::string(",engine_type=local,hardware=cpu_slow");
-
-    printf("%s\n", session_prams.c_str());
-    iRet = BallerASRSessionBegin(session_prams.c_str(), &session_id);
-    if (iRet != BALLER_SUCCESS)
+    std::stringstream session_param;
+    session_param << "language=" << g_language
+        << ",res_dir=" << "./data/" << g_language
+        << ",sample_rate=16000,sample_size=16";
+    std::cout << "call BallerASRSessionBegin with param=" << session_param.str() << std::endl;
+    int ret = BallerASRSessionBegin(session_param.str().c_str(), &session_id);
+    if (BALLER_SUCCESS != ret)
     {
-        printf("Call BallerASRSessionBegin failed. Return Code: %d\n", iRet);
-        return 0;
+        std::cout << "call BallerASRSessionBegin failed(" << ret << ")" << std::endl;
+        return ret;
+    }
+    std::cout << "call BallerASRSessionBegin success" << std::endl;
+    std::cout << std::endl;
+
+    for (int loop_idx = 0; loop_idx < g_loop_count; ++loop_idx)
+    {
+        std::cout << "loop_idx=" << loop_idx << std::endl;
+        auto begin_pt = std::chrono::steady_clock::now();
+        DoTask(session_id);
+        int use_ms = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - begin_pt).count();
+        std::cout << "loop idx=" << loop_idx << " rate=" << float(use_ms) / float(g_pcm_data.size() / 16 / 2) << std::endl;
+        std::cout << std::endl;
     }
 
-    for (int loop_index = 0; loop_index < thread_param->loop_cnt; ++loop_index)
+    std::cout << "call BallerASRSessionEnd" << std::endl;
+    ret = BallerASRSessionEnd(session_id);
+    if (BALLER_SUCCESS != ret)
     {
-        printf("start call test_once_whitout_dynamic_correction\n");
-        test_once_whitout_dynamic_correction(session_id, thread_param->pcm_data, thread_param->pcm_data_len);
-
-        printf("\nstart call test_once_with_dynamic_correction\n");
-        test_once_with_dynamic_correction(session_id, thread_param->pcm_data, thread_param->pcm_data_len);
-
-        printf("\nstart call test_continue_whitout_dynamic_correction\n");
-        test_continue_whitout_dynamic_correction(session_id, thread_param->pcm_data, thread_param->pcm_data_len);
-
-        printf("\nstart call test_continue_with_dynamic_correction\n");
-        test_continue_with_dynamic_correction(session_id, thread_param->pcm_data, thread_param->pcm_data_len);
+        std::cout << "call BallerASRSessionEnd failed(" << ret << ")" << std::endl;
+        return ret;
     }
-
-    // Call BallerASRSessionEnd interface to release session
-    iRet = BallerASRSessionEnd(session_id);
-    if (iRet != BALLER_SUCCESS)
-    {
-        printf("Call BallerASRSessionEnd failed. Return Code: %d\n", iRet);
-    }
-
-    return 0;
+    std::cout << "call BallerASRSessionEnd success" << std::endl;
+    std::cout << std::endl;
+    return BALLER_SUCCESS;
 }
 
-int main()
+int main(int argc, char** argv)
 {
-    // Call BallerLogin interface to login
-    std::string login_params = "org_id=" + std::to_string(ORG_ID) + ","
-        + "app_id=" + std::to_string(APP_ID) + "," + "app_key=" + APP_KEY + ","
-        + "license=license/baller_sdk.license,log_level=info,log_path=./baller_log/";
-    int iRet = BallerLogin(login_params.c_str());
-    if (iRet != BALLER_SUCCESS)
-    {
-        printf("Call BallerLogin failed. Return Code: %d\n", iRet);
-        return 0;
-    }
-
-    // read pcm data
-    char* pPCMData = 0;
-    int iPCMLen = 0;
-    if (0 == ReadPCMData(PCM_FILE, &pPCMData, &iPCMLen))
-    {
-        printf("read pcm data failed\n");
-
-        iRet = BallerLogout();
-        if (iRet != BALLER_SUCCESS)
-        {
-            printf("Call BallerLogout failed. Return Code: %d\n", iRet);
-        }
-        return 0;
-    }
-
-    s_thread_param thread_param;
-    thread_param.dir = "data";
-    thread_param.language = LANGUAGE;
-    thread_param.loop_cnt = 1;
-    thread_param.pcm_data = pPCMData;
-    thread_param.pcm_data_len = iPCMLen;
-    thread_param.sample_size = SAMPLE_SIZE;
-    thread_param.sample_rate = SAMPLE_RATE;
-    const int thread_cnt = 1;
-
 #ifdef _WIN32
-    std::vector<HANDLE> thread_handle;
-    for (int thread_idx = 0; thread_idx < thread_cnt; ++thread_idx) {
-        thread_handle.push_back(::CreateThread(0, 0, TestASR, &thread_param, 0, 0));
-    }
-    ::WaitForMultipleObjects((DWORD)thread_handle.size(), &thread_handle[0], TRUE, INFINITE);
-#else  // unix-like
-    std::vector<pthread_t> thread_handle;
-    for (int thread_idx = 0; thread_idx < thread_cnt; ++thread_idx) {
-        pthread_t sub_handle;
-        pthread_create(&sub_handle, 0, TestASR, &thread_param);
-        thread_handle.push_back(sub_handle);
-    }
-    for (int thread_idx = 0; thread_idx < thread_cnt; ++thread_idx) {
-        pthread_join(thread_handle[thread_idx], 0);
-    }
-#endif // _WIN32 / unix-like
+    system("chcp 65001");
+#endif
 
-    free(pPCMData);
-    pPCMData = 0;
-
-    // Call BallerLogout interface to logout
-    iRet = BallerLogout();
-    if (iRet != BALLER_SUCCESS)
+    if (argc != 3 && argc != 4)
     {
-        printf("Call BallerLogout failed. Return Code: %d\n", iRet);
+        std::cout << "Usage: " << argv[0] << " language pcm_file_name [loop_count]" << std::endl;
+        std::cout << "Example: " <<  argv[0] << " zho zho.pcm 1" << std::endl;
         return 0;
     }
+    g_language = argv[1];
+    g_pcm_file_name = argv[2];
+    if (argc == 4)
+    {
+        g_loop_count = std::stoi(argv[3]);
+    }
+    std::cout << "test " << g_language << " " << g_pcm_file_name << std::endl;
+
+    ReadFile(g_pcm_file_name, g_pcm_data);
+    if (g_pcm_data.empty())
+    {
+        std::cout << g_pcm_file_name << " is empty" << std::endl;
+        return 0;
+    }
+
+    std::stringstream login_param;
+    login_param << "org_id=" << ORG_ID << ",app_id=" << APP_ID << ",app_key=" << APP_KEY
+        << ",license=license/baller_sdk.license"
+        << ",log_level=info, log_path=./baller_log/";
+    std::cout << "call BallerLogin with param=" << login_param.str() << std::endl;
+    int ret = BallerLogin(login_param.str().c_str());
+    if (ret != BALLER_SUCCESS)
+    {
+        std::cout << "call BallerLogin failed(" << ret << ")" << std::endl;
+        return 0;
+    }
+    std::cout << "call BallerLogin success" << std::endl;
+    std::cout << std::endl;
+
+    DoWork();
+
+    std::cout << "call BallerLogout" << std::endl;
+    ret = BallerLogout();
+    if (ret != BALLER_SUCCESS)
+    {
+        std::cout << "call BallerLogout failed(" << ret << ")" << std::endl;
+        return 0;
+    }
+    std::cout << "call BallerLogout success" << std::endl;
+    std::cout << std::endl;
 
     return 0;
 }

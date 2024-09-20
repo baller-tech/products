@@ -72,12 +72,13 @@ static bool SaveWavFile(const std::string& file_name, const std::vector<char>& p
 const static int64_t kOrgId = 0LL;
 const static int64_t kAppId = 0LL;
 const static std::string kAppKey = "";
+const static std::string kSn = "";
 
 static std::string language;
+static std::string voice_name;
 static std::string out_dir;
 static std::string text_file_name;
 static float speed = 1.0f;
-static std::string ability_server;
 
 struct BallerCallbackParam {
     std::vector<char> pcm_data;
@@ -133,12 +134,9 @@ int DoTTS()
     baller_session_id session_id = BALLER_INVALID_SESSION_ID;
 
     std::stringstream ss;
-    ss << "res_dir=./data/" << language;
+    ss << "res_dir=./tts-data/" << language;
     ss << ",language=" << language;
-    if (!ability_server.empty())
-    {
-        ss << ",engine_type=cloud";
-    }
+    ss << ",voice_name=" << voice_name;
     std::cout << "sesion param: " << ss.str().c_str() << std::endl;
     int code = BallerTTSSessionBegin(ss.str().c_str(), &session_id);
     if (BALLER_SUCCESS != code)
@@ -221,41 +219,25 @@ int DoTTS()
 }
 
 int main(int argc, char** argv)
-{
-    BallerTTSSetWorkingThreadNumber(4);
-    BallerTTSWorkingThread();
-    
-    if (argc != 5 && argc != 6)
+{    
+    if (argc != 6)
     {
-        std::cout << "中文语音合成命令行参数: " << argv[0] << " zho 测试文本.txt out_dir speed [ability_server_addr]" << std::endl;
-        std::cout << "英文语音合成命令行参数: " << argv[0] << " eng 测试文本.txt out_dir speed [ability_server_addr]" << std::endl;
-
+        std::cout << "语音合成命令行参数: " << argv[0] << " language voice_name 测试文本.txt out_dir speed" << std::endl;
         std::cout << "out_dir 位输出音频文件的文件夹，运行前需保证该文件夹已存在。" << std::endl;
-        std::cout << "ability_server_addr为可选项，表示能力服务器的地址，如果不填表示使用本地能力" << std::endl;
         return 0;
     }
 
     language = argv[1];
-    if (language == "chs")
-    {
-        language = "zho";
-    }
-    text_file_name = argv[2];
-    out_dir = argv[3];
-    speed = std::stof(argv[4]);
-    if (argc == 6)
-    {
-        ability_server = argv[5];
-    }
+    voice_name = argv[2];
+    text_file_name = argv[3];
+    out_dir = argv[4];
+    speed = std::stof(argv[5]);
 
     std::stringstream ss;
     ss << "org_id=" << kOrgId << ",app_id=" << kAppId << ",app_key=" << kAppKey;
     ss << ",license=./license/baller_sdk.license";
     ss << ",log_level=info,log_path=./logs";
-    if (!ability_server.empty())
-    {
-        ss << ",ability_server=" << ability_server;
-    }
+    ss << ",sn=" << kSn;
     printf("login param: %s\n", ss.str().c_str());
     int code = BallerLogin(ss.str().c_str());
     if (BALLER_SUCCESS != code)

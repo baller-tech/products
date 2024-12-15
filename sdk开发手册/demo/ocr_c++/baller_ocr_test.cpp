@@ -101,6 +101,14 @@ int ReadImageData(const char* pszImage, char** ppImageData, int* piImageDataLen)
     return *piImageDataLen;
 }
 
+void BALLER_CALLBACK my_ocr_cb(void* user_param, const char* content)
+{
+    if (content)
+    {
+        printf("%s\n", content);
+    }
+}
+
 #ifdef _WIN32
 DWORD WINAPI TestOCR(LPVOID param)
 #else  // unix-like
@@ -131,58 +139,11 @@ void * TestOCR(void * param)
 
         // Call the BallerOCRPut interface to put image data
         const char* params_once = "input_mode=once";
-        iRet = BallerOCRPut(session_id, params_once, thread_param->image_data, thread_param->image_data_len);
+        iRet = BallerOCRPut(session_id, params_once, thread_param->image_data, thread_param->image_data_len, my_ocr_cb, nullptr);
         if (iRet != BALLER_SUCCESS)
         {
             printf("Call BallerOCRPut failed. Return Code: %d\n", iRet);
             continue;
-        }
-
-        // Call the BallerOCRGet interface to get result
-        while (1)
-        {
-            char *pResult = NULL;
-            int iResultLen = 0;
-
-            iRet = BallerOCRGet(session_id, &pResult, &iResultLen);
-            if (BALLER_MORE_RESULT == iRet)
-            {
-                if (iResultLen > 0 && pResult)
-                {
-#ifdef _WIN32
-                    char * gb = u8_to_gb((const char *)pResult);
-                    printf("%s\n", gb);
-                    free(gb);
-#else
-                    printf("BallerOCRGet result: %s\n", (char*)pResult);
-#endif
-                }
-
-                // 还有识别结果需要获取 需继续调用BallerOCRGet
-                // 为了避免浪费CPU资源停10ms在继续获取，10ms为经验值，具体停留的时间需根据机器性能和业务需求综合考虑
-                BallerSleepMSec(10);
-                continue;
-            }
-            else if (BALLER_SUCCESS == iRet)
-            {
-                if (iResultLen > 0 && pResult)
-                {
-#ifdef _WIN32
-                    char * gb = u8_to_gb((const char *)pResult);
-                    printf("%s\n", gb);
-                    free(gb);
-#else
-                    printf("BallerOCRGet result: %s\n", (char*)pResult);
-#endif
-                }
-                printf("BallerOCRGet Finish\n");
-                break;
-            }
-            else
-            {
-                printf("Call BallerOCRGet failed. Return Code: %d\n", iRet);
-                break;
-            }
         }
 
         int elapsed = int(std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - start).count());

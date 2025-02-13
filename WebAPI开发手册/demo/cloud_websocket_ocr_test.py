@@ -24,7 +24,7 @@ app_key = ""
 
 # 图片上文本的语种
 # 请查考《图像识别（OCR）WebSocket协议WebAPI开发文档.pdf》中“支持的语种”章节
-language = "chs"
+language = "zho"
 
 # 请求的地址
 request_url = "ws://api.baller-tech.com/v1/service/ws/v1/ocr"

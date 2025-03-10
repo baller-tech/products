@@ -16,7 +16,7 @@ from email.utils import formatdate
 import requests
 
 # 请求的地址
-request_url = "http://api.baller-tech.com/v1/service/v1/mt"
+request_url = "http://api.baller-tech.com/v1/service/v1/nmt"
 
 # 由北京市大牛儿科技发展有限公司统一分配
 org_id = 0
@@ -24,8 +24,8 @@ app_id = 0
 app_key = ""
 
 # 语种
-# tib-chs: 藏文翻译为中文
-language = "tib-chs"
+# tib-zho: 藏文翻译为中文
+language = "tib-zho"
 # 测试数据存储的文件
 test_file = ""
 # 是否将结果保存到文件

@@ -6,10 +6,10 @@
 
 项目 | 说明
 ---|---
-请求地址 | ws://api.baller-tech.com/v1/service/ws/v1/mt
+请求地址 | ws://api.baller-tech.com/v1/service/ws/v1/nmt 
 字符编码 | UTF-8
 WebSocket版本 | 13 ([RFC 6455](https://tools.ietf.org/html/rfc6455 "RFC 6455"))
-响应格式  | 统一采用JSON格式  |
+响应格式  | 统一采用JSON格式  
 
 ## 调用流程
 1. 通过hmac-sha256计算签名，向服务器端发送WebSocket协议握手请求。
@@ -19,7 +19,7 @@ WebSocket版本 | 13 ([RFC 6455](https://tools.ietf.org/html/rfc6455 "RFC 6455")
 ## 握手和接口鉴权
 &#8195; &#8195;在WebSocket的握手阶段，请求方需要对请求进行签名，服务端会根据签名检查请求的合法性。握手时请求方将签名相关的参数经过url编码后加到请求地址的后面，具体的参数和示例如下：
 ```
-ws://api.baller-tech.com/v1/service/ws/v1/mt?authorization=xxxx&host=xxxx&date=xxx
+ws://api.baller-tech.com/v1/service/ws/v1/nmt?authorization=xxxx&host=xxxx&date=xxx
 ```
 | 参数  | 类型  |  说明 | 示例  |
 | ------------ | ------------ | ------------ | ------------ |

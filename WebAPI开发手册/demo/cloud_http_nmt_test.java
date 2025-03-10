@@ -27,7 +27,7 @@ import org.springframework.web.client.RestTemplate;
 public class cloud_http_nmt_test {
 
   // 请求地址
-  public static String mUrl = "http://api.baller-tech.com/v1/service/v1/mt";
+  public static String mUrl = "http://api.baller-tech.com/v1/service/v1/nmt";
 
   // 账号信息 由北京市大牛儿科技发展有限公司统一分配;
   public static long mAppId = 0L;
@@ -40,7 +40,7 @@ public class cloud_http_nmt_test {
 
   // 测试语种
   // 请查考《机器翻译（NMT）HTTP协议WebAPI开发文档.pdf》中“支持的语种”章节
-  public static String mLanguage = "uig-chs";
+  public static String mLanguage = "uig-zho";
   // 是否将结果保存到文件
   public static boolean mSaveToFile = true;
 

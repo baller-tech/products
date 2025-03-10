@@ -7,7 +7,7 @@
 
 项目 | 说明
 ---|---
-请求地址 | http://api.baller-tech.com/v1/service/v1/mt 
+请求地址 | http://api.baller-tech.com/v1/service/v1/nmt 
 请求方式 | 发送文字数据时使用POST；获取翻译结果时使用GET 
 字符编码 | UTF-8
 

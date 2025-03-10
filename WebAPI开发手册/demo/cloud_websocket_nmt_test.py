@@ -23,12 +23,12 @@ app_id = 0
 app_key = ""
 
 # 请求的地址
-request_url = "ws://api.baller-tech.com/v1/service/ws/v1/mt"
+request_url = "ws://api.baller-tech.com/v1/service/ws/v1/nmt"
 host = "api.baller-tech.com"
 
 # 测试语种
-# tib-chs: 藏文翻译为中文
-language = "tib-chs"
+# tib-zho: 藏文翻译为中文
+language = "tib-zho"
 # 存储测试数据的文件
 txt_file = ""
 # 结果是否保存到文件中

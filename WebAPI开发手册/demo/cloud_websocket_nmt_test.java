@@ -30,7 +30,7 @@ import com.alibaba.fastjson.JSONObject;
 public class cloud_websocket_nmt_test {
 	
 	// 地址配置
-	public static String mUrl = "ws://api.baller-tech.com/v1/service/ws/v1/mt";
+	public static String mUrl = "ws://api.baller-tech.com/v1/service/ws/v1/nmt";
 	public static String mHost = "api.baller-tech.com";
 
 	// 账号信息 由北京市大牛儿科技发展有限公司统一分配
@@ -40,9 +40,9 @@ public class cloud_websocket_nmt_test {
 
 	// 测试语种
 	// tib-chs: 藏文翻译为中文
-	public static String mLanguage = "chs-eng";
+	public static String mLanguage = "zho-eng";
 	// 测试使用的文件
-	public static String mTxtFile = "chs.txt";
+	public static String mTxtFile = "zho.txt";
 	// 结果保存文件
 	public static String mOutFile =  mTxtFile + "_out.txt";
 	// 是否将结果保存到文件

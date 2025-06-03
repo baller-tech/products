@@ -209,8 +209,9 @@ host:api.baller-tech.com
 | mary         | 英语（英音）   | 支持 |
 | elise        | 英语（美音）   | 支持 |
 | regina       | 英语（美音）   | 支持 |
-| aodeng       | 蒙语（传统）   | 支持 |
-| qimuge       | 蒙语（传统）   | 支持 |
+| chana       | 蒙语（传统）   | 支持 |
+| gerile       | 蒙语（传统）   | 支持 |
+| danba       | 蒙语（传统）   | 支持 |
 | tana         | 蒙语（西里尔） | 支持 |
 | suolangcuomu | 藏语（卫藏）   | 支持 |
 | gesangwangmu | 藏语（卫藏）   | 支持 |
